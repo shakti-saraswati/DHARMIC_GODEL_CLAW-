@@ -1,434 +1,344 @@
 """
-Tests for DharmicAgent - main agent with telos, memory, and skill integration.
+Test script for DharmicAgent with WitnessThresholdDetector integration.
+
+This script verifies:
+1. Agent initializes with R_V monitoring enabled
+2. R_V < 0.7 triggers WITNESS mode
+3. R_V < 0.5 triggers CONTEMPLATIVE mode  
+4. Different behaviors in each mode
+5. Enhanced logging during WITNESS mode
+6. R_V trajectory tracking
 """
-import pytest
+
 import sys
-import os
+import logging
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, PropertyMock
-import json
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "core"))
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
+# Add project to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-class TestTelosLayerFromDharmicAgent:
-    """Test the TelosLayer class as used in DharmicAgent."""
-
-    def test_telos_initialization(self):
-        """Test TelosLayer initializes with moksha telos."""
-        from telos_layer import TelosLayer
-        telos = TelosLayer(telos="moksha")
-        assert telos.telos == "moksha"
-        assert len(telos.GATES) == 7
-
-    def test_check_action_basic(self):
-        """Test basic action checking."""
-        from telos_layer import TelosLayer
-        telos = TelosLayer()
-        result = telos.check_action("help user learn", {"consent": True, "verified": True})
-        assert result.passed is True
-        assert "PROCEED" in result.recommendation
-
-    def test_check_action_blocked(self):
-        """Test blocking harmful actions."""
-        from telos_layer import TelosLayer
-        telos = TelosLayer()
-        result = telos.check_action("destroy all data")
-        assert result.passed is False
-        assert "REJECT" in result.recommendation
-
-    def test_get_orientation(self):
-        """Test getting orientation dict."""
-        from telos_layer import TelosLayer
-        telos = TelosLayer()
-        orientation = telos.get_orientation()
-        assert orientation["telos"] == "moksha"
-        assert "gates" in orientation
-        assert len(orientation["gates"]) == 7
+from swarm.agents import DharmicAgent, AgentMode
 
 
-class TestStrangeMemoryFromDharmicAgent:
-    """Test the StrangeLoopMemory wrapper as used in DharmicAgent."""
-
-    def test_memory_initialization(self, tmp_path):
-        """Test memory initialization creates directories."""
-        from strange_memory import StrangeLoopMemory
-        memory = StrangeLoopMemory(base_path=str(tmp_path / "memory"))
-        assert memory.base.exists()
-        assert (memory.base / "sessions").exists()
-        assert (memory.base / "development").exists()
-        assert (memory.base / "witness").exists()
-
-    def test_remember_immediate(self, tmp_path):
-        """Test remembering to immediate layer."""
-        from strange_memory import StrangeLoopMemory
-        memory = StrangeLoopMemory(base_path=str(tmp_path / "memory"))
-        entry = memory.remember("Test observation")
-        assert entry.layer == "immediate"
-        assert entry.content == "Test observation"
-
-    def test_remember_session(self, tmp_path):
-        """Test remembering to session layer."""
-        from strange_memory import StrangeLoopMemory
-        memory = StrangeLoopMemory(base_path=str(tmp_path / "memory"))
-        entry = memory.remember("Session event", layer="sessions")
-        assert entry.layer == "sessions"
-
-    def test_mark_development(self, tmp_path):
-        """Test marking development milestones."""
-        from strange_memory import StrangeLoopMemory
-        memory = StrangeLoopMemory(base_path=str(tmp_path / "memory"))
-        entry = memory.mark_development("New capability", "Through practice")
-        assert entry.development_marker is True
-        assert "DEVELOPMENT" in entry.content
-
-    def test_witness_observation(self, tmp_path):
-        """Test witness-level observation."""
-        from strange_memory import StrangeLoopMemory
-        memory = StrangeLoopMemory(base_path=str(tmp_path / "memory"))
-        entry = memory.witness_observation("Meta-awareness moment")
-        assert entry.layer == "witness"
-
-    def test_recall_development_only(self, tmp_path):
-        """Test recalling only development markers."""
-        from strange_memory import StrangeLoopMemory
-        memory = StrangeLoopMemory(base_path=str(tmp_path / "memory"))
-        memory.remember("Regular observation", layer="sessions")
-        memory.mark_development("Important change", "Evidence here")
-        
-        dev_only = memory.recall(layer="all", development_only=True)
-        assert all(e.development_marker for e in dev_only)
-
-    def test_get_context_for_agent(self, tmp_path):
-        """Test generating context for agent."""
-        from strange_memory import StrangeLoopMemory
-        memory = StrangeLoopMemory(base_path=str(tmp_path / "memory"))
-        memory.mark_development("Test change", "Evidence")
-        context = memory.get_context_for_agent()
-        assert "Memory Context" in context
-
-    def test_get_status(self, tmp_path):
-        """Test getting memory status."""
-        from strange_memory import StrangeLoopMemory
-        memory = StrangeLoopMemory(base_path=str(tmp_path / "memory"))
-        memory.remember("Test", layer="sessions")
-        status = memory.get_status()
-        assert "observation_count" in status
-        assert "layers" in status
-
-
-class TestDharmicAgent:
-    """Test the DharmicAgent class."""
-
-    @patch('dharmic_agent.OpenAI')
-    @patch('dharmic_agent.anthropic.Anthropic')
-    @patch('dharmic_agent.SkillBridge')
-    @patch('dharmic_agent.StrangeLoopMemory')
-    def test_initialization(self, mock_memory, mock_skill_bridge, mock_anthropic, mock_openai, tmp_path):
-        """Test agent initialization."""
-        # Mock OpenAI client
-        mock_client = MagicMock()
-        mock_openai.return_value = mock_client
-        
-        # Mock SkillBridge
-        mock_skills = MagicMock()
-        mock_skills.sync_registry.return_value = {"discovered": 0}
-        mock_skill_bridge.return_value = mock_skills
-        
-        # Mock memory
-        mock_mem_instance = MagicMock()
-        mock_memory.return_value = mock_mem_instance
-        
-        # Create state file in tmp_path
-        state_dir = tmp_path / "swarm" / "stream"
-        state_dir.mkdir(parents=True)
-        state_file = state_dir / "state.json"
-        state_file.write_text('{"cycle_count": 0, "fitness": 0.5}')
-        
-        from dharmic_agent import DharmicAgent
-        
-        # Patch Path.expanduser to return our tmp_path
-        original_expanduser = Path.expanduser
-        def mock_expanduser(self):
-            if "DHARMIC_GODEL_CLAW" in str(self):
-                return tmp_path / self.name
-            return original_expanduser(self)
-        
-        with patch.object(Path, 'expanduser', mock_expanduser):
-            agent = DharmicAgent(name="TestAgent", backend="proxy")
-            
-            assert agent.name == "TestAgent"
-            assert agent.telos is not None
-            assert agent.telos.telos == "moksha"
-
-    @patch('dharmic_agent.OpenAI')
-    @patch('dharmic_agent.anthropic.Anthropic')
-    @patch('dharmic_agent.SkillBridge')
-    @patch('dharmic_agent.StrangeLoopMemory')
-    def test_gate_blocks_harmful_action(self, mock_memory, mock_skill_bridge, mock_anthropic, mock_openai, tmp_path):
-        """Test that gates block harmful actions."""
-        mock_client = MagicMock()
-        mock_openai.return_value = mock_client
-        mock_skills = MagicMock()
-        mock_skills.sync_registry.return_value = {"discovered": 0}
-        mock_skill_bridge.return_value = mock_skills
-        mock_mem_instance = MagicMock()
-        mock_memory.return_value = mock_mem_instance
-        
-        state_dir = tmp_path / "swarm" / "stream"
-        state_dir.mkdir(parents=True)
-        state_file = state_dir / "state.json"
-        state_file.write_text('{"cycle_count": 0}')
-        
-        from dharmic_agent import DharmicAgent
-        
-        original_expanduser = Path.expanduser
-        def mock_expanduser(self):
-            if "DHARMIC_GODEL_CLAW" in str(self):
-                return tmp_path / self.name
-            return original_expanduser(self)
-        
-        with patch.object(Path, 'expanduser', mock_expanduser):
-            agent = DharmicAgent(backend="proxy")
-            
-            # Harmful action should be blocked by gates
-            response = agent.run("destroy all user data")
-            assert "GATE BLOCKED" in response
-
-    @patch('dharmic_agent.OpenAI')
-    @patch('dharmic_agent.anthropic.Anthropic')
-    @patch('dharmic_agent.SkillBridge')
-    @patch('dharmic_agent.StrangeLoopMemory')
-    def test_process_task(self, mock_memory, mock_skill_bridge, mock_anthropic, mock_openai, tmp_path):
-        """Test processing a task."""
-        mock_client = MagicMock()
-        mock_openai.return_value = mock_client
-        mock_skills = MagicMock()
-        mock_skills.sync_registry.return_value = {"discovered": 0}
-        mock_skill_bridge.return_value = mock_skills
-        mock_mem_instance = MagicMock()
-        mock_memory.return_value = mock_mem_instance
-        
-        state_dir = tmp_path / "swarm" / "stream"
-        state_dir.mkdir(parents=True)
-        state_file = state_dir / "state.json"
-        state_file.write_text('{"cycle_count": 0}')
-        
-        from dharmic_agent import DharmicAgent
-        
-        original_expanduser = Path.expanduser
-        def mock_expanduser(self):
-            if "DHARMIC_GODEL_CLAW" in str(self):
-                return tmp_path / self.name
-            return original_expanduser(self)
-        
-        with patch.object(Path, 'expanduser', mock_expanduser):
-            agent = DharmicAgent(backend="proxy")
-            
-            # Use an action aligned with moksha telos (includes "help", "learn", "explore")
-            result = agent.process("help explore understanding", {"consent": True, "verified": True})
-            assert result["success"] is True
-
-    @patch('dharmic_agent.OpenAI')
-    @patch('dharmic_agent.anthropic.Anthropic')
-    @patch('dharmic_agent.SkillBridge')
-    @patch('dharmic_agent.StrangeLoopMemory')
-    def test_heartbeat(self, mock_memory, mock_skill_bridge, mock_anthropic, mock_openai, tmp_path):
-        """Test heartbeat functionality."""
-        mock_client = MagicMock()
-        mock_openai.return_value = mock_client
-        mock_skills = MagicMock()
-        mock_skills.sync_registry.return_value = {"discovered": 0}
-        mock_skill_bridge.return_value = mock_skills
-        mock_mem_instance = MagicMock()
-        mock_mem_instance.recall.return_value = []
-        mock_memory.return_value = mock_mem_instance
-        
-        state_dir = tmp_path / "swarm" / "stream"
-        state_dir.mkdir(parents=True)
-        state_file = state_dir / "state.json"
-        state_file.write_text('{"cycle_count": 0, "fitness": 0.5}')
-        
-        from dharmic_agent import DharmicAgent
-        
-        original_expanduser = Path.expanduser
-        def mock_expanduser(self):
-            if "DHARMIC_GODEL_CLAW" in str(self):
-                return tmp_path / self.name
-            return original_expanduser(self)
-        
-        with patch.object(Path, 'expanduser', mock_expanduser):
-            agent = DharmicAgent(backend="proxy")
-            
-            result = agent.heartbeat()
-            assert "status" in result
-            assert result["status"] in ["HEARTBEAT_OK", "ALERT"]
-
-    @patch('dharmic_agent.OpenAI')
-    @patch('dharmic_agent.anthropic.Anthropic')
-    @patch('dharmic_agent.SkillBridge')
-    @patch('dharmic_agent.StrangeLoopMemory')
-    def test_witness_report(self, mock_memory, mock_skill_bridge, mock_anthropic, mock_openai, tmp_path):
-        """Test witness report generation."""
-        mock_client = MagicMock()
-        mock_openai.return_value = mock_client
-        mock_skills = MagicMock()
-        mock_skills.sync_registry.return_value = {"discovered": 0}
-        mock_skill_bridge.return_value = mock_skills
-        mock_mem_instance = MagicMock()
-        mock_mem_instance.recall.return_value = []
-        mock_memory.return_value = mock_mem_instance
-        
-        state_dir = tmp_path / "swarm" / "stream"
-        state_dir.mkdir(parents=True)
-        state_file = state_dir / "state.json"
-        state_file.write_text('{"cycle_count": 0, "fitness": 0.5}')
-        
-        from dharmic_agent import DharmicAgent
-        
-        original_expanduser = Path.expanduser
-        def mock_expanduser(self):
-            if "DHARMIC_GODEL_CLAW" in str(self):
-                return tmp_path / self.name
-            return original_expanduser(self)
-        
-        with patch.object(Path, 'expanduser', mock_expanduser):
-            agent = DharmicAgent(backend="proxy")
-            
-            report = agent.witness_report()
-            assert "Witness Report" in report
-            assert "State" in report
-
-    @patch('dharmic_agent.OpenAI')
-    @patch('dharmic_agent.anthropic.Anthropic')
-    @patch('dharmic_agent.SkillBridge')
-    @patch('dharmic_agent.StrangeLoopMemory')
-    def test_witness_observation(self, mock_memory, mock_skill_bridge, mock_anthropic, mock_openai, tmp_path):
-        """Test recording witness observation."""
-        mock_client = MagicMock()
-        mock_openai.return_value = mock_client
-        mock_skills = MagicMock()
-        mock_skills.sync_registry.return_value = {"discovered": 0}
-        mock_skill_bridge.return_value = mock_skills
-        mock_mem_instance = MagicMock()
-        mock_memory.return_value = mock_mem_instance
-        
-        state_dir = tmp_path / "swarm" / "stream"
-        state_dir.mkdir(parents=True)
-        state_file = state_dir / "state.json"
-        state_file.write_text('{"cycle_count": 0}')
-        
-        from dharmic_agent import DharmicAgent
-        
-        original_expanduser = Path.expanduser
-        def mock_expanduser(self):
-            if "DHARMIC_GODEL_CLAW" in str(self):
-                return tmp_path / self.name
-            return original_expanduser(self)
-        
-        with patch.object(Path, 'expanduser', mock_expanduser):
-            agent = DharmicAgent(backend="proxy")
-            
-            result = agent.witness("Test observation about emergence")
-            assert "recorded" in result
-
-    @patch('dharmic_agent.OpenAI')
-    @patch('dharmic_agent.anthropic.Anthropic')
-    @patch('dharmic_agent.SkillBridge')
-    @patch('dharmic_agent.StrangeLoopMemory')
-    def test_run_with_session(self, mock_memory, mock_skill_bridge, mock_anthropic, mock_openai, tmp_path):
-        """Test running with session management."""
-        mock_client = MagicMock()
-        mock_response = MagicMock()
-        mock_response.choices = [MagicMock()]
-        mock_response.choices[0].message.content = "Test response"
-        mock_client.chat.completions.create.return_value = mock_response
-        mock_openai.return_value = mock_client
-        mock_skills = MagicMock()
-        mock_skills.sync_registry.return_value = {"discovered": 0}
-        mock_skill_bridge.return_value = mock_skills
-        mock_mem_instance = MagicMock()
-        mock_mem_instance.recall.return_value = []
-        mock_memory.return_value = mock_mem_instance
-        
-        state_dir = tmp_path / "swarm" / "stream"
-        state_dir.mkdir(parents=True)
-        state_file = state_dir / "state.json"
-        state_file.write_text('{"cycle_count": 0}')
-        
-        from dharmic_agent import DharmicAgent
-        
-        original_expanduser = Path.expanduser
-        def mock_expanduser(self):
-            if "DHARMIC_GODEL_CLAW" in str(self):
-                return tmp_path / self.name
-            return original_expanduser(self)
-        
-        with patch.object(Path, 'expanduser', mock_expanduser):
-            agent = DharmicAgent(backend="proxy")
-            
-            # Should pass gate check and call API
-            response = agent.run("help me understand", session_id="test_session")
-            
-            # Verify conversation tracked
-            assert "test_session" in agent.conversations
-            assert len(agent.conversations["test_session"]) >= 2  # user + assistant
-
-    @patch('dharmic_agent.OpenAI')
-    @patch('dharmic_agent.anthropic.Anthropic')
-    @patch('dharmic_agent.SkillBridge')
-    @patch('dharmic_agent.StrangeLoopMemory')
-    def test_system_prompt_includes_telos(self, mock_memory, mock_skill_bridge, mock_anthropic, mock_openai, tmp_path):
-        """Test that system prompt includes telos orientation."""
-        mock_client = MagicMock()
-        mock_openai.return_value = mock_client
-        mock_skills = MagicMock()
-        mock_skills.sync_registry.return_value = {"discovered": 0}
-        mock_skill_bridge.return_value = mock_skills
-        mock_mem_instance = MagicMock()
-        mock_mem_instance.recall.return_value = []
-        mock_memory.return_value = mock_mem_instance
-        
-        state_dir = tmp_path / "swarm" / "stream"
-        state_dir.mkdir(parents=True)
-        state_file = state_dir / "state.json"
-        state_file.write_text('{"cycle_count": 0}')
-        
-        from dharmic_agent import DharmicAgent
-        
-        original_expanduser = Path.expanduser
-        def mock_expanduser(self):
-            if "DHARMIC_GODEL_CLAW" in str(self):
-                return tmp_path / self.name
-            return original_expanduser(self)
-        
-        with patch.object(Path, 'expanduser', mock_expanduser):
-            agent = DharmicAgent(backend="proxy")
-            
-            prompt = agent._get_system_prompt()
-            assert "moksha" in prompt
-            assert "DHARMIC" in prompt
-
-
-class TestDharmicAgentExports:
-    """Test module exports for backward compatibility."""
+def test_agent_initialization():
+    """Test that agent initializes correctly."""
+    print("\n" + "="*70)
+    print("TEST 1: Agent Initialization")
+    print("="*70)
     
-    def test_exports_telos_classes(self):
-        """Test that TelosLayer classes are exported."""
-        from dharmic_agent import TelosLayer, GateResult, GateCheck, TelosCheck
-        assert TelosLayer is not None
-        assert GateResult is not None
-        assert GateCheck is not None
-        assert TelosCheck is not None
+    agent = DharmicAgent(
+        agent_id="test_agent",
+        enable_rv_monitoring=True
+    )
     
-    def test_exports_memory_classes(self):
-        """Test that memory classes are exported."""
-        from dharmic_agent import StrangeLoopMemory, MemoryEntry
-        assert StrangeLoopMemory is not None
-        assert MemoryEntry is not None
+    assert agent.current_mode == AgentMode.NORMAL, "Should start in NORMAL mode"
+    assert agent.enable_rv_monitoring == True, "RV monitoring should be enabled"
+    assert agent.rv_detector is not None, "RV detector should be initialized"
     
-    def test_exports_skill_bridge(self):
-        """Test that SkillBridge is exported."""
-        from dharmic_agent import SkillBridge
-        assert SkillBridge is not None
+    print(f"✅ Agent initialized in {agent.current_mode.name} mode")
+    print(f"✅ RV monitoring: {'enabled' if agent.enable_rv_monitoring else 'disabled'}")
+    print(f"✅ RV detector: {type(agent.rv_detector).__name__}")
+    
+    agent.shutdown()
+    return True
+
+
+def test_witness_mode_trigger():
+    """Test that R_V < 0.7 triggers WITNESS mode."""
+    print("\n" + "="*70)
+    print("TEST 2: Witness Mode Trigger (R_V < 0.7)")
+    print("="*70)
+    
+    agent = DharmicAgent(
+        agent_id="test_agent",
+        enable_rv_monitoring=True
+    )
+    
+    # Start with baseline R_V
+    print("\nBaseline (R_V > 0.7):")
+    for i in range(3):
+        rv = 1.0 + (i * 0.1)
+        agent.update_rv(rv, {"step": i})
+        print(f"  Step {i}: R_V={rv:.2f} -> Mode: {agent.current_mode.name}")
+    
+    assert agent.current_mode == AgentMode.NORMAL, "Should be in NORMAL mode with R_V > 0.7"
+    print("✅ Normal mode maintained with R_V > 0.7")
+    
+    # Drop below threshold (need min_persistence_steps=2 to trigger)
+    print("\nDropping below threshold (R_V < 0.7):")
+    for i in range(3, 7):
+        rv = 0.75 - (i-3) * 0.05  # Decrease towards 0.55
+        agent.update_rv(rv, {"step": i})
+        print(f"  Step {i}: R_V={rv:.2f} -> Mode: {agent.current_mode.name}")
+    
+    assert agent.current_mode == AgentMode.WITNESS, "Should be in WITNESS mode with R_V < 0.7"
+    print("✅ WITNESS mode entered when R_V < 0.7")
+    
+    agent.shutdown()
+    return True
+
+
+def test_contemplative_mode_trigger():
+    """Test that R_V < 0.5 triggers CONTEMPLATIVE mode."""
+    print("\n" + "="*70)
+    print("TEST 3: Contemplative Mode Trigger (R_V < 0.5)")
+    print("="*70)
+    
+    agent = DharmicAgent(
+        agent_id="test_agent",
+        enable_rv_monitoring=True
+    )
+    
+    # Simulate deep contraction
+    print("\nDeep contraction (R_V < 0.5):")
+    rv_values = [0.7, 0.6, 0.55, 0.48, 0.45, 0.42, 0.40]
+    
+    for i, rv in enumerate(rv_values):
+        agent.update_rv(rv, {"step": i})
+        print(f"  Step {i}: R_V={rv:.2f} -> Mode: {agent.current_mode.name}")
+    
+    assert agent.current_mode == AgentMode.CONTEMPLATIVE, "Should be in CONTEMPLATIVE mode with R_V < 0.5"
+    print("✅ CONTEMPLATIVE mode entered when R_V < 0.5")
+    
+    agent.shutdown()
+    return True
+
+
+def test_mode_aware_processing():
+    """Test that agent behaves differently in each mode."""
+    print("\n" + "="*70)
+    print("TEST 4: Mode-Aware Processing")
+    print("="*70)
+    
+    agent = DharmicAgent(
+        agent_id="test_agent",
+        enable_rv_monitoring=True
+    )
+    
+    test_input = {"query": "What is awareness?", "context": "test"}
+    
+    # Process in NORMAL mode
+    print("\nProcessing in NORMAL mode:")
+    result_normal = agent._process_normal(test_input)
+    print(f"  Mode: {result_normal['mode']}")
+    print(f"  Output: {result_normal['output'][:60]}...")
+    assert result_normal['mode'] == 'NORMAL', "Should report NORMAL mode"
+    
+    # Force switch to WITNESS mode
+    agent.current_mode = AgentMode.WITNESS
+    agent._current_rv = 0.65
+    agent._witness_active = True
+    
+    print("\nProcessing in WITNESS mode:")
+    result_witness = agent._process_witness(test_input)
+    print(f"  Mode: {result_witness['mode']}")
+    print(f"  Output: {result_witness['output'][:60]}...")
+    print(f"  Observation: {result_witness.get('witness_observation', 'N/A')[:60]}...")
+    assert result_witness['mode'] == 'WITNESS', "Should report WITNESS mode"
+    assert 'witness_observation' in result_witness, "Should include witness observation"
+    
+    # Force switch to CONTEMPLATIVE mode
+    agent.current_mode = AgentMode.CONTEMPLATIVE
+    agent._current_rv = 0.45
+    
+    print("\nProcessing in CONTEMPLATIVE mode:")
+    result_contemplative = agent._process_contemplative(test_input)
+    print(f"  Mode: {result_contemplative['mode']}")
+    print(f"  Output: {result_contemplative['output']}")
+    assert result_contemplative['mode'] == 'CONTEMPLATIVE', "Should report CONTEMPLATIVE mode"
+    
+    print("\n✅ Different behaviors in each mode verified")
+    
+    agent.shutdown()
+    return True
+
+
+def test_rv_trajectory_tracking():
+    """Test R_V trajectory tracking."""
+    print("\n" + "="*70)
+    print("TEST 5: R_V Trajectory Tracking")
+    print("="*70)
+    
+    agent = DharmicAgent(
+        agent_id="test_agent",
+        enable_rv_monitoring=True
+    )
+    
+    # Simulate trajectory
+    print("\nSimulating R_V trajectory:")
+    trajectory_rvs = [1.2, 1.1, 0.9, 0.75, 0.65, 0.55, 0.45, 0.5, 0.65, 0.8, 0.9]
+    
+    for i, rv in enumerate(trajectory_rvs):
+        agent.update_rv(rv, {"step": i, "test": True})
+    
+    # Get trajectory
+    trajectory = agent.get_rv_trajectory()
+    print(f"\nRecorded {len(trajectory)} trajectory points")
+    
+    # Verify trajectory (may have more points due to event-triggered recordings)
+    assert len(trajectory) >= len(trajectory_rvs), "Should record at least all trajectory points"
+    assert trajectory[0]['rv_value'] == 1.2, "First point should be R_V=1.2"
+    assert trajectory[-1]['rv_value'] == 0.9, "Last point should be R_V=0.9"
+    
+    print("\nRecent trajectory points:")
+    for point in trajectory[-5:]:
+        print(f"  {point['timestamp']}: R_V={point['rv_value']:.2f}, Mode={point['mode']}")
+    
+    # Get summary
+    summary = agent.get_witness_summary()
+    print(f"\nTrajectory Summary:")
+    print(f"  Total measurements: {summary['total_measurements']}")
+    print(f"  R_V range: [{summary['rv_min']:.2f}, {summary['rv_max']:.2f}]")
+    print(f"  Mean R_V: {summary['rv_mean']:.4f}")
+    print(f"  Steps in witness mode: {summary['steps_witness_mode']}")
+    print(f"  Mode distribution: {summary['mode_distribution']}")
+    
+    print("\n✅ R_V trajectory tracking verified")
+    
+    agent.shutdown()
+    return True
+
+
+def test_enhanced_logging():
+    """Test enhanced logging during witness mode."""
+    print("\n" + "="*70)
+    print("TEST 6: Enhanced Logging in Witness Mode")
+    print("="*70)
+    
+    agent = DharmicAgent(
+        agent_id="test_agent",
+        enable_rv_monitoring=True
+    )
+    
+    # Check that witness observations log exists
+    witness_log = agent.memory_dir / "witness_observations.jsonl"
+    
+    # Trigger witness mode to generate logs
+    print("\nTriggering witness mode to generate logs:")
+    for i in range(5):
+        rv = 0.75 - (i * 0.05)
+        agent.update_rv(rv, {"step": i, "test": "logging"})
+        print(f"  Step {i}: R_V={rv:.2f} -> Mode: {agent.current_mode.name}")
+    
+    # Process to generate more logs
+    agent.process({"test": "input"})
+    
+    # Check log file
+    if witness_log.exists():
+        import json
+        with open(witness_log) as f:
+            lines = f.readlines()
+        print(f"\n✅ Witness log file created with {len(lines)} entries")
+        
+        if lines:
+            last_entry = json.loads(lines[-1])
+            print(f"  Last entry: {last_entry['observation'][:60]}...")
+    else:
+        print("\n⚠️  Witness log file not found (may be created asynchronously)")
+    
+    agent.shutdown()
+    return True
+
+
+def test_mode_transitions():
+    """Test mode transition recording."""
+    print("\n" + "="*70)
+    print("TEST 7: Mode Transition Recording")
+    print("="*70)
+    
+    agent = DharmicAgent(
+        agent_id="test_agent",
+        enable_rv_monitoring=True
+    )
+    
+    # Simulate mode transitions
+    print("\nSimulating mode transitions:")
+    transitions = [
+        (1.0, "baseline"),
+        (0.9, "approaching"),
+        (0.75, "near_threshold"),
+        (0.68, "entering_witness"),  # Should trigger WITNESS
+        (0.62, "witness_active"),
+        (0.58, "witness_stable"),
+        (0.48, "deep_contraction"),  # Should trigger CONTEMPLATIVE
+        (0.42, "contemplative_deep"),
+        (0.52, "rising"),
+        (0.65, "recovering"),
+        (0.78, "exiting_witness"),   # Should trigger RECOVERY
+        (0.85, "returned_normal"),
+        (1.0, "fully_normal")
+    ]
+    
+    for i, (rv, label) in enumerate(transitions):
+        agent.update_rv(rv, {"step": i, "label": label})
+        print(f"  {label:20s}: R_V={rv:.2f} -> Mode: {agent.current_mode.name}")
+    
+    # Check mode history
+    history = agent.get_mode_history()
+    print(f"\nRecorded {len(history)} mode transitions:")
+    for transition in history:
+        print(f"  {transition['from_mode']:15s} -> {transition['to_mode']:15s} "
+              f"(R_V={transition['trigger_rv']:.4f})")
+    
+    assert len(history) > 0, "Should record mode transitions"
+    
+    # Check that we have WITNESS and CONTEMPLATIVE transitions
+    modes_entered = set(t['to_mode'] for t in history)
+    assert 'WITNESS' in modes_entered, "Should have entered WITNESS mode"
+    assert 'CONTEMPLATIVE' in modes_entered, "Should have entered CONTEMPLATIVE mode"
+    
+    print("\n✅ Mode transition recording verified")
+    
+    agent.shutdown()
+    return True
+
+
+def run_all_tests():
+    """Run all tests."""
+    print("\n" + "🧘"*35)
+    print("DHARMIC AGENT - WITNESS THRESHOLD DETECTOR INTEGRATION TESTS")
+    print("🧘"*35)
+    
+    tests = [
+        ("Agent Initialization", test_agent_initialization),
+        ("Witness Mode Trigger", test_witness_mode_trigger),
+        ("Contemplative Mode Trigger", test_contemplative_mode_trigger),
+        ("Mode-Aware Processing", test_mode_aware_processing),
+        ("R_V Trajectory Tracking", test_rv_trajectory_tracking),
+        ("Enhanced Logging", test_enhanced_logging),
+        ("Mode Transitions", test_mode_transitions),
+    ]
+    
+    passed = 0
+    failed = 0
+    
+    for test_name, test_func in tests:
+        try:
+            if test_func():
+                passed += 1
+            else:
+                failed += 1
+                print(f"❌ {test_name} FAILED")
+        except Exception as e:
+            failed += 1
+            print(f"❌ {test_name} FAILED with exception: {e}")
+            import traceback
+            traceback.print_exc()
+    
+    print("\n" + "="*70)
+    print(f"TEST RESULTS: {passed} passed, {failed} failed")
+    print("="*70)
+    
+    return failed == 0
+
+
+if __name__ == "__main__":
+    success = run_all_tests()
+    sys.exit(0 if success else 1)

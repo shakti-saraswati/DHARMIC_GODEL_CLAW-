@@ -228,8 +228,6 @@ def scan_skills(
         ],
     }
 
-    EVIDENCE_PATH.write_text(json.dumps(report, indent=2))
-
     should_fail = False
     for result in results:
         for finding in result.findings or []:
@@ -249,7 +247,39 @@ def scan_skills(
                 src = Path(file_scan.path)
                 if not src.exists():
                     continue
-                dest_name = f\"{result.skill_id.replace(':', '_')}__{src.name}__{file_scan.sha256[:12]}\"\n                dest = quarantine_dir / dest_name\n                try:\n                    shutil.copy2(src, dest)\n                    quarantined.append({\n                        \"skill_id\": result.skill_id,\n                        \"source\": str(src),\n                        \"dest\": str(dest),\n                        \"sha256\": file_scan.sha256,\n                    })\n                except Exception:\n                    continue\n+\n+    report[\"quarantine\"] = {\n+        \"enabled\": bool(quarantine_dir),\n+        \"dir\": str(quarantine_dir) if quarantine_dir else \"\",\n+        \"quarantined_files\": quarantined,\n+    }\n+\n+    return {\"report\": report, \"should_fail\": should_fail, \"quarantined\": quarantined}
+                path_fingerprint = hashlib.sha256(str(src).encode("utf-8")).hexdigest()[:8]
+                dest_name = f"{result.skill_id.replace(':', '_')}__{src.name}__{path_fingerprint}__{file_scan.sha256[:12]}"
+                dest = quarantine_dir / dest_name
+                try:
+                    if dest.exists():
+                        quarantined.append({
+                            "skill_id": result.skill_id,
+                            "source": str(src),
+                            "dest": str(dest),
+                            "sha256": file_scan.sha256,
+                            "status": "exists",
+                        })
+                        continue
+                    shutil.copy2(src, dest)
+                    quarantined.append({
+                        "skill_id": result.skill_id,
+                        "source": str(src),
+                        "dest": str(dest),
+                        "sha256": file_scan.sha256,
+                        "status": "copied",
+                    })
+                except Exception:
+                    continue
+
+    report["quarantine"] = {
+        "enabled": bool(quarantine_dir),
+        "dir": str(quarantine_dir) if quarantine_dir else "",
+        "quarantined_files": quarantined,
+    }
+
+    EVIDENCE_PATH.write_text(json.dumps(report, indent=2))
+
+    return {"report": report, "should_fail": should_fail, "quarantined": quarantined}
 
 
 def main() -> None:

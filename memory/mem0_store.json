@@ -20,5 +20,41 @@
         "layer": "core_identity"
       }
     }
+  ],
+  "dhyana": [
+    {
+      "id": "e271d957adde",
+      "memory": "User prefers dark mode",
+      "user_id": "dhyana",
+      "created_at": "2026-02-04T21:29:53.627566",
+      "metadata": {
+        "layer": "semantic",
+        "tags": [
+          "preference"
+        ]
+      }
+    },
+    {
+      "id": "4ba8f4f19ff8",
+      "memory": "Completed task today",
+      "user_id": "dhyana",
+      "created_at": "2026-02-04T21:29:53.739057",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "task"
+        ]
+      }
+    },
+    {
+      "id": "01f5f81aa448",
+      "memory": "Test memory",
+      "user_id": "dhyana",
+      "created_at": "2026-02-04T21:30:23.228973",
+      "metadata": {
+        "layer": "semantic",
+        "tags": []
+      }
+    }
   ]
 }

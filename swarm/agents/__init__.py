@@ -7,6 +7,7 @@ from .tester import TesterAgent
 from .refiner import RefinerAgent
 from .evolver import EvolverAgent
 from .dharmic_gate import DharmicGateAgent
+from .dharmic_agent import DharmicAgent, AgentMode
 
 __all__ = [
     "BaseAgent",
@@ -16,5 +17,7 @@ __all__ = [
     "TesterAgent",
     "RefinerAgent",
     "EvolverAgent",
-    "DharmicGateAgent"
+    "DharmicGateAgent",
+    "DharmicAgent",
+    "AgentMode"
 ]

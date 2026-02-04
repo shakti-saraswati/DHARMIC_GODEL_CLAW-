@@ -1,0 +1,26 @@
+[
+  {
+    "id": "2b41aca3e6b7969a",
+    "content": "Skill: semantic_search\nUse embeddings for search\nSteps:\n1. embed\n2. search",
+    "layer": "procedural",
+    "timestamp": "2026-02-04T21:29:53.775374Z",
+    "user_id": "dhyana",
+    "agent_id": "dharmic_claw",
+    "session_id": null,
+    "tags": [
+      "skill",
+      "semantic_search"
+    ],
+    "source": "procedural",
+    "confidence": 1.0,
+    "witness_quality": null,
+    "development_marker": false,
+    "genuine_confidence": 0.5,
+    "skill_name": "semantic_search",
+    "workflow_step": null,
+    "success_count": 1,
+    "failure_count": 0,
+    "last_accessed": null,
+    "access_count": 0
+  }
+]

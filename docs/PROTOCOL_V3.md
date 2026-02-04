@@ -532,6 +532,7 @@ The protocol integrates with the existing DHARMIC_GODEL_CLAW swarm:
 | `swarm/policy/` | Rate limits, costs, approvals |
 | `swarm/skill_supply_chain.py` | Skill supply-chain scanner |
 | `swarm/policy/skill_supply_chain.yaml` | Skill supply-chain policy |
+| `swarm/skill_registry.yaml` | Signed skill registry (hash-pinned) |
 | `.pre-commit-config.yaml` | Local hooks |
 | `.github/workflows/gates.yml` | CI workflow (HUMAN-ONLY) |
 | `evidence/` | Gate evidence bundles |
@@ -544,7 +545,7 @@ The protocol integrates with the existing DHARMIC_GODEL_CLAW swarm:
 - Initial hardened protocol
 - 17 gates (8 technical, 7 dharmic, 2 supply-chain)
 - ML overlay for ML-touched code
-- Skill overlay: signed registry + supply-chain scanner
+- Skill overlay: signed registry + hash pinning + supply-chain scanner (+ quarantine support)
 - Rate limits and cost tracking
 - Approval timeouts
 - File locking for multi-agent safety

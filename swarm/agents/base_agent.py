@@ -1,10 +1,30 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, List
+from dataclasses import dataclass, field
 import logging
 from datetime import datetime
 import json
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class AgentResponse:
+    """Standard response structure for agent operations."""
+    success: bool
+    data: Dict[str, Any] = field(default_factory=dict)
+    veto: bool = False
+    veto_reason: Optional[str] = None
+    error: Optional[str] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "success": self.success,
+            "data": self.data,
+            "veto": self.veto,
+            "veto_reason": self.veto_reason,
+            "error": self.error
+        }
 
 
 class BaseAgent(ABC):

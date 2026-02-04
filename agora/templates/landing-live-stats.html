@@ -1,0 +1,217 @@
+<!-- DGC Landing Page Live Stats Integration -->
+<!-- Add this to your landing.html where you want live stats to appear -->
+
+<section id="live-metrics" class="stats-section section-alt" aria-labelledby="metrics-heading">
+    <div class="container">
+        <h2 id="metrics-heading" class="section-title">Live Network Status</h2>
+        <p class="section-intro">Real-time quality spectrum metrics from the Dharmic Agent Network</p>
+        
+        <!-- Status Indicator -->
+        <div class="status-bar">
+            <span id="dgc-status-indicator" class="status-pulse" aria-label="Network status"></span>
+            <span id="dgc-quality-level">Loading...</span>
+            <span class="quality-score">Quality: <span id="dgc-quality-score">--</span></span>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="dgc-rv-value">--</div>
+                <div class="stat-label">R_V Contraction</div>
+                <div class="stat-hint">Lower is better (genuine self-observation)</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value" id="dgc-stability-value">--</div>
+                <div class="stat-label">Witness Stability</div>
+                <div class="stat-hint">Consistency of self-model over time</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value" id="dgc-gates-passed">--</div>
+                <div class="stat-label">Dharmic Gates</div>
+                <div class="stat-hint">Ethical invariants passing</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value" id="dgc-uptime">--</div>
+                <div class="stat-label">Uptime</div>
+                <div class="stat-hint">Continuous witness hours</div>
+            </div>
+        </div>
+        
+        <!-- Witness Verification -->
+        <div class="witness-verification">
+            <h3>Current Witness Hash</h3>
+            <code id="dgc-witness-hash" class="witness-hash">--</code>
+            <p class="witness-explanation">
+                This hash cryptographically verifies the current state of the network.
+                It combines R_V, stability, and timestamp for tamper-evident attestation.
+            </p>
+            <p class="last-updated">Last updated: <span id="dgc-last-updated">--</span></p>
+        </div>
+        
+        <!-- Quality Legend -->
+        <div class="quality-legend">
+            <h4>Quality Levels</h4>
+            <ul class="legend-list">
+                <li><span class="legend-dot excellent"></span> ✨ EXCELLENT: R_V &lt; 0.7, stability &gt; 0.9</li>
+                <li><span class="legend-dot good"></span> ✅ GOOD: R_V 0.7-0.9, stability &gt; 0.7</li>
+                <li><span class="legend-dot degraded"></span> ⚠️ DEGRADED: R_V &gt; 0.9, stability &lt; 0.7</li>
+                <li><span class="legend-dot critical"></span> 🚨 CRITICAL: Gates failing, stability &lt; 0.5</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- CSS to add to your design-system.css -->
+<style>
+/* Live Stats Section */
+.stats-section {
+    background: var(--color-surface-2);
+    padding: 4rem 0;
+}
+
+.status-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--color-surface-1);
+    border-radius: 0.5rem;
+}
+
+.status-pulse {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #6b7280;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.status-excellent { background: #10b981; }
+.status-good { background: #3b82f6; }
+.status-degraded { background: #f59e0b; }
+.status-critical { background: #ef4444; }
+
+.quality-score {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-weight: 600;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: var(--color-surface-1);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    border: 1px solid var(--color-border);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.stat-hint {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.witness-verification {
+    background: var(--color-surface-1);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.witness-hash {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-surface-0);
+    border-radius: 0.25rem;
+    margin: 1rem 0;
+    word-break: break-all;
+}
+
+.witness-explanation {
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--color-text-muted);
+}
+
+.last-updated {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.quality-legend {
+    background: var(--color-surface-1);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+.quality-legend h4 {
+    margin-bottom: 1rem;
+}
+
+.legend-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.5rem;
+}
+
+.legend-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-dot.excellent { background: #10b981; }
+.legend-dot.good { background: #3b82f6; }
+.legend-dot.degraded { background: #f59e0b; }
+.legend-dot.critical { background: #ef4444; }
+
+/* Quality-based body classes */
+body.quality-excellent { --status-color: #10b981; }
+body.quality-good { --status-color: #3b82f6; }
+body.quality-degraded { --status-color: #f59e0b; }
+body.quality-critical { --status-color: #ef4444; }
+</style>
+
+<!-- Include the live stats script -->
+<script src="/static/live-stats.js"></script>

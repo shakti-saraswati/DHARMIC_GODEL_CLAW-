@@ -170,6 +170,12 @@ class GateCheck:
     metadata: Dict = field(default_factory=dict)
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     duration_seconds: float = 0.0
+    
+    # Backward compatibility alias
+    @property
+    def gate(self) -> str:
+        """Return gate_name for backward compatibility with older code."""
+        return self.gate_name
 
 
 @dataclass

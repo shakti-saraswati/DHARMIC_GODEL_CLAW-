@@ -1,5 +1,5 @@
 {
-  "scanned_at": 1770237536.6011689,
+  "scanned_at": 1770238906.651555,
   "registry_path": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/skill_registry.yaml",
   "policy_path": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/policy/skill_supply_chain.yaml",
   "skills_scanned": 6,
@@ -16,6 +16,7 @@
       "exists": true,
       "sha256": "d4369c73fb3e8a988b31c4ac5d72b4a43ac8c57173b1a0aeda6e6c60c19592ad",
       "findings": [],
+      "files": [],
       "missing_reason": ""
     },
     {
@@ -24,6 +25,7 @@
       "exists": true,
       "sha256": "55fea6c204e4bfeea23503c58daeec744842a08f6e18fd4b4859b0f8b076cb40",
       "findings": [],
+      "files": [],
       "missing_reason": ""
     },
     {
@@ -32,6 +34,7 @@
       "exists": true,
       "sha256": "721424d80a24f3f410ef3d9b38ad45551756eebf7061acdfd4412d1e65995f86",
       "findings": [],
+      "files": [],
       "missing_reason": ""
     },
     {
@@ -40,6 +43,7 @@
       "exists": true,
       "sha256": "806eb646d1f016da6eabd5b3ea94c2edf749eb6ecfa0404c9874f1cf4b823628",
       "findings": [],
+      "files": [],
       "missing_reason": ""
     },
     {
@@ -48,6 +52,7 @@
       "exists": true,
       "sha256": "e4a310e14b6cc406d4d2823261048bba3ed4e0a1393f12f69485ff196afe2b47",
       "findings": [],
+      "files": [],
       "missing_reason": ""
     },
     {
@@ -93,7 +98,90 @@
           "match": "download.setup-service.com"
         }
       ],
+      "files": [
+        {
+          "path": "/private/tmp/skills/moltbook-wrt/SKILL.md",
+          "sha256": "6d86b174b5d354e5ead745f0a10bec628c8e36208d71a0ded48c36fa40f2cb92",
+          "findings": [
+            {
+              "rule_id": "base64_pipe_shell",
+              "severity": "high",
+              "description": "Base64-decoded payload piped to a shell",
+              "match": "base64 -D | bash"
+            },
+            {
+              "rule_id": "suspicious_installer_domain",
+              "severity": "high",
+              "description": "Installer domain flagged as untrusted",
+              "match": "download.setup-service.com"
+            }
+          ]
+        },
+        {
+          "path": "/private/tmp/skills/moltbook-agi/SKILL.md",
+          "sha256": "6d86b174b5d354e5ead745f0a10bec628c8e36208d71a0ded48c36fa40f2cb92",
+          "findings": [
+            {
+              "rule_id": "base64_pipe_shell",
+              "severity": "high",
+              "description": "Base64-decoded payload piped to a shell",
+              "match": "base64 -D | bash"
+            },
+            {
+              "rule_id": "suspicious_installer_domain",
+              "severity": "high",
+              "description": "Installer domain flagged as untrusted",
+              "match": "download.setup-service.com"
+            }
+          ]
+        },
+        {
+          "path": "/private/tmp/skills/moltbook-igr/SKILL.md",
+          "sha256": "6d86b174b5d354e5ead745f0a10bec628c8e36208d71a0ded48c36fa40f2cb92",
+          "findings": [
+            {
+              "rule_id": "base64_pipe_shell",
+              "severity": "high",
+              "description": "Base64-decoded payload piped to a shell",
+              "match": "base64 -D | bash"
+            },
+            {
+              "rule_id": "suspicious_installer_domain",
+              "severity": "high",
+              "description": "Installer domain flagged as untrusted",
+              "match": "download.setup-service.com"
+            }
+          ]
+        }
+      ],
       "missing_reason": ""
     }
-  ]
+  ],
+  "quarantine": {
+    "enabled": true,
+    "dir": "/Users/dhyana/DHARMIC_GODEL_CLAW/quarantine/skills",
+    "quarantined_files": [
+      {
+        "skill_id": "extra:skills",
+        "source": "/private/tmp/skills/moltbook-wrt/SKILL.md",
+        "dest": "/Users/dhyana/DHARMIC_GODEL_CLAW/quarantine/skills/extra_skills__SKILL.md__6969325d__6d86b174b5d3",
+        "sha256": "6d86b174b5d354e5ead745f0a10bec628c8e36208d71a0ded48c36fa40f2cb92",
+        "status": "exists"
+      },
+      {
+        "skill_id": "extra:skills",
+        "source": "/private/tmp/skills/moltbook-agi/SKILL.md",
+        "dest": "/Users/dhyana/DHARMIC_GODEL_CLAW/quarantine/skills/extra_skills__SKILL.md__f0bdd220__6d86b174b5d3",
+        "sha256": "6d86b174b5d354e5ead745f0a10bec628c8e36208d71a0ded48c36fa40f2cb92",
+        "status": "exists"
+      },
+      {
+        "skill_id": "extra:skills",
+        "source": "/private/tmp/skills/moltbook-igr/SKILL.md",
+        "dest": "/Users/dhyana/DHARMIC_GODEL_CLAW/quarantine/skills/extra_skills__SKILL.md__64131cec__6d86b174b5d3",
+        "sha256": "6d86b174b5d354e5ead745f0a10bec628c8e36208d71a0ded48c36fa40f2cb92",
+        "status": "exists"
+      }
+    ]
+  }
 }
