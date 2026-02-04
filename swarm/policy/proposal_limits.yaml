@@ -1,0 +1,79 @@
+# DHARMIC_CLAW Protocol v3 - Proposal Rate Limits
+# Prevents runaway agent loops and controls API costs
+
+version: "1.0"
+updated: "2026-02-04"
+
+# =============================================================================
+# RATE LIMITS
+# =============================================================================
+
+proposal_limits:
+  # Maximum proposals per time window
+  max_per_hour: 5
+  max_per_day: 20
+  max_per_week: 100
+  
+  # Cooldown after rejection
+  cooldown_after_rejection: "2h"
+  cooldown_after_consecutive_failures: "4h"
+  consecutive_failure_threshold: 3
+  
+  # Burst allowance (for urgent fixes)
+  burst_allowance:
+    enabled: true
+    max_burst: 3
+    burst_window: "15m"
+    requires_justification: true
+
+# =============================================================================
+# SCOPE LIMITS
+# =============================================================================
+
+scope_limits:
+  # Maximum files per proposal
+  max_files_per_proposal: 10
+  
+  # Maximum lines changed
+  max_lines_changed: 500
+  
+  # Maximum complexity (cyclomatic)
+  max_complexity_increase: 5
+  
+  # Exceptions for documented refactors
+  allow_large_refactor:
+    requires_human_approval: true
+    max_files: 50
+    max_lines: 2000
+
+# =============================================================================
+# QUEUE MANAGEMENT
+# =============================================================================
+
+queue:
+  max_pending_proposals: 10
+  stale_proposal_timeout: "24h"
+  priority_levels:
+    - critical  # Security fixes
+    - high      # Bug fixes
+    - medium    # Features
+    - low       # Refactors
+  
+  # Auto-reject low priority if queue full
+  auto_reject_policy:
+    enabled: true
+    threshold: 8
+    affected_priorities: ["low"]
+
+# =============================================================================
+# AGENT-SPECIFIC LIMITS
+# =============================================================================
+
+agent_limits:
+  CODING_AGENT:
+    daily_budget_proposals: 15
+    can_propose_security_changes: false
+  
+  CODE_GUARDIAN:
+    can_propose: false
+    daily_verification_limit: 100

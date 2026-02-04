@@ -1,0 +1,146 @@
+# DHARMIC_CLAW Protocol v3 - Approval Policy
+# Manages human approval workflow and timeouts
+
+version: "1.0"
+updated: "2026-02-04"
+
+# =============================================================================
+# APPROVAL TIMEOUTS
+# =============================================================================
+
+timeouts:
+  # Reminder to human
+  reminder_after: "24h"
+  reminder_method: "message"
+  reminder_max_count: 2
+  
+  # Escalation (e.g., to secondary approver)
+  escalate_after: "72h"
+  escalation_target: "secondary_approver"
+  
+  # Auto-close stale proposals
+  auto_close_after: "7d"
+  stale_reason: "No response - closing. Re-propose if still needed."
+
+# =============================================================================
+# APPROVAL REQUIREMENTS
+# =============================================================================
+
+approval_matrix:
+  # Based on risk level
+  risk_low:
+    requires_human: false
+    auto_approve_if_gates_pass: true
+  
+  risk_medium:
+    requires_human: true
+    approvers: ["primary"]
+    min_approvals: 1
+  
+  risk_high:
+    requires_human: true
+    approvers: ["primary", "secondary"]
+    min_approvals: 1
+  
+  risk_critical:
+    requires_human: true
+    approvers: ["primary"]
+    min_approvals: 1
+    requires_explicit_ack: true
+
+# =============================================================================
+# RISK CLASSIFICATION
+# =============================================================================
+
+risk_classification:
+  # Automatic risk elevation triggers
+  elevate_to_high:
+    - "changes_security_config"
+    - "modifies_auth_flow"
+    - "touches_financial_code"
+    - "external_api_changes"
+    - "database_schema_changes"
+  
+  elevate_to_critical:
+    - "modifies_gates"
+    - "changes_ci_pipeline"
+    - "production_deploy"
+    - "data_migration"
+
+# =============================================================================
+# APPROVER CONFIGURATION
+# =============================================================================
+
+approvers:
+  primary:
+    id: "dhyana"
+    contact: "johnvincentshrader@gmail.com"
+    notification_channels:
+      - "whatsapp"
+      - "email"
+  
+  secondary:
+    id: "emergency_contact"
+    contact: null  # Configure if needed
+    notification_channels:
+      - "email"
+
+# =============================================================================
+# APPROVAL WORKFLOW
+# =============================================================================
+
+workflow:
+  # Proposal submission
+  on_proposal_submit:
+    - validate_spec
+    - classify_risk
+    - determine_approvers
+    - notify_approvers
+  
+  # Waiting for approval
+  on_waiting:
+    - check_timeout
+    - send_reminder_if_due
+    - escalate_if_due
+    - auto_close_if_stale
+  
+  # On approval
+  on_approval:
+    - verify_approver_identity
+    - record_approval
+    - proceed_to_merge
+  
+  # On rejection
+  on_rejection:
+    - record_reason
+    - notify_proposer
+    - apply_cooldown
+
+# =============================================================================
+# APPROVAL RECORD SCHEMA
+# =============================================================================
+
+approval_record:
+  required_fields:
+    - proposal_id
+    - approver_id
+    - decision  # approved | rejected | deferred
+    - timestamp
+    - reason
+    - evidence_bundle_hash
+  
+  optional_fields:
+    - conditions
+    - notes
+    - delegation_chain
+
+# =============================================================================
+# DELEGATION
+# =============================================================================
+
+delegation:
+  enabled: false  # Disabled by default for security
+  max_delegation_depth: 1
+  delegatable_risk_levels:
+    - low
+    - medium

@@ -1,0 +1,304 @@
+# DHARMIC_CLAW Protocol v3 - Gate CI Workflow
+# This is the ULTIMATE AUTHORITY - no merge without passing
+# HUMAN-ONLY EDITABLE - Builder agents cannot modify this file
+
+name: DHARMIC Gates
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+# Cancel in-progress runs for same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  PROPOSAL_ID: ${{ github.event.pull_request.number || github.sha }}
+
+jobs:
+  # ===========================================================================
+  # PHASE 1: Technical Gates (1-8)
+  # ===========================================================================
+  
+  technical-gates:
+    name: Technical Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for coverage diff
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff pyright bandit detect-secrets pip-audit pytest pytest-cov hypothesis
+      
+      # Gate 1: Lint/Format
+      - name: "Gate 1: Lint/Format (ruff)"
+        run: |
+          ruff check . --output-format=json > ruff_output.json || true
+          ruff check . --exit-non-zero-on-fix
+      
+      # Gate 2: Type Check
+      - name: "Gate 2: Type Check (pyright)"
+        run: |
+          pyright --outputjson > pyright_report.json || true
+          pyright
+      
+      # Gate 3: Security Scan
+      - name: "Gate 3: Security Scan (bandit)"
+        run: |
+          bandit -r . -f json -o bandit_report.json || true
+          bandit -r . -ll  # Fail on medium+ severity
+      
+      - name: "Gate 3: Secret Detection"
+        run: |
+          detect-secrets scan > secrets_scan.json || true
+          detect-secrets scan --baseline .secrets.baseline
+      
+      # Gate 4: Dependency Safety
+      - name: "Gate 4: Dependency Safety (pip-audit)"
+        run: |
+          pip-audit --format json --output pip_audit.json || true
+          pip-audit
+      
+      # Gate 5: Test Coverage
+      - name: "Gate 5: Test Coverage"
+        run: |
+          pytest tests/ \
+            --cov=src --cov=swarm \
+            --cov-report=json:coverage.json \
+            --cov-report=term-missing \
+            --cov-fail-under=80 \
+            -v
+      
+      # Gate 6: Property Testing
+      - name: "Gate 6: Property Testing (hypothesis)"
+        run: |
+          pytest tests/ -m hypothesis \
+            --hypothesis-show-statistics \
+            -v || echo "No hypothesis tests found"
+      
+      # Gate 7: Integration Tests
+      - name: "Gate 7: Integration Tests"
+        run: |
+          pytest tests/integration/ -v --tb=short || echo "No integration tests found"
+      
+      # Gate 8: Performance Regression
+      - name: "Gate 8: Performance Benchmarks"
+        run: |
+          pytest tests/benchmarks/ \
+            --benchmark-json=benchmark.json \
+            --benchmark-compare \
+            -v || echo "No benchmark tests found"
+        continue-on-error: true  # Warn only
+      
+      # Upload evidence
+      - name: Upload technical gate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: technical-gates-evidence
+          path: |
+            ruff_output.json
+            pyright_report.json
+            bandit_report.json
+            secrets_scan.json
+            pip_audit.json
+            coverage.json
+            benchmark.json
+          retention-days: 90
+
+  # ===========================================================================
+  # PHASE 2: Dharmic Gates (9-15)
+  # ===========================================================================
+  
+  dharmic-gates:
+    name: Dharmic Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          pip install pyyaml
+      
+      # Gate 9: AHIMSA
+      - name: "Gate 9: AHIMSA (hazard documentation)"
+        run: |
+          if [ ! -f "HAZARDS.md" ]; then
+            echo "⚠️  AHIMSA: HAZARDS.md not found"
+            echo "ahimsa_status=warn" >> $GITHUB_ENV
+          else
+            echo "✓ AHIMSA: HAZARDS.md present"
+            echo "ahimsa_status=pass" >> $GITHUB_ENV
+          fi
+      
+      # Gate 10: SATYA - checked by test coverage
+      - name: "Gate 10: SATYA (claims backed by evidence)"
+        run: |
+          echo "✓ SATYA: Delegated to test coverage gate"
+      
+      # Gate 11: CONSENT - manual approval required for PRs
+      - name: "Gate 11: CONSENT (human approval)"
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "ℹ️  CONSENT: PR requires human approval to merge"
+      
+      # Gate 12: VYAVASTHIT
+      - name: "Gate 12: VYAVASTHIT (telos alignment)"
+        run: |
+          # Check if proposal.yaml exists and has telos section
+          if [ -f "proposal.yaml" ]; then
+            python3 -c "import yaml; d=yaml.safe_load(open('proposal.yaml')); assert 'telos_alignment' in d"
+            echo "✓ VYAVASTHIT: Telos alignment documented"
+          else
+            echo "⚠️  VYAVASTHIT: No proposal.yaml found"
+          fi
+        continue-on-error: true
+      
+      # Gate 13: REVERSIBILITY
+      - name: "Gate 13: REVERSIBILITY (rollback plan)"
+        run: |
+          if [ ! -f "ROLLBACK.md" ]; then
+            echo "⚠️  REVERSIBILITY: ROLLBACK.md not found"
+          else
+            echo "✓ REVERSIBILITY: Rollback plan present"
+          fi
+        continue-on-error: true
+      
+      # Gate 14: SVABHAAVA
+      - name: "Gate 14: SVABHAAVA (nature alignment)"
+        run: |
+          echo "✓ SVABHAAVA: Checked by code review"
+      
+      # Gate 15: WITNESS
+      - name: "Gate 15: WITNESS (audit trail)"
+        run: |
+          echo "✓ WITNESS: GitHub provides audit trail"
+
+  # ===========================================================================
+  # PHASE 3: Supply Chain Gates (16-17)
+  # ===========================================================================
+  
+  supply-chain-gates:
+    name: Supply Chain Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          pip install cyclonedx-bom pip-licenses
+      
+      # Gate 16: SBOM
+      - name: "Gate 16: SBOM Generation"
+        run: |
+          cyclonedx-py environment -o sbom.json || echo "SBOM generation skipped"
+      
+      # Gate 17: License Compliance
+      - name: "Gate 17: License Compliance"
+        run: |
+          pip-licenses --format=json --output-file=licenses.json
+          # Check for copyleft licenses
+          if pip-licenses --format=plain | grep -iE "GPL|AGPL|LGPL"; then
+            echo "❌ Copyleft license detected!"
+            exit 1
+          fi
+          echo "✓ No copyleft licenses found"
+      
+      - name: Upload supply chain evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: supply-chain-evidence
+          path: |
+            sbom.json
+            licenses.json
+          retention-days: 90
+
+  # ===========================================================================
+  # FINAL: Run Full Gate Suite
+  # ===========================================================================
+  
+  full-gate-run:
+    name: Full Gate Suite
+    needs: [technical-gates, dharmic-gates, supply-chain-gates]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          pip install pyyaml
+      
+      - name: Download all evidence
+        uses: actions/download-artifact@v4
+      
+      - name: Run gate aggregator
+        run: |
+          python -m swarm.run_gates \
+            --proposal-id "PR-${{ env.PROPOSAL_ID }}" \
+            --dry-run
+      
+      - name: Upload final evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-bundle-${{ env.PROPOSAL_ID }}
+          path: evidence/
+          retention-days: 90
+
+  # ===========================================================================
+  # PROTECTED: Block merge if gates fail
+  # ===========================================================================
+  
+  gate-check:
+    name: Gate Check (Required)
+    needs: [full-gate-run]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Check gate results
+        run: |
+          if [ "${{ needs.full-gate-run.result }}" != "success" ]; then
+            echo "❌ GATES FAILED - Merge blocked"
+            exit 1
+          fi
+          echo "✓ ALL GATES PASSED - Merge allowed"

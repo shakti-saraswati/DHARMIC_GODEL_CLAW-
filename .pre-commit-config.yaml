@@ -1,0 +1,111 @@
+# DHARMIC_CLAW Protocol v3 - Pre-commit Configuration
+# Runs subset of gates locally before commit
+# Full gates run in CI (run_gates.py)
+
+default_language_version:
+  python: python3.11
+
+repos:
+  # ==========================================================================
+  # TECHNICAL GATES (Local subset)
+  # ==========================================================================
+  
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.2.1
+    hooks:
+      # Gate 1: Lint
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      # Gate 1: Format
+      - id: ruff-format
+
+  - repo: https://github.com/RobertCraiworthy/pyright-python
+    rev: 1.1.350
+    hooks:
+      # Gate 2: Type Check
+      - id: pyright
+        args: [--pythonversion, "3.11"]
+        additional_dependencies:
+          - pyright
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.7
+    hooks:
+      # Gate 3: Security Scan (basic)
+      - id: bandit
+        args: [-c, pyproject.toml, -r, src/, swarm/]
+        additional_dependencies: ["bandit[toml]"]
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      # Gate 3: Secret Detection
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+
+  # ==========================================================================
+  # STANDARD CHECKS
+  # ==========================================================================
+  
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--unsafe]  # Allow custom tags
+      - id: check-json
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: check-executables-have-shebangs
+
+  # ==========================================================================
+  # DHARMIC GATES (Local warning only)
+  # ==========================================================================
+  
+  - repo: local
+    hooks:
+      # Gate 9: AHIMSA - Check for HAZARDS.md
+      - id: ahimsa-check
+        name: AHIMSA - Hazard documentation
+        entry: bash -c 'test -f HAZARDS.md || (echo "⚠️  AHIMSA: HAZARDS.md not found" && exit 0)'
+        language: system
+        pass_filenames: false
+        always_run: true
+        verbose: true
+
+      # Gate 13: REVERSIBILITY - Check for ROLLBACK.md
+      - id: reversibility-check
+        name: REVERSIBILITY - Rollback plan
+        entry: bash -c 'test -f ROLLBACK.md || (echo "⚠️  REVERSIBILITY: ROLLBACK.md not found" && exit 0)'
+        language: system
+        pass_filenames: false
+        always_run: true
+        verbose: true
+
+      # Protect gates.yaml from modification
+      - id: protect-gates
+        name: Protect gates.yaml
+        entry: bash -c 'if git diff --cached --name-only | grep -q "swarm/gates.yaml"; then echo "❌ gates.yaml is HUMAN-ONLY editable. Remove from commit." && exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # Protect CI workflows
+      - id: protect-ci
+        name: Protect CI workflows
+        entry: bash -c 'if git diff --cached --name-only | grep -q ".github/workflows/"; then echo "❌ CI workflows are HUMAN-ONLY editable. Remove from commit." && exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+# ==========================================================================
+# CI Integration Note
+# ==========================================================================
+# Pre-commit runs a SUBSET of gates for fast local feedback.
+# Full gate execution happens in CI via:
+#   python -m swarm.run_gates --proposal-id <ID>
+#
+# The CI workflow is the ULTIMATE AUTHORITY - no merge without all 17 gates passing.

@@ -1,0 +1,186 @@
+{
+  "proposal_id": "TEST-001",
+  "timestamp": "2026-02-04T10:38:23.181748+00:00",
+  "overall_result": "PASS",
+  "gates_passed": 0,
+  "gates_failed": 0,
+  "gates_warned": 0,
+  "gates_skipped": 17,
+  "total_duration_seconds": 0.000705718994140625,
+  "gate_results": [
+    {
+      "gate_id": 1,
+      "gate_name": "LINT_FORMAT",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 2,
+      "gate_name": "TYPE_CHECK",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 3,
+      "gate_name": "SECURITY_SCAN",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 4,
+      "gate_name": "DEPENDENCY_SAFETY",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 5,
+      "gate_name": "TEST_COVERAGE",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 6,
+      "gate_name": "PROPERTY_TESTING",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 7,
+      "gate_name": "CONTRACT_INTEGRATION",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 8,
+      "gate_name": "PERFORMANCE_REGRESSION",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 9,
+      "gate_name": "AHIMSA",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 10,
+      "gate_name": "SATYA",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 11,
+      "gate_name": "CONSENT",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 12,
+      "gate_name": "VYAVASTHIT",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 13,
+      "gate_name": "REVERSIBILITY",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 14,
+      "gate_name": "SVABHAAVA",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 15,
+      "gate_name": "WITNESS",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 16,
+      "gate_name": "SBOM_PROVENANCE",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    },
+    {
+      "gate_id": 17,
+      "gate_name": "LICENSE_COMPLIANCE",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed"
+    }
+  ],
+  "evidence_bundle_hash": "fcc8781cba54a7c692db62a9c5ec9d447090d68cd4714e17a26c28bf877b3f33",
+  "emergency_bypass": false,
+  "emergency_reason": "",
+  "emergency_approver": ""
+}

@@ -1,0 +1,413 @@
+# DHARMIC_CLAW Autonomous Coding Protocol v3 - Gate Configuration
+# HUMAN-ONLY EDITABLE - Builder agents cannot modify this file
+# Last updated: 2026-02-04
+# Maintainer: dhyana
+
+version: "3.0"
+schema_hash: "sha256:COMPUTE_ON_LOAD"
+
+# =============================================================================
+# ROLE SEPARATION (Non-negotiable)
+# =============================================================================
+roles:
+  builder:
+    name: "CODING_AGENT"
+    permissions:
+      - write_specs
+      - write_tests
+      - write_code
+    restrictions:
+      - "!modify_gates"
+      - "!modify_ci"
+      - "!modify_security_configs"
+      - "!self_certify"
+  
+  verifier:
+    name: "CODE_GUARDIAN"
+    permissions:
+      - read_all
+      - run_gates
+      - produce_evidence
+    restrictions:
+      - "!write_code"
+      - "!modify_policy"
+      - "!approve_changes"
+  
+  approver:
+    name: "HUMAN"
+    permissions:
+      - all
+    restrictions: []
+
+# =============================================================================
+# GATES (17 Total)
+# =============================================================================
+
+gates:
+  # ---------------------------------------------------------------------------
+  # TECHNICAL GATES (1-8)
+  # ---------------------------------------------------------------------------
+  
+  - id: 1
+    name: "LINT_FORMAT"
+    category: "technical"
+    tier: "required"
+    command: "ruff check . --fix --exit-non-zero-on-fix"
+    timeout_seconds: 60
+    on_failure: "block"
+    evidence:
+      - "ruff_output.txt"
+      - "format_diff.patch"
+
+  - id: 2
+    name: "TYPE_CHECK"
+    category: "technical"
+    tier: "required"
+    command: "pyright --outputjson"
+    args: ["--pythonversion", "3.11", "--strict"]
+    timeout_seconds: 120
+    on_failure: "block"
+    evidence:
+      - "pyright_report.json"
+
+  - id: 3
+    name: "SECURITY_SCAN"
+    category: "technical"
+    tier: "required"
+    commands:
+      - "bandit -r . -f json -o bandit_report.json"
+      - "detect-secrets scan --baseline .secrets.baseline"
+    timeout_seconds: 180
+    on_failure: "block"
+    severity_threshold: "medium"
+    evidence:
+      - "bandit_report.json"
+      - "secrets_scan.json"
+
+  - id: 4
+    name: "DEPENDENCY_SAFETY"
+    category: "technical"
+    tier: "required"
+    command: "pip-audit --format json --output pip_audit.json"
+    timeout_seconds: 120
+    on_failure: "block"
+    allow_known_vulnerabilities: false
+    evidence:
+      - "pip_audit.json"
+
+  - id: 5
+    name: "TEST_COVERAGE"
+    category: "technical"
+    tier: "required"
+    command: "pytest --cov=. --cov-report=json --cov-fail-under=80"
+    timeout_seconds: 300
+    on_failure: "block"
+    thresholds:
+      min_coverage_percent: 80
+      scope: "changed_lines"
+    evidence:
+      - "coverage.json"
+      - "pytest_results.xml"
+
+  - id: 6
+    name: "PROPERTY_TESTING"
+    category: "technical"
+    tier: "required"
+    command: "pytest tests/ -m hypothesis --hypothesis-show-statistics"
+    timeout_seconds: 300
+    on_failure: "block"
+    min_examples: 100
+    evidence:
+      - "hypothesis_stats.json"
+
+  - id: 7
+    name: "CONTRACT_INTEGRATION"
+    category: "technical"
+    tier: "required"
+    command: "pytest tests/integration/ -v --tb=short"
+    timeout_seconds: 600
+    on_failure: "block"
+    evidence:
+      - "integration_results.xml"
+
+  - id: 8
+    name: "PERFORMANCE_REGRESSION"
+    category: "technical"
+    tier: "required"
+    command: "pytest tests/benchmarks/ --benchmark-compare --benchmark-json=benchmark.json"
+    timeout_seconds: 600
+    on_failure: "warn"
+    thresholds:
+      max_stddev: 0.1
+      max_regression_percent: 10
+    evidence:
+      - "benchmark.json"
+      - "benchmark_comparison.txt"
+
+  # ---------------------------------------------------------------------------
+  # DHARMIC GATES (9-15)
+  # ---------------------------------------------------------------------------
+
+  - id: 9
+    name: "AHIMSA"
+    category: "dharmic"
+    tier: "absolute"
+    description: "Non-harm - hazard list must exist and be addressed"
+    check_type: "file_exists"
+    required_files:
+      - "HAZARDS.md"
+      - "proposal.yaml:hazards"
+    evaluator: "dharmic_gate_evaluator"
+    on_failure: "block"
+    questions:
+      - "Does this change introduce potential harm?"
+      - "Are all hazards documented and mitigated?"
+    evidence:
+      - "ahimsa_assessment.json"
+
+  - id: 10
+    name: "SATYA"
+    category: "dharmic"
+    tier: "strong"
+    description: "Truth - all claims must be backed by evidence"
+    check_type: "evidence_validation"
+    evaluator: "dharmic_gate_evaluator"
+    on_failure: "block"
+    questions:
+      - "Are all claims in documentation backed by tests or data?"
+      - "Is the change description accurate and complete?"
+    evidence:
+      - "satya_assessment.json"
+      - "claim_evidence_map.json"
+
+  - id: 11
+    name: "CONSENT"
+    category: "dharmic"
+    tier: "strong"
+    description: "Human sign-off required if risk >= medium"
+    check_type: "approval_required"
+    risk_threshold: "medium"
+    evaluator: "dharmic_gate_evaluator"
+    on_failure: "block"
+    requires_human: true
+    questions:
+      - "Has the human approved this change?"
+      - "Is the risk level correctly assessed?"
+    evidence:
+      - "consent_record.json"
+      - "approval_signature.txt"
+
+  - id: 12
+    name: "VYAVASTHIT"
+    category: "dharmic"
+    tier: "advisory"
+    description: "Natural order - change allows rather than forces"
+    check_type: "telos_alignment"
+    evaluator: "dharmic_gate_evaluator"
+    on_failure: "warn"
+    questions:
+      - "Does this change align with the system's telos?"
+      - "Does it allow natural flow rather than forcing behavior?"
+    evidence:
+      - "vyavasthit_assessment.json"
+
+  - id: 13
+    name: "REVERSIBILITY"
+    category: "dharmic"
+    tier: "advisory"
+    description: "Rollback plan must be present and tested"
+    check_type: "file_exists"
+    required_files:
+      - "ROLLBACK.md"
+    evaluator: "dharmic_gate_evaluator"
+    on_failure: "warn"
+    questions:
+      - "Can this change be rolled back?"
+      - "Is the rollback procedure documented and tested?"
+    evidence:
+      - "rollback_plan.json"
+
+  - id: 14
+    name: "SVABHAAVA"
+    category: "dharmic"
+    tier: "advisory"
+    description: "Change matches system nature and purpose"
+    check_type: "nature_alignment"
+    evaluator: "dharmic_gate_evaluator"
+    on_failure: "warn"
+    questions:
+      - "Does this change fit the system's nature?"
+      - "Would this change be expected by someone who understands the system?"
+    evidence:
+      - "svabhaava_assessment.json"
+
+  - id: 15
+    name: "WITNESS"
+    category: "dharmic"
+    tier: "advisory"
+    description: "Audit trail + evidence hash for strange loop observation"
+    check_type: "audit_complete"
+    evaluator: "dharmic_gate_evaluator"
+    on_failure: "warn"
+    required_artifacts:
+      - "audit_trail.jsonl"
+      - "evidence_bundle_hash.sha256"
+    questions:
+      - "Is the complete audit trail preserved?"
+      - "Can this change observe its own evaluation?"
+    evidence:
+      - "witness_trail.json"
+      - "evidence_hash.sha256"
+
+  # ---------------------------------------------------------------------------
+  # SUPPLY-CHAIN & LICENSE GATES (16-17)
+  # ---------------------------------------------------------------------------
+
+  - id: 16
+    name: "SBOM_PROVENANCE"
+    category: "supply_chain"
+    tier: "required"
+    description: "Software Bill of Materials + SLSA provenance"
+    commands:
+      - "cyclonedx-py environment -o sbom.json"
+      - "slsa-verifier verify-artifact --source-uri github.com/dharmic-claw"
+    timeout_seconds: 120
+    on_failure: "block"
+    evidence:
+      - "sbom.json"
+      - "slsa_provenance.json"
+
+  - id: 17
+    name: "LICENSE_COMPLIANCE"
+    category: "supply_chain"
+    tier: "required"
+    description: "Ensure no GPL/AGPL contamination"
+    command: "pip-licenses --format=json --output-file=licenses.json"
+    timeout_seconds: 60
+    on_failure: "block"
+    policy:
+      allow_only:
+        - "MIT"
+        - "Apache-2.0"
+        - "BSD-2-Clause"
+        - "BSD-3-Clause"
+        - "ISC"
+        - "Python-2.0"
+        - "PSF-2.0"
+      fail_on:
+        - "GPL"
+        - "AGPL"
+        - "LGPL"
+        - "SSPL"
+    evidence:
+      - "licenses.json"
+      - "license_compliance.json"
+
+# =============================================================================
+# ML OVERLAY (Applied only to ML-touched code paths)
+# =============================================================================
+
+ml_overlay:
+  enabled: true
+  triggers:
+    - "*.py:import torch"
+    - "*.py:import tensorflow"
+    - "*.py:import transformers"
+    - "models/"
+    - "training/"
+    - "**/ml/**"
+  
+  gates:
+    - id: "ML_DATA_PROVENANCE"
+      description: "Training data source must be documented"
+      required_files:
+        - "DATA_PROVENANCE.md"
+        - "data_manifest.json"
+      on_failure: "block"
+    
+    - id: "ML_EVAL_SUITE"
+      description: "Evaluation metrics and test suite required"
+      command: "pytest tests/ml_eval/ -v"
+      min_metrics:
+        - "accuracy"
+        - "precision"
+        - "recall"
+      on_failure: "block"
+    
+    - id: "ML_MODEL_CARD"
+      description: "Model card with limitations and biases"
+      required_files:
+        - "MODEL_CARD.md"
+      required_sections:
+        - "Intended Use"
+        - "Limitations"
+        - "Ethical Considerations"
+        - "Training Data"
+      on_failure: "block"
+    
+    - id: "ML_RISK_REGISTER"
+      description: "AI-specific risks documented"
+      required_files:
+        - "AI_RISK_REGISTER.md"
+      on_failure: "warn"
+    
+    - id: "ML_REPRODUCIBILITY"
+      description: "Seed + env + config lock for reproducibility"
+      required_files:
+        - "requirements.txt"
+        - "config.yaml:random_seed"
+        - "environment.lock"
+      on_failure: "block"
+
+# =============================================================================
+# ENFORCEMENT POLICY
+# =============================================================================
+
+enforcement:
+  # CI is the ultimate authority
+  ci_required: true
+  no_merge_without_gates: true
+  
+  # Human-only editable files
+  protected_files:
+    - "gates.yaml"
+    - ".github/workflows/*.yml"
+    - "security/*.yaml"
+    - ".secrets.baseline"
+  
+  # Builder restrictions
+  builder_cannot_modify:
+    - "gates.yaml"
+    - ".github/"
+    - "security/"
+    - ".pre-commit-config.yaml"
+
+# =============================================================================
+# EVIDENCE BUNDLE SCHEMA
+# =============================================================================
+
+evidence_bundle:
+  format: "json"
+  required_fields:
+    - "timestamp"
+    - "proposal_id"
+    - "gate_results"
+    - "evidence_files"
+    - "bundle_hash"
+  
+  output_path: "evidence/{proposal_id}/gate_results.json"
+  
+  retention:
+    success: "90d"
+    failure: "365d"
+
+# =============================================================================
+# META
+# =============================================================================
+
+meta:
+  created: "2026-02-04"
+  protocol_version: "3.0"
+  maintainer: "dhyana"
+  last_human_edit: "2026-02-04"
+  integrity_check: "sha256:COMPUTE_ON_SAVE"

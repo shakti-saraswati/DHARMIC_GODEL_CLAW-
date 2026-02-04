@@ -1,0 +1,106 @@
+# DHARMIC_CLAW Protocol v3 - Cost Tracking Configuration
+# Monitors API usage and compute costs
+
+version: "1.0"
+updated: "2026-02-04"
+
+# =============================================================================
+# BUDGET CONTROLS
+# =============================================================================
+
+budget:
+  daily_budget_usd: 20.00
+  weekly_budget_usd: 100.00
+  monthly_budget_usd: 300.00
+  
+  alert_thresholds:
+    warning_percent: 75
+    critical_percent: 90
+    emergency_percent: 95
+  
+  # When budget exceeded
+  on_budget_exceeded:
+    - action: "pause_non_critical"
+      threshold: 90
+    - action: "alert_human"
+      threshold: 95
+    - action: "hard_stop"
+      threshold: 100
+
+# =============================================================================
+# PER-CHANGE TRACKING
+# =============================================================================
+
+per_change_tracking:
+  enabled: true
+  
+  # Track these costs per proposal
+  tracked_costs:
+    - llm_api_calls
+    - llm_tokens_input
+    - llm_tokens_output
+    - test_compute_seconds
+    - ci_minutes
+  
+  # Cost estimates (for budgeting)
+  cost_estimates:
+    llm_tokens_1k_input_usd: 0.003
+    llm_tokens_1k_output_usd: 0.015
+    ci_minute_usd: 0.008
+    test_compute_minute_usd: 0.01
+
+# =============================================================================
+# EFFICIENCY METRICS
+# =============================================================================
+
+efficiency:
+  # Track proposal success rate
+  track_success_rate: true
+  min_acceptable_success_rate: 0.6
+  
+  # Cost per successful change
+  track_cost_per_success: true
+  alert_if_cost_per_success_exceeds_usd: 5.00
+  
+  # Rework tracking
+  track_rework_rate: true
+  max_acceptable_rework_rate: 0.2
+
+# =============================================================================
+# REPORTING
+# =============================================================================
+
+reporting:
+  daily_summary: true
+  weekly_report: true
+  
+  output_paths:
+    daily: "logs/costs/daily_{date}.json"
+    weekly: "logs/costs/weekly_{week}.json"
+    per_change: "evidence/{proposal_id}/costs.json"
+  
+  # Human notification
+  notify_human:
+    on_daily_summary: false
+    on_budget_alert: true
+    on_anomaly: true
+
+# =============================================================================
+# COST OPTIMIZATION
+# =============================================================================
+
+optimization:
+  # Cache expensive operations
+  cache_test_results: true
+  cache_lint_results: true
+  cache_ttl_minutes: 60
+  
+  # Batch similar operations
+  batch_similar_proposals: true
+  batch_window_minutes: 5
+  
+  # Use cheaper models for simple tasks
+  model_tiering:
+    simple_lint: "fast"
+    complex_analysis: "standard"
+    security_review: "thorough"
