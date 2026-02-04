@@ -1,0 +1,10 @@
+version: "1.0"
+thresholds:
+  max_density: 0.4
+  max_centralization: 0.6
+  max_reciprocity: 0.85
+  max_burst_rate_per_min: 120
+notes:
+  - "Density measures how interconnected the agent graph is."
+  - "Centralization flags hub dominance (single agent control)."
+  - "Burst rate flags coordination spikes."

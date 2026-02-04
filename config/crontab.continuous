@@ -1,0 +1,19 @@
+# DHARMIC_CLAW Continuous Operation Cron Jobs
+# Added 2026-02-04 for 24/7 TOP 10 project tracking
+
+# Existing jobs (keep these)
+*/5 * * * * /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/devops/alert.sh >> /Users/dhyana/DHARMIC_GODEL_CLAW/logs/cron.log 2>&1
+0 0 * * * /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/devops/rotate_logs.sh >> /Users/dhyana/DHARMIC_GODEL_CLAW/logs/cron.log 2>&1
+0 2 * * * /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/devops/backup_memory.sh >> /Users/dhyana/DHARMIC_GODEL_CLAW/logs/cron.log 2>&1
+
+# NEW: Every 4 hours - Review TOP 10 Projects
+0 */4 * * * cd ~/DHARMIC_GODEL_CLAW && python3 scripts/review_top_10_projects.py >> ~/DHARMIC_GODEL_CLAW/logs/project_review.log 2>&1
+
+# NEW: Every hour - Council Deliberation on TOP 10
+0 * * * * cd ~/DHARMIC_GODEL_CLAW/src/core && source ../../.venv/bin/activate && python3 agno_council_v2.py --deliberate "What are the priorities for advancing our TOP 10 projects?" >> ~/DHARMIC_GODEL_CLAW/logs/council_deliberation.log 2>&1
+
+# NEW: Daily at 6 AM - Progress Report
+0 6 * * * cd ~/DHARMIC_GODEL_CLAW && python3 scripts/generate_progress_report.py >> ~/DHARMIC_GODEL_CLAW/logs/progress_report.log 2>&1
+
+# NEW: Every 30 min - Project heartbeat (log only)
+*/30 * * * * echo "$(date): Heartbeat check" >> ~/DHARMIC_GODEL_CLAW/logs/heartbeat.log 2>&1

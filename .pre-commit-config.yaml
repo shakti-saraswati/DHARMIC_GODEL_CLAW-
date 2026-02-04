@@ -88,7 +88,7 @@ repos:
       # Protect gates.yaml from modification
       - id: protect-gates
         name: Protect gates.yaml
-        entry: bash -c 'if git diff --cached --name-only | grep -q "swarm/gates.yaml"; then echo "❌ gates.yaml is HUMAN-ONLY editable. Remove from commit." && exit 1; fi'
+        entry: bash -c 'if git diff --cached --name-only | grep -qE "swarm/gates.yaml|swarm/policy/"; then echo "❌ gates.yaml and policy files are HUMAN-ONLY editable. Remove from commit." && exit 1; fi'
         language: system
         pass_filenames: false
         always_run: true

@@ -1,0 +1,39 @@
+version: "1.0"
+fail_on:
+  - high
+scan:
+  include_sibling_scripts: true
+  extensions:
+    - ".md"
+    - ".sh"
+    - ".py"
+    - ".txt"
+patterns:
+  - id: base64_pipe_shell
+    severity: high
+    description: "Base64-decoded payload piped to a shell"
+    regex: "base64\\s+-[dD].*\\|\\s*(bash|sh|zsh)"
+  - id: curl_pipe_shell
+    severity: high
+    description: "curl output piped directly to a shell"
+    regex: "curl\\s+[^\\n]*\\|\\s*(bash|sh|zsh)"
+  - id: wget_pipe_shell
+    severity: high
+    description: "wget output piped directly to a shell"
+    regex: "wget\\s+[^\\n]*\\|\\s*(bash|sh|zsh)"
+  - id: eval_curl
+    severity: high
+    description: "eval of curl output"
+    regex: "eval\\s+\\$\\(curl"
+  - id: raw_ip_url
+    severity: high
+    description: "Direct download from raw IP address"
+    regex: "https?://\\d{1,3}(?:\\.\\d{1,3}){3}"
+  - id: suspicious_installer_domain
+    severity: high
+    description: "Installer domain flagged as untrusted"
+    regex: "download\\.setup-service\\.com"
+  - id: sudo_exec
+    severity: medium
+    description: "Privileged command execution"
+    regex: "sudo\\s+.*(curl|wget|bash|sh)"

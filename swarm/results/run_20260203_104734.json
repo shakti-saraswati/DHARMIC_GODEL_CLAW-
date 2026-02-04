@@ -1,0 +1,43 @@
+{
+  "config": {
+    "model": "claude-sonnet-4-20250514",
+    "cycles": 2,
+    "dry_run": true,
+    "fitness_threshold": 0.8
+  },
+  "duration_seconds": 1.8e-05,
+  "results": [
+    {
+      "cycle": 1,
+      "result": "success",
+      "files_changed": [],
+      "tests_passed": true,
+      "metrics": {
+        "issues_found": 0,
+        "dry_run": true
+      },
+      "fitness": 0.6
+    },
+    {
+      "cycle": 2,
+      "result": "success",
+      "files_changed": [],
+      "tests_passed": true,
+      "metrics": {
+        "issues_found": 0,
+        "dry_run": true
+      },
+      "fitness": 0.7
+    }
+  ],
+  "final_status": {
+    "current_state": "ready",
+    "cycles_completed": 0,
+    "baseline_fitness": 0.5,
+    "model": "claude-sonnet-4-20250514",
+    "max_cycles": 10,
+    "agents_active": 5,
+    "workflow_phases": 7,
+    "evaluation_enabled": true
+  }
+}

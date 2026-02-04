@@ -1,0 +1,15 @@
+# Test dependencies for Dharmic Agent test suite
+
+# Core testing framework
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.11.0
+
+# Coverage reporting (optional)
+pytest-cov>=4.1.0
+
+# YAML parsing (for telos config tests)
+PyYAML>=6.0
+
+# Note: Main project dependencies should be installed separately
+# See: /Users/dhyana/DHARMIC_GODEL_CLAW/src/core/requirements.txt

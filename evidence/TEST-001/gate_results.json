@@ -1,186 +1,322 @@
 {
   "proposal_id": "TEST-001",
-  "timestamp": "2026-02-04T10:38:23.181748+00:00",
-  "overall_result": "PASS",
+  "timestamp": "2026-02-04T12:56:29.415490+00:00",
+  "overall_result": "FAIL",
   "gates_passed": 0,
-  "gates_failed": 0,
+  "gates_failed": 1,
   "gates_warned": 0,
-  "gates_skipped": 17,
-  "total_duration_seconds": 0.000705718994140625,
+  "gates_skipped": 25,
+  "total_duration_seconds": 2.093367099761963,
   "gate_results": [
     {
-      "gate_id": 1,
+      "gate_id": "1",
       "gate_name": "LINT_FORMAT",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 2,
+      "gate_id": "2",
       "gate_name": "TYPE_CHECK",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 3,
+      "gate_id": "3",
       "gate_name": "SECURITY_SCAN",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 4,
+      "gate_id": "4",
       "gate_name": "DEPENDENCY_SAFETY",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 5,
+      "gate_id": "5",
       "gate_name": "TEST_COVERAGE",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 6,
+      "gate_id": "6",
       "gate_name": "PROPERTY_TESTING",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 7,
+      "gate_id": "7",
       "gate_name": "CONTRACT_INTEGRATION",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 8,
+      "gate_id": "8",
       "gate_name": "PERFORMANCE_REGRESSION",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 9,
+      "gate_id": "9",
       "gate_name": "AHIMSA",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 10,
+      "gate_id": "10",
       "gate_name": "SATYA",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 11,
+      "gate_id": "11",
       "gate_name": "CONSENT",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 12,
+      "gate_id": "12",
       "gate_name": "VYAVASTHIT",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 13,
+      "gate_id": "13",
       "gate_name": "REVERSIBILITY",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 14,
+      "gate_id": "14",
       "gate_name": "SVABHAAVA",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 15,
+      "gate_id": "15",
       "gate_name": "WITNESS",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 16,
+      "gate_id": "16",
       "gate_name": "SBOM_PROVENANCE",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     },
     {
-      "gate_id": 17,
+      "gate_id": "17",
       "gate_name": "LICENSE_COMPLIANCE",
       "result": "skip",
       "duration_seconds": 0,
       "stdout": "",
       "stderr": "",
       "artifacts": [],
-      "error_message": "Dry run - gate not executed"
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
+    },
+    {
+      "gate_id": "ML_DATA_PROVENANCE",
+      "gate_name": "ML_DATA_PROVENANCE",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
+    },
+    {
+      "gate_id": "ML_EVAL_SUITE",
+      "gate_name": "ML_EVAL_SUITE",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
+    },
+    {
+      "gate_id": "ML_MODEL_CARD",
+      "gate_name": "ML_MODEL_CARD",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
+    },
+    {
+      "gate_id": "ML_RISK_REGISTER",
+      "gate_name": "ML_RISK_REGISTER",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
+    },
+    {
+      "gate_id": "ML_REPRODUCIBILITY",
+      "gate_name": "ML_REPRODUCIBILITY",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
+    },
+    {
+      "gate_id": "ACCELERATOR_PLAN",
+      "gate_name": "ACCELERATOR_PLAN",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
+    },
+    {
+      "gate_id": "CUDA_COMPAT",
+      "gate_name": "CUDA_COMPAT",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
+    },
+    {
+      "gate_id": "ACCELERATOR_BENCHMARKS",
+      "gate_name": "ACCELERATOR_BENCHMARKS",
+      "result": "skip",
+      "duration_seconds": 0,
+      "stdout": "",
+      "stderr": "",
+      "artifacts": [],
+      "error_message": "Dry run - gate not executed",
+      "exception_applied": false,
+      "exception_reason": ""
     }
   ],
-  "evidence_bundle_hash": "fcc8781cba54a7c692db62a9c5ec9d447090d68cd4714e17a26c28bf877b3f33",
+  "evidence_bundle_hash": "8330295988e45901396d975148ac2d5568479f320e849b377d2443ddd9f291ad",
+  "evidence_signature": "",
+  "signature_method": "hmac-sha256",
+  "signature_key_id": "",
+  "signature_required": true,
+  "signature_present": false,
   "emergency_bypass": false,
   "emergency_reason": "",
-  "emergency_approver": ""
+  "emergency_approver": "",
+  "exceptions_applied": []
 }

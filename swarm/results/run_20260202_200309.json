@@ -1,0 +1,40 @@
+{
+  "config": {
+    "model": "claude-sonnet-4-20250514",
+    "cycles": 1,
+    "dry_run": true,
+    "fitness_threshold": 0.8
+  },
+  "duration_seconds": 24.0786,
+  "results": [
+    {
+      "cycle_id": "evo_20260202_200245_e4a97baa",
+      "start_time": "2026-02-02T20:02:45.482614",
+      "dry_run": true,
+      "states_visited": [
+        "propose"
+      ],
+      "result": "error",
+      "fitness": null,
+      "error": "'ahimsa_score'",
+      "end_time": "2026-02-02T20:03:08.560158"
+    }
+  ],
+  "final_status": {
+    "current_state": "idle",
+    "cycles_completed": 0,
+    "baseline_fitness": 0.0,
+    "recent_results": [
+      {
+        "cycle_id": "evo_20260202_200245_e4a97baa",
+        "result": "error",
+        "fitness": null
+      }
+    ],
+    "config": {
+      "max_cycles": 10,
+      "fitness_threshold": 0.8,
+      "model": "claude-sonnet-4-20250514"
+    }
+  }
+}

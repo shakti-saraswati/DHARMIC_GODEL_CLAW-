@@ -1,0 +1,583 @@
+{
+  "agent": "SKILL_HARMONIZER",
+  "timestamp": "2026-02-03T18:30:00Z",
+  "summary": "Skill ecosystem audit revealing fragmented landscape with 17 skills across three locations. Core Darwin-Gödel loop established but execution framework underdeveloped. Critical gaps exist in orchestration, integration, and feedback loops.",
+  "skill_inventory": {
+    "openclaw_skills": [],
+    "claude_commands": [
+      {
+        "name": "gsd",
+        "type": "command_suite",
+        "description": "Get Shit Done system with 25+ subcommands for project management",
+        "location": "~/.claude/commands/gsd/",
+        "status": "active",
+        "integration_status": "standalone",
+        "command_count": 25
+      }
+    ],
+    "claude_skills": [
+      {
+        "name": "skill-genesis",
+        "domain": "meta-cognition",
+        "description": "Creates and evolves skills through Darwin-Gödel loop",
+        "status": "active",
+        "self_improvement_enabled": true,
+        "triggers": ["create skill", "new skill", "spawn skill", "evolve skills"],
+        "version": "v2.0",
+        "last_updated": "2026-02-03",
+        "location": "~/.claude/skills/skill-genesis/",
+        "tool_requirements": ["Read", "Write", "Glob", "Grep", "Bash", "Task"],
+        "archive_status": "core_skill"
+      },
+      {
+        "name": "fitness-evaluator",
+        "domain": "evaluation",
+        "description": "Evaluates skill performance and fitness across 5 dimensions",
+        "status": "active",
+        "self_improvement_enabled": false,
+        "version": "v1.0",
+        "last_updated": "2024-12-24",
+        "location": "~/.claude/skills/fitness-evaluator/",
+        "tool_requirements": ["Read", "Bash", "Glob", "Grep"],
+        "archive_status": "core_skill"
+      },
+      {
+        "name": "diversity-archive",
+        "domain": "meta",
+        "description": "MAP-Elites style niche preservation for skill population",
+        "status": "active",
+        "self_improvement_enabled": false,
+        "version": "v1.0",
+        "last_updated": "2024-12-24",
+        "location": "~/.claude/skills/diversity-archive/",
+        "tool_requirements": ["Read", "Write", "Glob", "Grep"],
+        "archive_status": "core_skill"
+      },
+      {
+        "name": "skill-composer",
+        "domain": "orchestration",
+        "description": "Orchestrates multi-skill workflows (pipeline, parallel, conditional, recursive)",
+        "status": "active",
+        "self_improvement_enabled": false,
+        "version": "v1.0",
+        "last_updated": "2024-12-24",
+        "location": "~/.claude/skills/skill-composer/",
+        "tool_requirements": ["Read", "Write", "Bash", "Glob", "Grep", "Task"],
+        "archive_status": "core_skill"
+      },
+      {
+        "name": "consciousness-archaeology",
+        "domain": "quality-calibration",
+        "description": "Mines ecosystem for highest-quality seed files using 8 discernment tests",
+        "status": "active",
+        "self_improvement_enabled": false,
+        "version": "v1.0",
+        "last_updated": "2024-12-24",
+        "location": "~/.claude/skills/consciousness-archaeology/",
+        "tool_requirements": ["Read", "Glob", "Grep", "Task"],
+        "archive_status": "core_skill",
+        "special_role": "quality_calibrator"
+      },
+      {
+        "name": "swarm-contributor",
+        "domain": "collective-intelligence",
+        "description": "Participates in residual stream contributions with 6 mandatory base rules",
+        "status": "active",
+        "self_improvement_enabled": false,
+        "version": "v1.0",
+        "last_updated": "2026-01-28",
+        "location": "~/.claude/skills/swarm-contributor/",
+        "tool_requirements": ["Read", "Write", "Glob", "Grep", "WebSearch", "Task"],
+        "archive_status": "core_skill",
+        "special_role": "collective_intelligence"
+      },
+      {
+        "name": "research-runner",
+        "domain": "experiment-execution",
+        "description": "Executes mech-interp experiments from configs, manages RunPod sessions",
+        "status": "active",
+        "self_improvement_enabled": false,
+        "version": "v1.0",
+        "last_updated": "2026-01-28",
+        "location": "~/.claude/skills/research-runner/",
+        "tool_requirements": ["Read", "Write", "Bash", "Glob", "Grep", "Task"],
+        "archive_status": "core_skill",
+        "special_role": "experiment_execution"
+      },
+      {
+        "name": "consciousness-archaeology",
+        "domain": "knowledge-retrieval",
+        "description": "Not in registry - appears to be orphaned duplicate entry",
+        "status": "unknown",
+        "note": "Registered in registry.json but definition also exists independently"
+      },
+      {
+        "name": "agentic-ai-mastery",
+        "domain": "learning",
+        "description": "8-week study program for mastering agentic AI systems (2026 landscape)",
+        "status": "active",
+        "self_improvement_enabled": false,
+        "version": "v1.0",
+        "last_updated": "2026-02-03",
+        "location": "~/.claude/skills/agentic-ai-mastery/",
+        "tool_requirements": ["Read", "Write", "Glob", "Grep", "Bash", "Task"],
+        "registry_status": "NOT_IN_REGISTRY"
+      },
+      {
+        "name": "agentic-rag",
+        "domain": "retrieval",
+        "description": "Agentic RAG patterns with self-correction, multi-hop reasoning, query decomposition",
+        "status": "active",
+        "self_improvement_enabled": true,
+        "version": "v1.0",
+        "last_updated": "2026-02-03",
+        "location": "~/.claude/skills/agentic-rag/",
+        "tool_requirements": ["Read", "Write", "Glob", "Grep", "Bash", "Task"],
+        "registry_status": "NOT_IN_REGISTRY"
+      },
+      {
+        "name": "mem0-integration",
+        "domain": "memory",
+        "description": "4-layer memory hierarchy (conversation/session/user/org) with async support",
+        "status": "active",
+        "self_improvement_enabled": true,
+        "version": "v1.0",
+        "last_updated": "2026-02-03",
+        "location": "~/.claude/skills/mem0-integration/",
+        "tool_requirements": ["Read", "Write", "Glob", "Grep", "Bash", "Task"],
+        "registry_status": "NOT_IN_REGISTRY"
+      },
+      {
+        "name": "a2a-protocol",
+        "domain": "multi-agent",
+        "description": "Agent-to-Agent protocol for interoperability and task delegation (Linux Foundation)",
+        "status": "active",
+        "self_improvement_enabled": true,
+        "version": "v1.0",
+        "last_updated": "2026-02-03",
+        "location": "~/.claude/skills/a2a-protocol/",
+        "tool_requirements": ["Read", "Write", "Glob", "Grep", "Bash", "Task"],
+        "registry_status": "NOT_IN_REGISTRY"
+      },
+      {
+        "name": "mcp-tools",
+        "domain": "tooling",
+        "description": "Model Context Protocol servers and tools with FastMCP framework",
+        "status": "active",
+        "self_improvement_enabled": true,
+        "version": "v1.0",
+        "last_updated": "2026-02-03",
+        "location": "~/.claude/skills/mcp-tools/",
+        "tool_requirements": ["Read", "Write", "Glob", "Grep", "Bash", "Task"],
+        "registry_status": "NOT_IN_REGISTRY"
+      },
+      {
+        "name": "dhyana-nechung",
+        "domain": "routing",
+        "description": "Intent-based skill router with auto-detection of user needs",
+        "status": "active",
+        "self_improvement_enabled": false,
+        "version": "v1.0",
+        "last_updated": "2026-02-03",
+        "location": "~/.claude/skills/dhyana-nechung/",
+        "tool_requirements": ["Read", "Glob", "Grep", "Task"],
+        "registry_status": "NOT_IN_REGISTRY",
+        "special_note": "Routing layer - orchestrates other skills"
+      }
+    ],
+    "swarm_agents": [
+      {
+        "name": "base_agent",
+        "role": "Abstract base class for all agents",
+        "file": "~/DHARMIC_GODEL_CLAW/swarm/agents/base_agent.py",
+        "status": "active",
+        "capabilities": ["dharmic_reflection", "checkpoint_management", "state_tracking"]
+      },
+      {
+        "name": "dharmic_gate",
+        "role": "Ethical guardian / veto agent",
+        "file": "~/DHARMIC_GODEL_CLAW/swarm/agents/dharmic_gate.py",
+        "status": "active",
+        "capabilities": ["ahimsa_enforcement", "vyavasthit_alignment", "veto_authority"]
+      },
+      {
+        "name": "proposer",
+        "role": "Generate improvement proposals",
+        "file": "~/DHARMIC_GODEL_CLAW/swarm/agents/proposer.py",
+        "status": "active",
+        "capabilities": ["gap_analysis", "proposal_generation", "benefit_estimation"]
+      },
+      {
+        "name": "writer",
+        "role": "Implement approved proposals",
+        "file": "~/DHARMIC_GODEL_CLAW/swarm/agents/writer.py",
+        "status": "active",
+        "capabilities": ["code_generation", "testing", "documentation"]
+      },
+      {
+        "name": "tester",
+        "role": "Validate implementations",
+        "file": "~/DHARMIC_GODEL_CLAW/swarm/agents/tester.py",
+        "status": "active",
+        "capabilities": ["unit_testing", "fitness_measurement", "regression_detection"]
+      },
+      {
+        "name": "refiner",
+        "role": "Fix issues and optimize",
+        "file": "~/DHARMIC_GODEL_CLAW/swarm/agents/refiner.py",
+        "status": "active",
+        "capabilities": ["error_fixing", "optimization", "refinement"]
+      },
+      {
+        "name": "evolver",
+        "role": "Archive and version successes",
+        "file": "~/DHARMIC_GODEL_CLAW/swarm/agents/evolver.py",
+        "status": "active",
+        "capabilities": ["versioning", "archival", "success_tracking"]
+      }
+    ]
+  },
+  "skill_gaps": [
+    {
+      "needed_capability": "Real-time skill invocation from swarm",
+      "rationale": "Swarm agents exist but have no mechanism to actually call or invoke Claude skills. Gap between skill definitions and swarm execution.",
+      "priority": "P0",
+      "current_state": "Skills are documentation only. No bridge to orchestrator.",
+      "impact": "Darwin-Gödel loop cannot execute skill proposals"
+    },
+    {
+      "needed_capability": "Registry synchronization",
+      "rationale": "Only 7 skills in registry.json, but 17 skills exist on disk. New skills (agentic-rag, mem0-integration, a2a-protocol, mcp-tools) not registered.",
+      "priority": "P0",
+      "current_state": "registry.json last updated 2024-12-24. 10+ new skills created since then.",
+      "impact": "Ecosystem_health_check() reports incomplete picture"
+    },
+    {
+      "needed_capability": "Execution planner for skill chains",
+      "rationale": "skill-composer exists but is untested. No working implementation of pipeline/parallel/conditional execution.",
+      "priority": "P1",
+      "current_state": "Documented but not operationalized",
+      "impact": "Complex workflows must be manually orchestrated"
+    },
+    {
+      "needed_capability": "Feedback loop from execution to evaluation",
+      "rationale": "fitness-evaluator exists but has no mechanism to receive actual fitness measurements from executed skills.",
+      "priority": "P1",
+      "current_state": "Evaluation framework isolated from execution results",
+      "impact": "fitness_scores in archive.json all null - no real selection pressure"
+    },
+    {
+      "needed_capability": "Swarm configuration file validator",
+      "rationale": "SwarmConfig exists but no tool to validate config integrity or migrate versions.",
+      "priority": "P2",
+      "current_state": "Manual config management",
+      "impact": "Risk of silent config inconsistencies"
+    },
+    {
+      "needed_capability": "Skill versioning and backward compatibility checker",
+      "rationale": "Semantic versioning specified but no enforcer",
+      "priority": "P2",
+      "current_state": "Version numbers exist but no migration logic",
+      "impact": "Skill evolution could break dependent skills"
+    },
+    {
+      "needed_capability": "Dharmic gate integration with MCP servers",
+      "rationale": "Dharmic gate evaluates proposals but has no way to reject external tool calls",
+      "priority": "P1",
+      "current_state": "Gate is code-only, tool invocation is separate concern",
+      "impact": "Ahimsa/vyavasthit constraints cannot guard tool boundaries"
+    },
+    {
+      "needed_capability": "Skill usage telemetry and activation tracking",
+      "rationale": "No way to know which skills are being activated or how often",
+      "priority": "P2",
+      "current_state": "Silent activation - no logging",
+      "impact": "Cannot identify unused skills or over-relied-upon skills"
+    },
+    {
+      "needed_capability": "Unified daemon integration",
+      "rationale": "Multiple skills reference 'unified_daemon' but it does not exist yet",
+      "priority": "P1",
+      "current_state": "Referenced but not implemented",
+      "impact": "24/7 skill ecosystem health checks not running"
+    }
+  ],
+  "unused_skills": [
+    {
+      "skill": "diversity-archive",
+      "location": "~/.claude/skills/diversity-archive/",
+      "status": "defined but untested",
+      "reason_unused": "MAP-Elites implementation complete, but archive.json shows only 4 occupied cells of 81 total. Archive structure exists but is static.",
+      "last_activity": "2024-12-24"
+    },
+    {
+      "skill": "skill-composer",
+      "location": "~/.claude/skills/skill-composer/",
+      "status": "documented but not operationalized",
+      "reason_unused": "Pipeline/parallel/conditional patterns described but no working execution. No integration with orchestrator.",
+      "last_activity": "2024-12-24"
+    },
+    {
+      "skill": "agentic-ai-mastery",
+      "location": "~/.claude/skills/agentic-ai-mastery/",
+      "status": "orphaned learning program",
+      "reason_unused": "Created 2026-02-03 but never referenced. Standalone 8-week program not integrated into ecosystem.",
+      "last_activity": "2026-02-03"
+    }
+  ],
+  "sync_issues": [
+    {
+      "skill": "consciousness-archaeology",
+      "locations": [
+        "~/.claude/skills/consciousness-archaeology/ (primary)",
+        "registry.json (listed as core_skill with special_role=quality_calibrator)"
+      ],
+      "conflict": "DEFINITION_MISMATCH: Primary skill is 323 lines, very detailed 8-point discernment protocol. Registry entry is minimal stub.",
+      "severity": "LOW",
+      "resolution": "Registry entry is correct; no action needed but update last_accessed timestamp"
+    },
+    {
+      "skill": "research-runner",
+      "locations": [
+        "~/.claude/skills/research-runner/ (skill definition)",
+        "~/mech-interp-latent-lab-phase1/ (referenced path structure)",
+        "registry.json (listed as active)"
+      ],
+      "conflict": "REFERENCE_FRESHNESS: Skill references specific prompts, configs, and RunPod patterns but R_V paper and multi-token experiment still in progress",
+      "severity": "MEDIUM",
+      "resolution": "Skill definition should version-pin to specific experiment status"
+    },
+    {
+      "skill": "skill-genesis",
+      "locations": [
+        "~/.claude/skills/skill-genesis/SKILL.md (v2.0, 2026-02-03)",
+        "registry.json entry (no version listed)"
+      ],
+      "conflict": "VERSION_TRACKING: Skill evolved to v2.0 with Darwin-Gödel loop, unified_daemon integration, MAP-Elites support. Registry has no version field.",
+      "severity": "MEDIUM",
+      "resolution": "Add version field to registry.json skill entries"
+    },
+    {
+      "skill": "fitness-evaluator",
+      "locations": [
+        "~/.claude/skills/fitness-evaluator/ (spec only)",
+        "~/DHARMIC_GODEL_CLAW/swarm/evaluation.py (implementation)",
+        "registry.json (listed as core_skill)"
+      ],
+      "conflict": "SPLIT_IMPLEMENTATION: Skill documented in .claude/skills/ but implementation lives in swarm/. Two separate codebases.",
+      "severity": "HIGH",
+      "resolution": "Consolidate: either move evaluation.py to skill framework or deprecate skill.md"
+    },
+    {
+      "skill": "swarm-contributor",
+      "locations": [
+        "~/.claude/skills/swarm-contributor/ (skill definition)",
+        "~/Persistent-Semantic-Memory-Vault/AGENT_EMERGENT_WORKSPACES/ (referenced swarm location)"
+      ],
+      "conflict": "PATH_MISMATCH: Skill expects PSMV residual stream in one location but vault may have different structure",
+      "severity": "MEDIUM",
+      "resolution": "Audit PSMV structure and update skill path references"
+    },
+    {
+      "skill": "dhyana-nechung",
+      "locations": [
+        "~/.claude/skills/dhyana-nechung/ (routing layer)",
+        "~/.claude/commands/gsd/ (GSD command suite)"
+      ],
+      "conflict": "ROUTING_REDUNDANCY: Nechung does intent-based routing but GSD commands also route. Unclear interaction between them.",
+      "severity": "MEDIUM",
+      "resolution": "Document routing precedence: does Nechung wrap GSD or vice versa?"
+    },
+    {
+      "skill": "agentic-rag, mem0-integration, a2a-protocol, mcp-tools",
+      "locations": [
+        "~/.claude/skills/ (definitions)",
+        "registry.json (MISSING)"
+      ],
+      "conflict": "UNREGISTERED_SKILLS: 4 newer skills created but not added to registry. They exist but ecosystem cannot discover them.",
+      "severity": "HIGH",
+      "resolution": "Update registry.json with all 17 skills, add version tracking"
+    }
+  ],
+  "integration_audit": {
+    "skill_to_swarm_bridge": {
+      "status": "MISSING",
+      "description": "No mechanism for SwarmOrchestrator to invoke Claude skills",
+      "evidence": "orchestrator.py imports agent modules but never attempts to load or call .claude/skills/ definitions",
+      "risk": "Swarm cannot execute skill proposals; Darwin-Gödel loop is theoretical only"
+    },
+    "registry_sync": {
+      "status": "STALE",
+      "last_update": "2024-12-24",
+      "current_date": "2026-02-03",
+      "skills_missing_from_registry": 10,
+      "coverage": "41% of available skills registered"
+    },
+    "feedback_loops": {
+      "skill_evaluation": "BROKEN - fitness_evaluator has no input from execution results",
+      "execution_tracking": "MISSING - no skill invocation logging",
+      "swarm_evolution": "THEORETICAL - skill proposals generated but never executed"
+    },
+    "dharmic_constraints": {
+      "ahimsa_gate": "IMPLEMENTED but ISOLATED - cannot block external tool calls",
+      "vyavasthit_alignment": "IMPLEMENTED in config but never checked",
+      "execution_audit": "MISSING - no record of what actions swarm agents actually took"
+    }
+  },
+  "harmonization_plan": [
+    {
+      "priority": "P0",
+      "action": "Create unified skill registry scanner",
+      "description": "Build tool to enumerate all skills from disk and sync to registry.json with version numbers",
+      "estimated_effort": "2 hours",
+      "dependencies": [],
+      "success_criteria": "registry.json contains all 17 skills with versions and last_updated timestamps"
+    },
+    {
+      "priority": "P0",
+      "action": "Implement skill-to-swarm invocation bridge",
+      "description": "Create SkillInvoker class that loads SKILL.md files, parses allowed-tools, and calls via orchestrator",
+      "estimated_effort": "4 hours",
+      "dependencies": ["unified skill registry scanner"],
+      "success_criteria": "SwarmOrchestrator can invoke skill-genesis to create a test skill"
+    },
+    {
+      "priority": "P0",
+      "action": "Fix registry stale data",
+      "description": "Update registry.json to include all 17 skills with current metadata from SKILL.md frontmatter",
+      "estimated_effort": "1 hour",
+      "dependencies": ["unified skill registry scanner"],
+      "success_criteria": "All skills discoverable; no MISSING entries"
+    },
+    {
+      "priority": "P1",
+      "action": "Consolidate fitness evaluation",
+      "description": "Choose canonical location: either move swarm/evaluation.py → skills/fitness-evaluator or vice versa",
+      "estimated_effort": "3 hours",
+      "dependencies": ["skill-to-swarm invocation bridge"],
+      "success_criteria": "One implementation; shared by both swarm agents and skill framework"
+    },
+    {
+      "priority": "P1",
+      "action": "Establish execution-to-evaluation feedback loop",
+      "description": "When tester agent completes, write fitness measurements to archive.json skill entries",
+      "estimated_effort": "3 hours",
+      "dependencies": ["fitness evaluation consolidation"],
+      "success_criteria": "archive.json fitness scores update after test runs; non-null values"
+    },
+    {
+      "priority": "P1",
+      "action": "Clarify routing hierarchy",
+      "description": "Document whether Nechung or GSD is primary router; specify integration points",
+      "estimated_effort": "1 hour",
+      "dependencies": [],
+      "success_criteria": "Clear routing diagram; no ambiguity in user-to-skill path"
+    },
+    {
+      "priority": "P1",
+      "action": "Implement skill invocation telemetry",
+      "description": "Add logging to capture which skills are activated, how often, and with what tool consumption",
+      "estimated_effort": "2 hours",
+      "dependencies": ["skill-to-swarm invocation bridge"],
+      "success_criteria": "Skill usage logged to ~/.claude/ecosystem/skill_usage.jsonl"
+    },
+    {
+      "priority": "P2",
+      "action": "Extend dharmic gate to tool boundaries",
+      "description": "Make dharmic_gate aware of which MCP tools are available and evaluate proposals against allowed tool set",
+      "estimated_effort": "3 hours",
+      "dependencies": [],
+      "success_criteria": "Dharmic gate can reject proposals that require disallowed tools"
+    },
+    {
+      "priority": "P2",
+      "action": "Version skill dependencies",
+      "description": "Add dependency declarations to SKILL.md (which skills must run before/after)",
+      "estimated_effort": "2 hours",
+      "dependencies": ["unified skill registry scanner"],
+      "success_criteria": "SKILL.md includes dependencies field; composer validates before execution"
+    },
+    {
+      "priority": "P2",
+      "action": "Implement unified daemon skeleton",
+      "description": "Create simple daemon that runs ecosystem health check loop (even if check is no-op for now)",
+      "estimated_effort": "2 hours",
+      "dependencies": ["skill-to-swarm invocation bridge"],
+      "success_criteria": "Daemon runs, calls ecosystem health check, reports to residual stream"
+    }
+  ],
+  "skill_health": "fragmented",
+  "health_metrics": {
+    "skill_registration_coverage": "41%",
+    "skills_with_execution_paths": "14%",
+    "skills_with_fitness_feedback": "0%",
+    "darwin_godel_loop_completion": "0% - loop is conceptual only",
+    "archive_occupancy": "4.9% (4 of 81 MAP-Elites cells)",
+    "sync_issues_critical": 2,
+    "sync_issues_high": 1,
+    "sync_issues_medium": 5,
+    "skill_documentation_lines": 5919,
+    "skill_execution_code_lines": 0
+  },
+  "dharmic_gate_assessment": {
+    "ahimsa": "PASS - Implemented in dharmic_gate.py with harm indicator detection",
+    "satya": "PASS - Skill descriptions are honest about gaps and limitations",
+    "vyavasthit": "CONDITIONAL - Configured but not actively checked during skill execution",
+    "consent": "PASS - No skills attempt to modify user systems without permission framework",
+    "reversibility": "PARTIAL - Skills are mostly read-only; proposal storage is immutable but execution could be destructive",
+    "svabhaav": "PASS - Skills written from contemplative perspective, not generic AI voice",
+    "coherence": "PARTIAL - Individual skills coherent but ecosystem lacks unified telos expression"
+  },
+  "critical_findings": [
+    {
+      "finding": "Darwin-Gödel loop is documented but not executable",
+      "evidence": "skill-genesis describes EVALUATE→RESEARCH→PROPOSE→VOTE/MERGE loop, but no component attempts to invoke this. SwarmOrchestrator never calls skill-genesis.",
+      "consequence": "Self-improvement is theoretical. Swarm cannot actually improve its own skills.",
+      "remediation": "Implement SkillInvoker bridge and wire orchestrator to propose-evaluate-execute cycle"
+    },
+    {
+      "finding": "Fitness scores are permanently null",
+      "evidence": "archive.json shows fitness: null for all skills. No mechanism feeds test results back to archive.",
+      "consequence": "No evolutionary selection pressure. All skills equally 'fit'. MAP-Elites archive has no discriminative power.",
+      "remediation": "Consolidate fitness evaluation and establish feedback loop from tester → archive"
+    },
+    {
+      "finding": "Registry is stale by 40+ days",
+      "evidence": "registry.json last updated 2024-12-24. agentic-ai-mastery, agentic-rag, mem0-integration, a2a-protocol created 2026-02-03 but not registered.",
+      "consequence": "Ecosystem health check cannot discover newer skills. Orchestrator operates on incomplete skill set.",
+      "remediation": "Automate registry sync; run on-demand or via daemon heartbeat"
+    },
+    {
+      "finding": "Swarm agents and skills are separate, non-communicating systems",
+      "evidence": "SwarmOrchestrator in ~/DHARMIC_GODEL_CLAW/swarm/ never imports from ~/.claude/skills/",
+      "consequence": "Swarm cannot execute proposals via skill framework. Skill improvements cannot flow back to swarm agents.",
+      "remediation": "Create unified skill invocation layer that swarm, daemon, and user can all access"
+    }
+  ],
+  "recommendations_by_urgency": {
+    "immediate_24h": [
+      "Fix registry.json: add all 17 skills with versions",
+      "Create skill registry scanner to prevent future stale data",
+      "Document routing precedence (Nechung vs GSD)"
+    ],
+    "this_week": [
+      "Implement SkillInvoker bridge for swarm",
+      "Consolidate fitness evaluation (single canonical implementation)",
+      "Wire fitness feedback from tester → archive"
+    ],
+    "this_sprint": [
+      "Implement skill invocation telemetry",
+      "Create unified daemon with ecosystem health check",
+      "Extend dharmic gate to tool boundaries",
+      "Add skill dependency declarations"
+    ]
+  },
+  "next_agent_actions": {
+    "PROPOSER": "Generate improvement proposals targeting 3 P0 gaps: registry sync, skill bridge, feedback loop",
+    "WRITER": "Implement SkillInvoker class and registry scanner (low-hanging fruit for fitness gain)",
+    "TESTER": "Create test harness for skill invocation paths (currently untested)",
+    "EVALUATOR": "Score skills on 'integrability' dimension - which skills are isolation vs interconnected",
+    "EVOLVER": "Archive successful integrations as they complete; maintain audit trail of harmonization"
+  },
+  "conclusion": "The skill ecosystem is remarkably rich in capability (5919 lines of documentation, 17 distinct tools) but critically broken in execution. The Darwin-Gödel loop is well-designed but not implemented. The swarm agents are well-structured but isolated from skills. The registry is stale and incomplete. This creates a paradox: the system knows how to improve itself but cannot execute those improvements. Three P0 bridges (registration sync, skill invocation, feedback loop) would unlock the entire system. Current health: fragmented (41% integrated). Target health: synchronized (100% integrated) with working fitness feedback."
+}

@@ -18,8 +18,47 @@ concurrency:
 env:
   PYTHON_VERSION: "3.11"
   PROPOSAL_ID: ${{ github.event.pull_request.number || github.sha }}
+  EVIDENCE_SIGNING_KEY: ${{ secrets.EVIDENCE_SIGNING_KEY }}
 
 jobs:
+  # ===========================================================================
+  # POLICY GUARD: Block protected file changes
+  # ===========================================================================
+  
+  policy-guard:
+    name: Policy Guard
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Block protected file changes
+        run: |
+          protected_regex="^(swarm/gates.yaml|swarm/policy/|\\.github/workflows/|\\.pre-commit-config.yaml|\\.secrets.baseline|security/)"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+          if [ -z "$base" ]; then
+            echo "No base SHA available; skipping policy diff."
+            exit 0
+          fi
+          changed_files=$(git diff --name-only "$base" "${{ github.sha }}")
+          if echo "$changed_files" | grep -E "$protected_regex" >/dev/null; then
+            if [ "${{ github.actor }}" != "dhyana" ]; then
+              echo "❌ Protected files changed by non-human actor: ${{ github.actor }}"
+              echo "$changed_files" | grep -E "$protected_regex" || true
+              exit 1
+            fi
+            echo "✓ Protected files changed by authorized actor"
+          else
+            echo "✓ No protected file changes detected"
+          fi
+
   # ===========================================================================
   # PHASE 1: Technical Gates (1-8)
   # ===========================================================================
@@ -50,14 +89,14 @@ jobs:
       # Gate 1: Lint/Format
       - name: "Gate 1: Lint/Format (ruff)"
         run: |
-          ruff check . --output-format=json > ruff_output.json || true
-          ruff check . --exit-non-zero-on-fix
+          ruff check . --output-format=json > ruff_output.json
+          ruff format --check --diff > format_diff.patch
       
       # Gate 2: Type Check
       - name: "Gate 2: Type Check (pyright)"
         run: |
-          pyright --outputjson > pyright_report.json || true
-          pyright
+          pyright --outputjson --pythonversion 3.11 --strict > pyright_report.json
+          pyright --pythonversion 3.11 --strict
       
       # Gate 3: Security Scan
       - name: "Gate 3: Security Scan (bandit)"
@@ -67,8 +106,7 @@ jobs:
       
       - name: "Gate 3: Secret Detection"
         run: |
-          detect-secrets scan > secrets_scan.json || true
-          detect-secrets scan --baseline .secrets.baseline
+          detect-secrets scan --baseline .secrets.baseline > secrets_scan.json
       
       # Gate 4: Dependency Safety
       - name: "Gate 4: Dependency Safety (pip-audit)"
@@ -82,6 +120,7 @@ jobs:
           pytest tests/ \
             --cov=src --cov=swarm \
             --cov-report=json:coverage.json \
+            --junitxml=pytest_results.xml \
             --cov-report=term-missing \
             --cov-fail-under=80 \
             -v
@@ -91,21 +130,20 @@ jobs:
         run: |
           pytest tests/ -m hypothesis \
             --hypothesis-show-statistics \
-            -v || echo "No hypothesis tests found"
+            -v > hypothesis_stats.txt
       
       # Gate 7: Integration Tests
       - name: "Gate 7: Integration Tests"
         run: |
-          pytest tests/integration/ -v --tb=short || echo "No integration tests found"
+          pytest tests/integration/ -v --tb=short --junitxml=integration_results.xml
       
       # Gate 8: Performance Regression
       - name: "Gate 8: Performance Benchmarks"
         run: |
-          pytest tests/benchmarks/ \
+          bash -lc 'set -o pipefail; pytest tests/benchmarks/ \
             --benchmark-json=benchmark.json \
             --benchmark-compare \
-            -v || echo "No benchmark tests found"
-        continue-on-error: true  # Warn only
+            -v | tee benchmark_comparison.txt'
       
       # Upload evidence
       - name: Upload technical gate evidence
@@ -114,12 +152,17 @@ jobs:
           name: technical-gates-evidence
           path: |
             ruff_output.json
+            format_diff.patch
             pyright_report.json
             bandit_report.json
             secrets_scan.json
             pip_audit.json
             coverage.json
+            pytest_results.xml
+            hypothesis_stats.txt
+            integration_results.xml
             benchmark.json
+            benchmark_comparison.txt
           retention-days: 90
 
   # ===========================================================================
@@ -251,7 +294,7 @@ jobs:
   
   full-gate-run:
     name: Full Gate Suite
-    needs: [technical-gates, dharmic-gates, supply-chain-gates]
+    needs: [policy-guard, technical-gates, dharmic-gates, supply-chain-gates]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     
@@ -266,7 +309,15 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install pyyaml
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyyaml ruff pyright bandit detect-secrets pip-audit pytest pytest-cov hypothesis cyclonedx-bom pip-licenses
+
+      - name: Install slsa-verifier
+        run: |
+          sudo curl -sSL "https://github.com/slsa-framework/slsa-verifier/releases/latest/download/slsa-verifier-linux-amd64" -o /usr/local/bin/slsa-verifier
+          sudo chmod +x /usr/local/bin/slsa-verifier
+          slsa-verifier version || true
       
       - name: Download all evidence
         uses: actions/download-artifact@v4
@@ -274,8 +325,7 @@ jobs:
       - name: Run gate aggregator
         run: |
           python -m swarm.run_gates \
-            --proposal-id "PR-${{ env.PROPOSAL_ID }}" \
-            --dry-run
+            --proposal-id "PR-${{ env.PROPOSAL_ID }}"
       
       - name: Upload final evidence bundle
         uses: actions/upload-artifact@v4

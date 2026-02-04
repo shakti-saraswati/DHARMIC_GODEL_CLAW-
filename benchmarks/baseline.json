@@ -1,0 +1,6 @@
+{
+  "created_at": "2026-02-04T00:00:00Z",
+  "source": "placeholder",
+  "benchmarks": [],
+  "note": "Run: pytest tests/benchmarks/ --benchmark-json=benchmark.json && python -m swarm.performance_baseline --update"
+}

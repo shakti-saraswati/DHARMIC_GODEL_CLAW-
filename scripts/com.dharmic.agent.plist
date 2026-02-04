@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.dharmic.agent</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/dhyana/DHARMIC_GODEL_CLAW/.venv/bin/python3</string>
+        <string>/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/daemon.py</string>
+        <string>--heartbeat</string>
+        <string>3600</string>
+        <string>--verbose</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/dhyana/DHARMIC_GODEL_CLAW/src/core</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/dhyana/DHARMIC_GODEL_CLAW/logs/launchd_stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/dhyana/DHARMIC_GODEL_CLAW/logs/launchd_stderr.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/dhyana/DHARMIC_GODEL_CLAW/.venv/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>PYTHONPATH</key>
+        <string>/Users/dhyana/DHARMIC_GODEL_CLAW/src/core</string>
+    </dict>
+
+    <!-- Restart if crashes, but with backoff -->
+    <key>ThrottleInterval</key>
+    <integer>60</integer>
+
+    <!-- Nice low priority -->
+    <key>Nice</key>
+    <integer>10</integer>
+</dict>
+</plist>

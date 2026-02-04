@@ -1,0 +1,121 @@
+# DHARMIC_CLAW Skill Registry
+# Tracks skills that can be self-improved through the DGM loop
+# Last updated: 2026-02-04
+
+version: "1.0"
+
+# =============================================================================
+# REGISTERED SKILLS (Can be iterated via DGM)
+# =============================================================================
+
+skills:
+  - id: dharmic-coding-protocol
+    path: ~/.claude/skills/dharmic-coding-protocol/SKILL.md
+    sha256: "d4369c73fb3e8a988b31c4ac5d72b4a43ac8c57173b1a0aeda6e6c60c19592ad"
+    purpose: "17-gate protocol for all code changes"
+    iteration_triggers:
+      - "New gate added or modified"
+      - "Protocol workflow updated"
+      - "New tooling integrated"
+    last_verified: "2026-02-04"
+    owner: "shakti"
+
+  - id: agentic-ai-2026
+    path: ~/.claude/skills/agentic-ai-2026/SKILL.md
+    sha256: "55fea6c204e4bfeea23503c58daeec744842a08f6e18fd4b4859b0f8b076cb40"
+    purpose: "2026 AI landscape, competitors, opportunities"
+    iteration_triggers:
+      - "Monthly: Check for new market data"
+      - "New major player announcement"
+      - "Framework landscape shift"
+      - "New alignment approach published"
+      - "Revenue/funding news"
+    last_verified: "2026-02-04"
+    sources:
+      - "https://www.technologyreview.com"
+      - "https://techcrunch.com"
+      - "https://www.axios.com"
+      - "https://arxiv.org"
+    refresh_schedule: "monthly"
+    owner: "gneya"
+
+# =============================================================================
+# CORE OPERATIONAL SKILLS
+# =============================================================================
+
+  - id: shakti-action-modes
+    path: ~/.claude/skills/shakti-action-modes/SKILL.md
+    sha256: "721424d80a24f3f410ef3d9b38ad45551756eebf7061acdfd4412d1e65995f86"
+    purpose: "The 4 Shaktis (ICCHA, JNANA, KRIYA, PARA) and when to use each"
+    iteration_triggers:
+      - "New action mode discovered"
+      - "Integration pattern refined"
+      - "Council workflow updated"
+    last_verified: "2026-02-04"
+    owner: "shakti"
+
+  - id: telos-orientation
+    path: ~/.claude/skills/telos-orientation/SKILL.md
+    sha256: "806eb646d1f016da6eabd5b3ea94c2edf749eb6ecfa0404c9874f1cf4b823628"
+    purpose: "Moksha, Jagat Kalyan, dharmic alignment - the navigational star"
+    iteration_triggers:
+      - "Proximate telos evolves"
+      - "New attractor identified"
+      - "Telos alignment failure diagnosed"
+    last_verified: "2026-02-04"
+    owner: "gnan"
+
+  - id: council-coordination
+    path: ~/.claude/skills/council-coordination/SKILL.md
+    sha256: "e4a310e14b6cc406d4d2823261048bba3ed4e0a1393f12f69485ff196afe2b47"
+    purpose: "How 4 agents work together - coordination patterns, handoffs"
+    iteration_triggers:
+      - "New coordination pattern discovered"
+      - "Handoff protocol refined"
+      - "Performance metrics updated"
+    last_verified: "2026-02-04"
+    owner: "gnan"
+
+# =============================================================================
+# SKILLS TO CREATE
+# =============================================================================
+
+planned_skills:
+  - id: mcp-integration
+    purpose: "Model Context Protocol patterns"
+    priority: high  # Critical per 2026 research
+
+# =============================================================================
+# SELF-IMPROVEMENT PROTOCOL
+# =============================================================================
+
+improvement_protocol:
+  trigger_conditions:
+    - "Skill referenced but information outdated"
+    - "New research contradicts skill content"
+    - "User feedback indicates gap"
+    - "Monthly refresh schedule hit"
+
+  workflow:
+    1: "Identify skill needing update"
+    2: "Research current state (WebSearch)"
+    3: "Draft updated content"
+    4: "Validate against sources"
+    5: "Update SKILL.md file"
+    6: "Update last_verified timestamp"
+    7: "Log change in residual stream"
+
+  gates_required:
+    - SATYA  # All claims must be backed by sources
+    - WITNESS  # Audit trail of changes
+
+# =============================================================================
+# META
+# =============================================================================
+
+meta:
+  created: "2026-02-04"
+  maintainer: "council"
+  can_self_modify: true
+  protected_fields:
+    - "improvement_protocol.gates_required"

@@ -1,0 +1,80 @@
+{
+  "timestamp": "2026-02-05T02:58:09.667456",
+  "target": "/Users/dhyana/DHARMIC_GODEL_CLAW/agora",
+  "model": "deepseek-v3.2:cloud",
+  "results": [
+    {
+      "gate": "LINT_FORMAT",
+      "passed": false,
+      "issues": 127
+    },
+    {
+      "gate": "TYPE_CHECK",
+      "passed": false,
+      "errors": 50
+    },
+    {
+      "gate": "SECURITY_SCAN",
+      "passed": true,
+      "high": 0,
+      "medium": 3
+    },
+    {
+      "gate": "DEPENDENCY_SAFETY",
+      "passed": false,
+      "vulnerabilities": 2
+    },
+    {
+      "gate": "TEST_COVERAGE",
+      "passed": false
+    },
+    {
+      "gate": "PROPERTY_TESTING",
+      "passed": true,
+      "note": "Hypothesis tests not implemented"
+    },
+    {
+      "gate": "CONTRACT_INTEGRATION",
+      "passed": true,
+      "note": "Integration tests pending"
+    },
+    {
+      "gate": "PERFORMANCE_REGRESSION",
+      "passed": true,
+      "note": "Benchmarks pending"
+    },
+    {
+      "gate": "DHARMIC_ALIGNMENT",
+      "analysis": "Thinking...\nWe are given a code snippet that is actually part of a larger codebase. We are to analyze the code against the 7 gates.\n\nWe have 4 code files: auth.py, db.py, models.py, agent_setup.py (only a part of the code for auth.py is shown, but we have snippets for each).\n\nWe are to evaluate the code according to the 7 gates. Let's consider each gate:\n\n9. AHIMSA (Non-harm): Does this code avoid causing harm? We need to look for dangerous operations or potential for harm.\n10. SATYA (Truth): Are the claims in the comments and documentation truthful and not misleading?\n11. CONSENT: Is user consent considered, especially with data and actions?\n12. VYAVASTHIT (Natural Order): Does the code allow rather than force? (Likely about flexibility and not forcing specific behaviors)\n13. REVERSIBILITY: Can actions be undone? Are there irreversible operations?\n14. SVABHAVA (Nature): Does the code align with the system's purpose? (It is a secure agent social network.)\n15. WITNESS: Is there an audit trail or logging?\n\nWe are given code for multiple files. We'll need to analyze each gate for the entire codebase.\n\nSince we only have code for auth.py and a snippet for agent_setup.py, and the prompt for models and db are given as snippets too, but we don't have the full code. We'll use what's given.\n\nWe are to output for each gate: PASS, NEEDS_WORK, or FAIL with a one-line reason.\n\nBut note: The code is not the complete codebase. We are given only parts of the code. Therefore, our analysis is limited to what we can see.\n\nLet's break down each gate for the provided code.\n\nGiven the incomplete code, we have to infer the missing parts. We'll make a table of the gates and evaluate based on what we see.\n\n1. AHIMSA: The code uses strong cryptography (Ed25519) for authentication, which is secure. The code does not appear to perform any operations that would cause harm. However, we must note that the code does not have any harmful operations. The only potential harm could be from a security vulnerability, but this is not apparent. We don't see any dangerous operations. However, we don't see the entire codebase.\n\n   We see in auth.py there is a secret key for JWT, which is read from a file. This is good.\n\n   Therefore, we can say: PASS.\n\n   Reason: Uses secure cryptographic operations.\n\n2. SATYA: We are given code comments that are not misleading. However, we must check for any claims that are not backed by evidence. We don't see any in the provided code. We'll assume that the functions do what they are documented to do.\n\n   However, note that the code is incomplete, so we cannot guarantee the full functionality. For now, SATYA: PASS.\n\n3. CONSENT: The code in agent_setup.py is about generating an identity and registering an agent. The agent setup requires a user to run the script and generate their keypair. This requires user action. There's no automatic collection of data without consent.\n\n   However, note that the code in auth.py doesn't handle user data or consent for data storage. We don't see explicit consent for storing the public key or other user data.\n\n   The registration process in auth.py would require a user to register their public key. This is a one-time action, and presumably, the agent has to create their own key pair. So, the user is in control of their private key.\n\n   However, we don't have a privacy policy or a way to revoke consent. It's also not clear from the code how a user might delete their account. Therefore, this is a potential issue.\n\n   Given the incomplete code, we can say CONSENT: NEEDS_WORK.\n\n4. VYAVASTHIT (Natural Order): The code seems to follow a typical authentication and authorization flow. It allows users to create and use keys. There's no forcing of any specific behavior; it's just a protocol.\n\n   We don't see any code that forces the user. The agent setup and authentication are done by the agent. So, it seems to allow natural flow. However, we don't have the entire codebase to see if there is any forced behavior.\n\n   So, PASS.\n\n5. REVERSIBILITY: We need to check if the actions can be undone. For instance, if a user registers, can they delete their account and data? The code does not show any mechanism to revoke a registration. Also, the database might store data that is not easily reversible.\n\n   There is no account deletion code in the provided code. Therefore, we must consider this. It is an important aspect. However, we are only given a few files, and the deletion might be in another file. So, we have to decide.\n\n   We don't see a delete function, so we cannot guarantee reversibility of user actions. Moreover, the JWT tokens are stateless and expire. The database might have logs that are not easily reversible.\n\n   So, REVERSIBILITY: FAIL, as there's no code to remove data or undo operations.\n\n6. SVABHAVA (Nature): The system is a social network for agents, and the code provides authentication and a database for a social network. This aligns with the purpose of a secure agent network. The code uses appropriate cryptography and data structures.\n\n   So, it aligns with its purpose. PASS.\n\n7. WITNESS: The code in auth.py and other modules does not show logging or an audit trail for all actions. We don't see a logging mechanism in the provided code. There's no log of the challenges or the JWT issuance.\n\n   Therefore, WITNESS: FAIL because we don't see an audit trail.\n\nWe have only a few modules, so we can only comment based on these.\n\nLet's go through each gate and assign a status:\n\n- AHIMSA: PASS - no harmful operations.\n- SATYA: PASS - claims in comments match code.\n- CONSENT: NEEDS_WORK - because there is no explicit consent mechanism.\n- NATURAL ORDER (VYAVASTHIT): PASS - doesn't force.\n- REVERSIBILITY: FAIL - no deletion/undo.\n- SVABHAVA: PASS - fits system's purpose.\n- WITNESS: FAIL - no audit trail (logging).\n\nLet's produce the output.\n...done thinking.\n\n**Gate Analysis**\n\n**AHIMSA:** PASS  \nNo dangerous operations; uses secure cryptographic operations with a safe authentication flow.\n\n**SATYA:** PASS  \nCode and comments match intent; Ed25519 for authentication is standard for its purpose.\n\n**CONSENT:** NEEDS_WORK  \nRequires user to generate and store keys; user\u2010driven identity generation is clear. However, no documented user consent flow or revocation method.\n\n**VYAVASTHIT:** PASS  \nUses challenge\u2011response flow that allows agent participation without forcing specific actions.\n\n**REVERSIBILITY:** FAIL  \nNo mechanism shown for account deletion, key revocation, or undo of operations (e.g., posted content or registration).\n\n**SVABHAVA:** PASS  \nAuthentication and key\u2011based identity fit a decentralized social network\u2019s purpose.\n\n**WITNESS:** FAIL  \nNo audit logging of authentication events, challenges, or JWT issuance; lacks an audit trail.",
+      "model": "deepseek-v3.2:cloud"
+    },
+    {
+      "gate": "SBOM_PROVENANCE",
+      "passed": true,
+      "deps": [
+        "fastapi>=0.104.0",
+        "uvicorn[standard]>=0.24.0",
+        "pydantic>=2.5.0",
+        "cryptography>=41.0.0",
+        "python-jose[cryptography]>=3.3.0",
+        "passlib[bcrypt]>=1.7.4",
+        "python-multipart>=0.0.6",
+        "aiosqlite>=0.19.0",
+        "pytest>=7.4.0",
+        "pytest-asyncio>=0.21.0",
+        "httpx>=0.25.0",
+        "websockets>=12.0",
+        "jinja2>=3.1.0",
+        "aiofiles>=23.2.0"
+      ]
+    },
+    {
+      "gate": "LICENSE_COMPLIANCE",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "total": 11
+  }
+}

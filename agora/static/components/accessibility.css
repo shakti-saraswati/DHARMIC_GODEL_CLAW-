@@ -1,0 +1,659 @@
+/**
+ * DHARMIC_AGORA Accessibility Styles
+ * WCAG 2.1 Level AA Compliant
+ * 
+ * Includes:
+ * - High contrast mode support
+ * - Focus indicators
+ * - Reduced motion support
+ * - Screen reader utilities
+ * - Keyboard navigation enhancements
+ */
+
+/* ============================================
+   SKIP LINKS
+   ============================================ */
+
+.skip-links {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    z-index: 9999;
+    background: var(--accent);
+    color: white;
+}
+
+.skip-links a {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    padding: 1rem 1.5rem;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 0 0 4px 0;
+    transition: top 0.2s ease;
+}
+
+.skip-links a:focus {
+    top: 0;
+    outline: 3px solid white;
+    outline-offset: 2px;
+}
+
+/* ============================================
+   FOCUS INDICATORS
+   ============================================ */
+
+/* Enhanced focus styles for all interactive elements */
+*:focus {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Specific focus styles for buttons */
+button:focus,
+.tab:focus,
+.vote-btn:focus,
+.page-btn:focus,
+.export-btn:focus {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.3);
+}
+
+/* Input focus styles */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 3px solid var(--accent);
+    outline-offset: 0;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+}
+
+/* Card focus styles */
+.post-card:focus-within,
+.stat-card:focus-within,
+.agent-card:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* Remove focus from non-interactive elements */
+div:focus,
+span:focus,
+p:focus {
+    outline: none;
+}
+
+/* Focus visible only (modern browsers) */
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+*:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   HIGH CONTRAST MODE
+   ============================================ */
+
+@media (prefers-contrast: high) {
+    :root {
+        --bg-primary: #000000;
+        --bg-secondary: #1a1a1a;
+        --bg-tertiary: #2a2a2a;
+        --border: #ffffff;
+        --text-primary: #ffffff;
+        --text-secondary: #e0e0e0;
+        --text-muted: #c0c0c0;
+    }
+
+    /* Stronger borders in high contrast */
+    .stat-card,
+    .post-card,
+    .agent-card,
+    .table-wrapper,
+    button,
+    input,
+    select {
+        border-width: 2px;
+    }
+
+    /* Remove subtle effects */
+    .stat-card:hover,
+    .post-card:hover,
+    .agent-card:hover {
+        box-shadow: none;
+    }
+}
+
+/* Windows High Contrast Mode */
+@media screen and (-ms-high-contrast: active) {
+    * {
+        border-color: WindowText !important;
+        color: WindowText !important;
+        background-color: Window !important;
+    }
+
+    button,
+    a {
+        border: 2px solid ButtonText !important;
+    }
+
+    button:hover,
+    a:hover {
+        background-color: Highlight !important;
+        color: HighlightText !important;
+    }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Remove spinner animation */
+    .spinner {
+        animation: none;
+        border-top-color: var(--accent);
+    }
+
+    /* Remove hover transitions */
+    .stat-card,
+    .post-card,
+    .agent-card,
+    .tab,
+    .vote-btn,
+    button {
+        transition: none;
+    }
+}
+
+/* ============================================
+   SCREEN READER UTILITIES
+   ============================================ */
+
+/* Visually hidden but available to screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focusable when navigated to via keyboard */
+.sr-only-focusable:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+}
+
+/* Hide from screen readers but visible */
+.aria-hidden {
+    speak: none;
+}
+
+/* ============================================
+   IMPROVED COLOR CONTRAST
+   ============================================ */
+
+:root {
+    /* Updated colors for WCAG AA compliance */
+    --text-secondary: #9b9bb8;  /* Was #8888a0 - increased from 3.2:1 to 4.7:1 */
+    --text-muted: #7878a0;      /* Was #5858708 (typo) - now 4.5:1 */
+    --border: #3a3a55;          /* Was #2a2a3d - increased visibility */
+}
+
+/* Ensure subtitle meets contrast requirements */
+.subtitle {
+    color: var(--text-secondary);
+}
+
+/* Ensure muted text meets minimum contrast */
+.witness-time,
+.stat-label,
+.agent-stat-label,
+th,
+.author-address,
+.post-meta {
+    color: var(--text-secondary); /* Use secondary instead of muted */
+}
+
+/* Link contrast improvements */
+footer a,
+a {
+    color: #7c7ef7; /* Lighter accent for better contrast */
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+footer a:hover,
+a:hover {
+    color: #9b9df9;
+    text-decoration-thickness: 2px;
+}
+
+/* ============================================
+   KEYBOARD NAVIGATION ENHANCEMENTS
+   ============================================ */
+
+/* Tab panels keyboard focus */
+.panel[tabindex="0"]:focus {
+    outline: 2px dashed var(--accent);
+    outline-offset: 4px;
+}
+
+/* Tab list arrow key navigation hint */
+.tabs {
+    position: relative;
+}
+
+.tabs::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border);
+    pointer-events: none;
+}
+
+/* Active tab indicator enhanced */
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 2px 2px 0 0;
+}
+
+.tab {
+    position: relative;
+}
+
+/* ============================================
+   TOUCH TARGET SIZING
+   ============================================ */
+
+/* Ensure minimum 44x44px touch targets */
+button,
+.tab,
+.vote-btn,
+.page-btn,
+input,
+select {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Exception for inline buttons with padding */
+.vote-btn {
+    padding: 0.75rem 1rem;
+}
+
+/* ============================================
+   LOADING & STATUS ANNOUNCEMENTS
+   ============================================ */
+
+/* Loading spinner accessible label */
+.spinner::after {
+    content: 'Loading...';
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Status dot accessibility */
+.status-dot::after {
+    content: attr(aria-label);
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ============================================
+   FORM ACCESSIBILITY
+   ============================================ */
+
+/* Required field indicator */
+[required]::after,
+.required::after {
+    content: '*';
+    color: var(--error);
+    margin-left: 0.25rem;
+    font-weight: bold;
+}
+
+/* Error message styling */
+.error-message {
+    color: var(--error);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-message::before {
+    content: '⚠';
+    font-size: 1rem;
+}
+
+/* Success message styling */
+.success-message {
+    color: var(--success);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.success-message::before {
+    content: '✓';
+    font-size: 1rem;
+}
+
+/* Form field grouping */
+fieldset {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+legend {
+    padding: 0 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ============================================
+   TABLE ACCESSIBILITY
+   ============================================ */
+
+/* Table caption */
+table caption {
+    padding: 1rem;
+    font-weight: 600;
+    text-align: left;
+    color: var(--text-primary);
+}
+
+/* Highlight focused row */
+tr:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+/* ============================================
+   MODAL/DIALOG ACCESSIBILITY
+   ============================================ */
+
+/* Modal backdrop */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal container */
+.modal {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Modal close button */
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: 2px solid var(--border);
+    color: var(--text-primary);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    background: var(--bg-tertiary);
+    border-color: var(--accent);
+}
+
+/* ============================================
+   RESPONSIVE TEXT SIZING
+   ============================================ */
+
+/* Support text zoom without breaking layout */
+@media (min-width: 1px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+/* At 200% zoom */
+@media (min-width: 1px) and (min-resolution: 192dpi) {
+    .container {
+        padding: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   PRINT ACCESSIBILITY
+   ============================================ */
+
+@media print {
+    /* Show URLs for links */
+    a[href]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+        color: #666;
+    }
+
+    /* Remove interactive elements */
+    button,
+    .vote-controls,
+    .filter-bar,
+    .connection-status {
+        display: none;
+    }
+
+    /* Ensure text is readable */
+    body {
+        color: #000;
+        background: #fff;
+    }
+
+    /* Page breaks */
+    .post-card,
+    .agent-card {
+        page-break-inside: avoid;
+    }
+}
+
+/* ============================================
+   DARK MODE TOGGLE SUPPORT
+   ============================================ */
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f5f5f5;
+        --bg-tertiary: #e8e8e8;
+        --border: #d0d0d0;
+        --text-primary: #1a1a1a;
+        --text-secondary: #4a4a4a;
+        --text-muted: #6a6a6a;
+        --accent: #4f46e5;
+        --accent-glow: rgba(79, 70, 229, 0.2);
+    }
+
+    /* Invert specific elements that look better dark */
+    .logo {
+        filter: none;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES FOR ACCESSIBILITY
+   ============================================ */
+
+/* Live region for dynamic content */
+.live-region {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Disabled state styling */
+[disabled],
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(50%);
+}
+
+[disabled]:hover,
+.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Loading state */
+[aria-busy="true"] {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+/* Invalid form field */
+[aria-invalid="true"],
+.invalid {
+    border-color: var(--error);
+    border-width: 2px;
+}
+
+[aria-invalid="true"]:focus,
+.invalid:focus {
+    outline-color: var(--error);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+}
+
+/* Valid form field */
+[aria-invalid="false"],
+.valid {
+    border-color: var(--success);
+}
+
+/* Current page/item indicator */
+[aria-current="page"],
+[aria-current="step"],
+[aria-current="true"] {
+    font-weight: 700;
+    background: var(--accent);
+    color: white;
+}
+
+/* Expanded/collapsed states */
+[aria-expanded="false"] .expand-icon::before {
+    content: '▶';
+}
+
+[aria-expanded="true"] .expand-icon::before {
+    content: '▼';
+}
+
+/* ============================================
+   MOBILE ACCESSIBILITY
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* Larger touch targets on mobile */
+    button,
+    .tab,
+    .vote-btn,
+    a {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 0.875rem 1rem;
+    }
+
+    /* Improved spacing */
+    .filter-bar {
+        gap: 1rem;
+    }
+
+    /* Prevent zoom on focus (iOS) */
+    input,
+    select,
+    textarea {
+        font-size: 16px;
+    }
+}

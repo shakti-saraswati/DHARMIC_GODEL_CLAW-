@@ -1,0 +1,18 @@
+# Unified Memory Indexer Dependencies
+
+# Core (always required)
+# - Python 3.8+
+# - SQLite 3.25+ with FTS5
+
+# For semantic search (optional but recommended)
+sentence-transformers>=2.2.0
+numpy>=1.21.0
+
+# For frontmatter parsing (optional)
+python-frontmatter>=1.0.0
+pyyaml>=6.0
+
+# Development
+tpytest>=7.0.0
+black>=22.0.0
+mypy>=0.950

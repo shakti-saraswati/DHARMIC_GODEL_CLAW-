@@ -1,0 +1,19 @@
+proposal_id: "TBD"
+title: ""
+summary: ""
+risk_level: "low"
+
+telos_alignment:
+  intent: ""
+  justification: ""
+
+hazards:
+  - hazard: ""
+    mitigation: ""
+
+rollback_plan: ""
+
+evidence:
+  tests: []
+  benchmarks: []
+  notes: ""

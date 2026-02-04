@@ -52,19 +52,20 @@ gates:
     name: "LINT_FORMAT"
     category: "technical"
     tier: "required"
-    command: "ruff check . --fix --exit-non-zero-on-fix"
+    commands:
+      - "ruff check . --output-format=json > ruff_output.json"
+      - "ruff format --check --diff > format_diff.patch"
     timeout_seconds: 60
     on_failure: "block"
     evidence:
-      - "ruff_output.txt"
+      - "ruff_output.json"
       - "format_diff.patch"
 
   - id: 2
     name: "TYPE_CHECK"
     category: "technical"
     tier: "required"
-    command: "pyright --outputjson"
-    args: ["--pythonversion", "3.11", "--strict"]
+    command: "pyright --outputjson --pythonversion 3.11 --strict > pyright_report.json"
     timeout_seconds: 120
     on_failure: "block"
     evidence:
@@ -76,7 +77,7 @@ gates:
     tier: "required"
     commands:
       - "bandit -r . -f json -o bandit_report.json"
-      - "detect-secrets scan --baseline .secrets.baseline"
+      - "detect-secrets scan --baseline .secrets.baseline > secrets_scan.json"
     timeout_seconds: 180
     on_failure: "block"
     severity_threshold: "medium"
@@ -99,7 +100,7 @@ gates:
     name: "TEST_COVERAGE"
     category: "technical"
     tier: "required"
-    command: "pytest --cov=. --cov-report=json --cov-fail-under=80"
+    command: "pytest --cov=. --cov-report=json:coverage.json --junitxml=pytest_results.xml --cov-fail-under=80"
     timeout_seconds: 300
     on_failure: "block"
     thresholds:
@@ -113,18 +114,18 @@ gates:
     name: "PROPERTY_TESTING"
     category: "technical"
     tier: "required"
-    command: "pytest tests/ -m hypothesis --hypothesis-show-statistics"
+    command: "pytest tests/ -m hypothesis --hypothesis-show-statistics -v > hypothesis_stats.txt"
     timeout_seconds: 300
     on_failure: "block"
     min_examples: 100
     evidence:
-      - "hypothesis_stats.json"
+      - "hypothesis_stats.txt"
 
   - id: 7
     name: "CONTRACT_INTEGRATION"
     category: "technical"
     tier: "required"
-    command: "pytest tests/integration/ -v --tb=short"
+    command: "pytest tests/integration/ -v --tb=short --junitxml=integration_results.xml"
     timeout_seconds: 600
     on_failure: "block"
     evidence:
@@ -134,12 +135,14 @@ gates:
     name: "PERFORMANCE_REGRESSION"
     category: "technical"
     tier: "required"
-    command: "pytest tests/benchmarks/ --benchmark-compare --benchmark-json=benchmark.json"
+    command: "bash -lc 'set -o pipefail; pytest tests/benchmarks/ --benchmark-compare --benchmark-json=benchmark.json -v | tee benchmark_comparison.txt'"
     timeout_seconds: 600
-    on_failure: "warn"
+    on_failure: "block"
     thresholds:
       max_stddev: 0.1
       max_regression_percent: 10
+    baseline_path: "benchmarks/baseline.json"
+    on_missing_baseline: "warn"
     evidence:
       - "benchmark.json"
       - "benchmark_comparison.txt"
@@ -270,12 +273,12 @@ gates:
     description: "Software Bill of Materials + SLSA provenance"
     commands:
       - "cyclonedx-py environment -o sbom.json"
-      - "slsa-verifier verify-artifact --source-uri github.com/dharmic-claw"
+      - "slsa-verifier verify-artifact --source-uri github.com/dharmic-claw > slsa_provenance.txt"
     timeout_seconds: 120
     on_failure: "block"
     evidence:
       - "sbom.json"
-      - "slsa_provenance.json"
+      - "slsa_provenance.txt"
 
   - id: 17
     name: "LICENSE_COMPLIANCE"
@@ -360,6 +363,65 @@ ml_overlay:
       on_failure: "block"
 
 # =============================================================================
+# ACCELERATOR OVERLAY (CUDA / GPU / HPC)
+# =============================================================================
+
+accelerator_overlay:
+  enabled: true
+  triggers:
+    - "*.cu"
+    - "*.cuh"
+    - "*.cpp:cuda"
+    - "*.py:torch.cuda"
+    - "*.py:cupy"
+    - "cuda/"
+    - "kernels/"
+    - "accelerator/"
+
+  gates:
+    - id: "ACCELERATOR_PLAN"
+      description: "Hardware target plan for accelerator code"
+      required_files:
+        - "ACCELERATOR_PLAN.md"
+        - "HARDWARE_TARGETS.md"
+      on_failure: "block"
+
+    - id: "CUDA_COMPAT"
+      description: "CUDA compatibility matrix and build notes"
+      required_files:
+        - "CUDA_COMPAT.md"
+      on_failure: "block"
+
+    - id: "ACCELERATOR_BENCHMARKS"
+      description: "Accelerator performance baselines"
+      required_files:
+        - "benchmarks/cuda_baseline.json"
+      on_failure: "warn"
+
+# =============================================================================
+# SKILL REGISTRY OVERLAY
+# =============================================================================
+
+skills_overlay:
+  enabled: true
+  triggers:
+    - "swarm/skill_registry.yaml"
+
+  gates:
+    - id: "SKILL_REGISTRY_SIGNED"
+      description: "Skill registry must be signed and allowlisted"
+      command: "python -m swarm.skill_registry verify"
+      on_failure: "block"
+      evidence:
+        - "skill_registry_check.json"
+    - id: "SKILL_SUPPLY_CHAIN_SCAN"
+      description: "Scan skill files for supply-chain red flags"
+      command: "python -m swarm.skill_supply_chain scan"
+      on_failure: "block"
+      evidence:
+        - "skill_supply_chain_report.json"
+
+# =============================================================================
 # ENFORCEMENT POLICY
 # =============================================================================
 
@@ -383,6 +445,15 @@ enforcement:
     - ".pre-commit-config.yaml"
 
 # =============================================================================
+# EVIDENCE SIGNING
+# =============================================================================
+
+evidence_signing:
+  required: true
+  method: "hmac-sha256"
+  key_env: "EVIDENCE_SIGNING_KEY"
+
+# =============================================================================
 # EVIDENCE BUNDLE SCHEMA
 # =============================================================================
 
@@ -394,6 +465,11 @@ evidence_bundle:
     - "gate_results"
     - "evidence_files"
     - "bundle_hash"
+    - "artifact_hashes"
+    - "evidence_signature"
+    - "signature_method"
+    - "signature_key_id"
+    - "exceptions_applied"
   
   output_path: "evidence/{proposal_id}/gate_results.json"
   

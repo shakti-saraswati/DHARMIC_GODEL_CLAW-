@@ -1,0 +1,41 @@
+{
+  "config": {
+    "model": "claude-sonnet-4-20250514",
+    "cycles": 1,
+    "dry_run": true,
+    "fitness_threshold": 0.8
+  },
+  "duration_seconds": 69.943992,
+  "results": [
+    {
+      "cycle_id": "evo_20260202_200330_3323014d",
+      "start_time": "2026-02-02T20:03:30.882469",
+      "dry_run": true,
+      "states_visited": [
+        "propose",
+        "write"
+      ],
+      "result": "error",
+      "fitness": null,
+      "error": "Writer failed: Failed to parse JSON response: Unterminated string starting at: line 5 column 24 (char 98)",
+      "end_time": "2026-02-02T20:04:39.824815"
+    }
+  ],
+  "final_status": {
+    "current_state": "idle",
+    "cycles_completed": 0,
+    "baseline_fitness": 0.0,
+    "recent_results": [
+      {
+        "cycle_id": "evo_20260202_200330_3323014d",
+        "result": "error",
+        "fitness": null
+      }
+    ],
+    "config": {
+      "max_cycles": 10,
+      "fitness_threshold": 0.8,
+      "model": "claude-sonnet-4-20250514"
+    }
+  }
+}

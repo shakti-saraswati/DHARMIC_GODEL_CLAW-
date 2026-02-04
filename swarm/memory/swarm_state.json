@@ -1,0 +1,144 @@
+{
+  "tasks": {
+    "task_20260203144151_0001": {
+      "id": "task_20260203144151_0001",
+      "description": "Research the dharmic swarm architecture",
+      "parent_id": null,
+      "sangha": null,
+      "priority": 2,
+      "status": "pending",
+      "result": null,
+      "dharmic_gates": [
+        {
+          "name": "ahimsa",
+          "passed": true,
+          "reason": "No harm patterns detected"
+        },
+        {
+          "name": "coherence",
+          "passed": true,
+          "reason": "Serves constructive purpose"
+        }
+      ],
+      "created_at": "2026-02-03T14:41:51.627938",
+      "completed_at": null
+    },
+    "task_20260203144151_0002": {
+      "id": "task_20260203144151_0002",
+      "description": "[sangha_research] Research the dharmic swarm architecture",
+      "parent_id": "task_20260203144151_0001",
+      "sangha": "sangha_research",
+      "priority": 2,
+      "status": "pending",
+      "result": null,
+      "dharmic_gates": [],
+      "created_at": "2026-02-03T14:41:51.628744",
+      "completed_at": null
+    },
+    "task_20260203144151_0003": {
+      "id": "task_20260203144151_0003",
+      "description": "[sangha_builder] Research the dharmic swarm architecture",
+      "parent_id": "task_20260203144151_0001",
+      "sangha": "sangha_builder",
+      "priority": 2,
+      "status": "pending",
+      "result": null,
+      "dharmic_gates": [],
+      "created_at": "2026-02-03T14:41:51.628751",
+      "completed_at": null
+    },
+    "task_20260203144151_0004": {
+      "id": "task_20260203144151_0004",
+      "description": "[sangha_synth] Research the dharmic swarm architecture",
+      "parent_id": "task_20260203144151_0001",
+      "sangha": "sangha_synth",
+      "priority": 2,
+      "status": "pending",
+      "result": null,
+      "dharmic_gates": [],
+      "created_at": "2026-02-03T14:41:51.628757",
+      "completed_at": null
+    },
+    "task_20260203144151_0005": {
+      "id": "task_20260203144151_0005",
+      "description": "[sangha_validator] Research the dharmic swarm architecture",
+      "parent_id": "task_20260203144151_0001",
+      "sangha": "sangha_validator",
+      "priority": 2,
+      "status": "pending",
+      "result": null,
+      "dharmic_gates": [],
+      "created_at": "2026-02-03T14:41:51.628762",
+      "completed_at": null
+    },
+    "task_20260203163144_0001": {
+      "id": "task_20260203163144_0001",
+      "description": "Quick test",
+      "parent_id": null,
+      "sangha": null,
+      "priority": 1,
+      "status": "pending",
+      "result": null,
+      "dharmic_gates": [
+        {
+          "name": "ahimsa",
+          "passed": true,
+          "reason": "No harm patterns detected"
+        },
+        {
+          "name": "coherence",
+          "passed": true,
+          "reason": "No negative coherence signals"
+        }
+      ],
+      "created_at": "2026-02-03T16:31:44.271163",
+      "completed_at": null
+    },
+    "task_20260203163150_0001": {
+      "id": "task_20260203163150_0001",
+      "description": "Research the dharmic swarm architecture",
+      "parent_id": null,
+      "sangha": null,
+      "priority": 1,
+      "status": "pending",
+      "result": null,
+      "dharmic_gates": [
+        {
+          "name": "ahimsa",
+          "passed": true,
+          "reason": "No harm patterns detected"
+        },
+        {
+          "name": "coherence",
+          "passed": true,
+          "reason": "Serves constructive purpose"
+        }
+      ],
+      "created_at": "2026-02-03T16:31:50.629671",
+      "completed_at": null
+    },
+    "task_20260203163215_0001": {
+      "id": "task_20260203163215_0001",
+      "description": "Research the dharmic swarm architecture",
+      "parent_id": null,
+      "sangha": null,
+      "priority": 1,
+      "status": "pending",
+      "result": null,
+      "dharmic_gates": [
+        {
+          "name": "ahimsa",
+          "passed": true,
+          "reason": "No harm patterns detected"
+        },
+        {
+          "name": "coherence",
+          "passed": true,
+          "reason": "Serves constructive purpose"
+        }
+      ],
+      "created_at": "2026-02-03T16:32:15.101121",
+      "completed_at": null
+    }
+  }
+}

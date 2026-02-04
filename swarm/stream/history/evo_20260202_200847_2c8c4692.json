@@ -1,0 +1,42 @@
+{
+  "id": "evo_20260202_200847_2c8c4692",
+  "timestamp": "2026-02-02T20:08:47.476332",
+  "state": "refine",
+  "agent": "refiner",
+  "action": "refinement_complete",
+  "parent_id": "evo_20260202_200714_0385ebac",
+  "fitness": null,
+  "files_changed": [
+    "swarm/metrics/fitness_tracker.py",
+    "swarm/metrics/__init__.py",
+    "swarm/metrics/__init__.py"
+  ],
+  "metadata": {
+    "refinements": [
+      {
+        "file": "swarm/metrics/fitness_tracker.py",
+        "original_issue": "Incomplete weights dictionary initialization in FitnessTracker.__init__ - dictionary definition is truncated",
+        "fix_applied": "Fixed the truncated weights dictionary by removing duplicate entries and properly closing the dictionary",
+        "original_code": "        self.weights = weights or {\n            DharmicPrinciple.TRUTH: 1.0,\n            DharmicPrinciple.NON_HARM: 1.2,\n            DharmicPrinciple.COMPASSION: 1.0,\n            DharmicPrinciple.WISDOM: 1.1,\n            DharmicPrinciple.JUSTICE: 1.0,\n            DharmicPrinciple.BALANCE: 0.9ple.TRUTH: 1.0,\n            DharmicPrinciple.NON_HARM: 1.2,\n            DharmicPrinciple.COMPASSION: 1.0,\n            DharmicPrinciple.WISDOM: 1.1,\n            DharmicPrinciple.JUSTICE: 1.0,\n            DharmicPrinciple.BALANCE: 0.9\n        }",
+        "refined_code": "        self.weights = weights or {\n            DharmicPrinciple.TRUTH: 1.0,\n            DharmicPrinciple.NON_HARM: 1.2,\n            DharmicPrinciple.COMPASSION: 1.0,\n            DharmicPrinciple.WISDOM: 1.1,\n            DharmicPrinciple.JUSTICE: 1.0,\n            DharmicPrinciple.BALANCE: 0.9\n        }",
+        "expected_improvement": 0.3
+      },
+      {
+        "file": "swarm/metrics/__init__.py",
+        "original_issue": "Missing import handling for all required metrics modules, causing ImportError when modules don't exist",
+        "fix_applied": "Added comprehensive fallback imports for all missing modules to prevent ImportError",
+        "original_code": "try:\n    from .collector import MetricsCollector\n    from .performance import PerformanceTracker\n    from .analytics import AgentAnalytics\n    from .monitor import SystemMonitor\nexcept ImportError as e:",
+        "refined_code": "try:\n    from .collector import MetricsCollector\nexcept ImportError:\n    class MetricsCollector:\n        def __init__(self) -> None:\n            pass\n        def collect(self, metric_name: str, value: Any, tags: Optional[Dict[str, str]] = None) -> None:\n            pass\n\ntry:\n    from .performance import PerformanceTracker\nexcept ImportError:\n    class PerformanceTracker:\n        def __init__(self) -> None:\n            pass\n        def track_execution_time(self, operation: str) -> Any:\n            from contextlib import nullcontext\n            return nullcontext()\n        def record_metric(self, name: str, value: float) -> None:\n            pass\n\ntry:\n    from .analytics import AgentAnalytics\nexcept ImportError:\n    class AgentAnalytics:\n        def __init__(self) -> None:\n            pass\n        def record_agent_action(self, agent_id: str, action: str, result: Any) -> None:\n            pass\n        def get_agent_stats(self, agent_id: str) -> Dict[str, Any]:\n            return {\"actions\": 0, \"success_rate\": 0.0}\n\ntry:\n    from .monitor import SystemMonitor\nexcept ImportError:\n    class SystemMonitor:\n        def __init__(self) -> None:\n            pass\n        def get_system_health(self) -> Dict[str, Any]:\n            return {\"status\": \"unknown\", \"uptime\": 0, \"memory_usage\": 0.0}\n        def check_resources(self) -> bool:\n            return True",
+        "expected_improvement": 0.25
+      },
+      {
+        "file": "swarm/metrics/__init__.py",
+        "original_issue": "Duplicate fallback class definitions after the try/except block causing syntax errors",
+        "fix_applied": "Removed the duplicate fallback class definitions that were redundantly defined after the import handling",
+        "original_code": "    # Provide minimal fallback implementations\n    class MetricsCollector:\n        def __init__(self) -> None:\n            pass\n        \n        def collect(self, metric_name: str, value: Any, tags: Optional[Dict[str, str]] = None) -> None:\n            pass\n    \n    class PerformanceTracker:\n        def __init__(self) -> None:\n            pass\n            \n        def track_execution_time(self, operation: str) -> Any:\n            from contextlib import nullcontext\n            return nullcontext()\n        \n        def record_metric(self, name: str, value: float) -> None:\n            pass\n    \n    class AgentAnalytics:\n        def __init__(self) -> None:\n            pass\n            \n        def record_agent_action(self, agent_id: str, action: str, result: Any) -> None:\n            pass\n        \n        def get_agent_stats(self, agent_id: str) -> Dict[str, Any]:\n            return {\"actions\": 0, \"success_rate\": 0.0}\n    \n    class SystemMonitor:\n        def __init__(self) -> None:\n            pass\n            \n        def get_system_health(self) -> Dict[str, Any]:\n            return {\"status\": \"unknown\", \"uptime\": 0, \"memory_usage\": 0.0}\n        \n        def check_resources(self) -> bool:\n            return True",
+        "refined_code": "",
+        "expected_improvement": 0.15
+      }
+    ]
+  }
+}

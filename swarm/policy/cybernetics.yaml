@@ -1,0 +1,20 @@
+# DHARMIC_CLAW Protocol v3 - Cybernetics Control Policy
+# HUMAN-ONLY EDITABLE
+
+version: "1.0"
+updated: "2026-02-04"
+
+setpoints:
+  error_rate_change_percent:
+    max: 5.0
+  performance_delta_percent:
+    min: -5.0
+  latency_p50_change_ms:
+    max: 10.0
+  latency_p99_change_ms:
+    max: 50.0
+
+actions:
+  on_violation:
+    - "raise_risk_score"
+    - "require_postmortem"

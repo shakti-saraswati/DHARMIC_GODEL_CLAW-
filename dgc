@@ -1,0 +1,62 @@
+#!/bin/bash
+# DGC - Dharmic Gödel Claw launcher
+# Usage: ./dgc [command]
+#
+# Commands:
+#   (none)    - Launch TUI
+#   chat      - Quick chat mode
+#   status    - Show status
+#   swarm     - Run DGM swarm cycle
+#   moltbook  - Run Moltbook heartbeat
+
+cd "$(dirname "$0")"
+source .venv/bin/activate 2>/dev/null || true
+
+case "${1:-tui}" in
+    tui|"")
+        python3 src/core/dgc_tui.py
+        ;;
+    chat)
+        python3 -c "
+from src.core.agno_agent import AgnoDharmicAgent
+agent = AgnoDharmicAgent()
+print('DGC Chat (Ctrl+C to exit)')
+print()
+while True:
+    try:
+        msg = input('You: ')
+        if msg.strip():
+            print()
+            print('DGC:', agent.run(msg))
+            print()
+    except (KeyboardInterrupt, EOFError):
+        print()
+        break
+"
+        ;;
+    status)
+        python3 -c "
+from src.core.dgc_tui import get_memory_stats, get_swarm_status, get_moltbook_status, get_proxy_status
+print('DGC Status')
+print('=' * 40)
+print(f'Proxy: {get_proxy_status()}')
+mem = get_memory_stats()
+total = sum(m['entries'] for m in mem.values())
+print(f'Memory: {total} entries')
+swarm = get_swarm_status()
+print(f'Swarm: fitness {swarm[\"fitness\"]:.2f} ({swarm[\"cycles\"]} cycles)')
+molt = get_moltbook_status()
+print(f'Moltbook: {molt[\"our_comments\"]} comments')
+"
+        ;;
+    swarm)
+        python3 swarm/run_swarm.py --cycles 1 ${2:---dry-run}
+        ;;
+    moltbook)
+        python3 src/core/moltbook_heartbeat.py --once
+        ;;
+    *)
+        echo "Usage: dgc [tui|chat|status|swarm|moltbook]"
+        exit 1
+        ;;
+esac

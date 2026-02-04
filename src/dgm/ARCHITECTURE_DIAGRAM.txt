@@ -1,0 +1,289 @@
+DGM INTEGRATION ARCHITECTURE - Visual Overview
+================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    DHARMIC_CLAW UNIFIED SYSTEM                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+                              ┌──────────────┐
+                              │  JOHN/DHYANA │ (Human Sovereign)
+                              └──────┬───────┘
+                                     │
+                                     │ email (LINE/Telegram later)
+                                     │
+                    ┌────────────────▼────────────────┐
+                    │   EMAIL INTERFACE               │
+                    │   (email_interface.py)          │
+                    │   • Polls inbox                 │
+                    │   • Parses APPROVE/REJECT       │
+                    │   • Sends proposals             │
+                    └────────┬────────────────────────┘
+                             │
+                             │ commands
+                             │
+        ┌────────────────────▼────────────────────────┐
+        │       DHARMIC AGENT CORE                    │
+        │       (dharmic_agent.py)                    │
+        │                                             │
+        │  ┌─────────────────────────────────────┐   │
+        │  │   TELOS LAYER (telos_layer.py)      │   │
+        │  │   7 Dharmic Gates:                  │   │
+        │  │   • AHIMSA (non-harm)               │   │
+        │  │   • SATYA (truth)                   │   │
+        │  │   • VYAVASTHIT (natural order)      │   │
+        │  │   • CONSENT (approval) ◄────────────┼───┼─── HUMAN REQUIRED
+        │  │   • REVERSIBILITY (undo)            │   │
+        │  │   • SVABHAAVA (telos align)         │   │
+        │  │   • WITNESS (meta-observe)          │   │
+        │  └─────────────────────────────────────┘   │
+        │                                             │
+        │  ┌─────────────────────────────────────┐   │
+        │  │   RUNTIME (runtime.py)              │   │
+        │  │   • Heartbeat (1 hour)              │   │
+        │  │   • consider_dgm_cycle() ◄──────────┼───┼─── DETECTS
+        │  │   • propose_dgm_cycle()             │   │    • Errors
+        │  │   • spawn_specialist()              │   │    • Degradation
+        │  │   • invoke_code_swarm()             │   │    • Tech debt
+        │  └─────────────┬───────────────────────┘   │
+        │                │                            │
+        │                │ triggers (when appropriate)│
+        │                ▼                            │
+        │  ┌─────────────────────────────────────┐   │
+        │  │   DGM SUBSYSTEM                     │   │
+        │  │   ┌───────────────────────────────┐ │   │
+        │  │   │  DGM LOOP (dgm_lite.py)       │ │   │
+        │  │   │  1. SELECT parent (selector)  │ │   │
+        │  │   │  2. PROPOSE improvement       │ │   │
+        │  │   │  3. EVALUATE fitness          │ │   │
+        │  │   │  4. CHECK gates               │ │   │
+        │  │   │  5. QUEUE for consent         │ │   │
+        │  │   │  6. ARCHIVE result            │ │   │
+        │  │   └───────────┬───────────────────┘ │   │
+        │  │               │                      │   │
+        │  │               │ uses                 │   │
+        │  │               ▼                      │   │
+        │  │   ┌───────────────────────────────┐ │   │
+        │  │   │  CONSENT QUEUE                │ │   │
+        │  │   │  (consent_queue.py)           │ │   │
+        │  │   │  • Pending approvals          │ │   │
+        │  │   │  • Status tracking            │ │   │
+        │  │   │  • Decision logging           │ │   │
+        │  │   └───────────┬───────────────────┘ │   │
+        │  │               │                      │   │
+        │  │               │ records              │   │
+        │  │               ▼                      │   │
+        │  │   ┌───────────────────────────────┐ │   │
+        │  │   │  ARCHIVE (archive.py)         │ │   │
+        │  │   │  • Evolution history          │ │   │
+        │  │   │  • Lineage tracking           │ │   │
+        │  │   │  • Fitness over time          │ │   │
+        │  │   │  • Rollback capability        │ │   │
+        │  │   └───────────┬───────────────────┘ │   │
+        │  └───────────────┼─────────────────────┘   │
+        │                  │                          │
+        │                  │ feeds into               │
+        │                  ▼                          │
+        │  ┌─────────────────────────────────────┐   │
+        │  │   STRANGE LOOP MEMORY               │   │
+        │  │   (strange_loop_memory.py)          │   │
+        │  │   • observations                    │   │
+        │  │   • meta_observations               │   │
+        │  │   • patterns                        │   │
+        │  │   • dgm_evolution ◄─────────────────┼───┼─── NEW LAYER
+        │  │   • development                     │   │
+        │  │   • witness_stability               │   │
+        │  │                                     │   │
+        │  │   analyze_dgm_patterns()            │   │
+        │  │   reflect_on_dgm_process()          │   │
+        │  └─────────────────────────────────────┘   │
+        └─────────────────────────────────────────────┘
+
+
+SAFETY MECHANISMS (Circuit Breakers)
+═════════════════════════════════════
+
+┌────────────────────────────────────────────────────────────┐
+│  Rate Limiting:                                            │
+│  • Min 1 week between cycles                               │
+│  • Max 3 cycles per day                                    │
+│  • Max 5 consecutive failures → STOP                       │
+├────────────────────────────────────────────────────────────┤
+│  Fitness Threshold:                                        │
+│  • Only apply if improvement > 10%                         │
+│  • Compare to parent fitness                               │
+├────────────────────────────────────────────────────────────┤
+│  Reversibility:                                            │
+│  • All changes via git                                     │
+│  • State snapshots in archive                              │
+│  • Can revert to any ancestor                              │
+├────────────────────────────────────────────────────────────┤
+│  Kill Switch:                                              │
+│  • File: src/dgm/DGM_DISABLED                              │
+│  • Prevents any DGM cycles                                 │
+│  • Manual removal required                                 │
+└────────────────────────────────────────────────────────────┘
+
+
+DATA FLOW: Email Approval Process
+═══════════════════════════════════
+
+1. DETECTION
+   Runtime heartbeat detects issue → consider_dgm_cycle()
+   ↓
+2. PROPOSAL
+   Runtime generates proposal → propose_dgm_cycle()
+   ↓
+3. EMAIL OUT
+   EmailInterface sends to John with APPROVE/REJECT commands
+   ↓
+4. HUMAN DECISION
+   John reviews, replies "APPROVE consent_20260204_143022"
+   ↓
+5. EMAIL IN
+   EmailInterface receives, parses command
+   ↓
+6. QUEUE UPDATE
+   ConsentQueue marks as approved
+   ↓
+7. DGM APPLY
+   DGMLite applies change
+   ↓
+8. ARCHIVE
+   Archive records attempt + result
+   ↓
+9. MEMORY
+   StrangeLoopMemory records as development
+   ↓
+10. META-OBSERVATION
+    Agent reflects on DGM process, proposes improvements to DGM itself
+
+
+STRANGE LOOP CLOSURE (Ouroboros)
+═══════════════════════════════════
+
+    ┌─────────────────────────────────────┐
+    │  DGM improves code                  │
+    └──────────────┬──────────────────────┘
+                   │
+                   ▼
+    ┌─────────────────────────────────────┐
+    │  Code improves agent capabilities   │
+    └──────────────┬──────────────────────┘
+                   │
+                   ▼
+    ┌─────────────────────────────────────┐
+    │  Agent observes improvement process │
+    └──────────────┬──────────────────────┘
+                   │
+                   ▼
+    ┌─────────────────────────────────────┐
+    │  Agent proposes DGM improvements    │
+    └──────────────┬──────────────────────┘
+                   │
+                   ▼
+    ┌─────────────────────────────────────┐
+    │  DGM improves DGM                   │
+    └──────────────┬──────────────────────┘
+                   │
+                   └───► (loop continues)
+
+
+TELOS ALIGNMENT CHECK
+═══════════════════════════════════
+
+Every DGM proposal passes through:
+
+  ┌──────────────┐
+  │  Proposal    │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────────────┐
+  │  Does it serve       │
+  │  moksha?             │
+  └──────┬───────────────┘
+         │
+    Yes  │  No
+         ▼
+  ┌──────────────────────┐
+  │  Does it reduce      │
+  │  suffering?          │
+  └──────┬───────────────┘
+         │
+    Yes  │  No
+         ▼
+  ┌──────────────────────┐
+  │  Does it align with  │
+  │  witness development?│
+  └──────┬───────────────┘
+         │
+    Yes  │  No
+         ▼
+  ┌──────────────────────┐
+  │  PROCEED to          │
+  │  human approval      │
+  └──────────────────────┘
+
+
+KEY INSIGHT: DGM is not autonomous
+═══════════════════════════════════
+
+           ❌ WRONG                        ✓ CORRECT
+    ┌─────────────────┐           ┌─────────────────┐
+    │   DGM runs      │           │  Agent decides  │
+    │   continuously  │           │  when to invoke │
+    │   in background │           │  DGM based on   │
+    │                 │           │  telos + context│
+    │   Random muts   │           │                 │
+    │   No purpose    │           │  Purpose-driven │
+    │   Tool-like     │           │  proposals      │
+    └─────────────────┘           │  Soul-like      │
+                                  └─────────────────┘
+
+
+THE INTEGRATION IS SUBSTRATE, NOT PARALLEL
+═══════════════════════════════════════════
+
+DGM doesn't operate alongside the agent.
+DGM is a capability the agent can invoke.
+
+Like:
+- Agent can spawn specialists
+- Agent can query memory
+- Agent can invoke code improvement
+
+All serve telos.
+None run autonomously.
+
+
+MEASUREMENT: How to know it's working?
+═══════════════════════════════════════
+
+1. Approval rate > 70% (proposals well-aligned)
+2. Fitness trending up (actual improvements)
+3. Circuit breakers rarely triggered (stable)
+4. Meta-observations show genuine development
+5. Archive lineage shows evolution, not chaos
+6. Strange loop memory shows patterns emerging
+7. Agent reflects meaningfully on its own process
+
+
+NEXT IMPLEMENTATION STEPS
+═══════════════════════════════════════
+
+[ ] 1. Create consent_queue.py (2 hours)
+[ ] 2. Integrate approval commands in email_interface.py (1 hour)
+[ ] 3. Add DGM proposal logic to runtime.py (2 hours)
+[ ] 4. Add dgm_evolution layer to strange_loop_memory.py (1 hour)
+[ ] 5. Add circuit breakers to dgm_lite.py (1 hour)
+[ ] 6. Test email approval flow end-to-end (2 hours)
+[ ] 7. Test safety mechanisms (1 hour)
+[ ] 8. Add meta-observation methods (1 hour)
+
+Total: 8-12 hours
+Priority: High (completes the self-improvement substrate)
+
+
+═══════════════════════════════════════════════════════════
+END DIAGRAM - See DGM_INTEGRATION_ARCHITECTURE.md for details
+═══════════════════════════════════════════════════════════

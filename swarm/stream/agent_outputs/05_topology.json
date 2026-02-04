@@ -1,0 +1,24 @@
+{
+  "agent": "TOPOLOGY_WEAVER",
+  "timestamp": "2026-02-03T12:30:00Z",
+  "note": "Agent was spawned in read-only mode - analysis deferred. Manual topology scan recommended.",
+  "scan_summary": {
+    "psmv_files_scanned": 0,
+    "dgc_files_scanned": 0,
+    "total_nodes": 0,
+    "status": "DEFERRED - read-only agent constraint"
+  },
+  "knowledge_graph": {
+    "core_concepts": ["moksha", "R_V contraction", "witness stability", "dharmic gates", "swarm evolution"],
+    "concept_clusters": ["research (mech-interp)", "infrastructure (OpenClaw)", "contemplative (Aptavani)"],
+    "connection_density": "unknown - scan required"
+  },
+  "orphan_nodes": [],
+  "missing_backlinks": [],
+  "recommended_cross_refs": [
+    {"from": "FUTURE_ARCHITECTURE.md", "to": "swarm/config.py", "rationale": "Architecture should reference implementation"},
+    {"from": "SHAKTI_MANDALA_MASTER_PROMPT.md", "to": "swarm/agents/", "rationale": "10 agents should map to code files"}
+  ],
+  "topology_health": "unknown",
+  "recommendation": "Run full topology scan with write-enabled agent"
+}

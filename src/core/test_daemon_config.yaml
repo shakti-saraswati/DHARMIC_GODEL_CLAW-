@@ -1,0 +1,26 @@
+agent:
+  heartbeat_interval: 3600
+  name: Dharmic Core
+  subagents:
+    thinking: auto
+interfaces:
+  email:
+    allowed_senders:
+    - john@example.com
+    enabled: false
+    poll_interval: 60
+  telegram:
+    allowed_users:
+    - '123456789'
+    enabled: false
+  web:
+    enabled: true
+    host: 127.0.0.1
+    port: 5000
+scheduled_tasks:
+  alignment_check: true
+  enabled: true
+  memory_consolidation: true
+  morning_reflection: true
+  pattern_meta: true
+  vault_exploration: true

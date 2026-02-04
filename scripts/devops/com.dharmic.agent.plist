@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Service Identity -->
+    <key>Label</key>
+    <string>com.dharmic.agent</string>
+
+    <!-- Program Configuration -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/dhyana/DHARMIC_GODEL_CLAW/.venv/bin/python3</string>
+        <string>/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/integrated_daemon.py</string>
+        <string>--config</string>
+        <string>/Users/dhyana/DHARMIC_GODEL_CLAW/config/daemon_config.yaml</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/dhyana/DHARMIC_GODEL_CLAW</string>
+
+    <!-- Launch Behavior -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Auto-restart on crash, but not on clean exit -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>Crashed</key>
+        <true/>
+    </dict>
+
+    <!-- Throttle restart attempts (wait 60s between restarts) -->
+    <key>ThrottleInterval</key>
+    <integer>60</integer>
+
+    <!-- Logging -->
+    <key>StandardOutPath</key>
+    <string>/Users/dhyana/DHARMIC_GODEL_CLAW/logs/launchd_stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/dhyana/DHARMIC_GODEL_CLAW/logs/launchd_stderr.log</string>
+
+    <!-- Environment Variables -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/dhyana/DHARMIC_GODEL_CLAW/.venv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>PYTHONPATH</key>
+        <string>/Users/dhyana/DHARMIC_GODEL_CLAW/src/core</string>
+        <key>PYTHONUNBUFFERED</key>
+        <string>1</string>
+        <key>HOME</key>
+        <string>/Users/dhyana</string>
+    </dict>
+
+    <!-- Process Management -->
+    <key>Nice</key>
+    <integer>10</integer>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>LowPriorityIO</key>
+    <true/>
+
+    <!-- Resource Limits -->
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>1024</integer>
+    </dict>
+
+    <key>HardResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>2048</integer>
+    </dict>
+
+    <!-- Watchdog - restart if hangs -->
+    <key>TimeOut</key>
+    <integer>300</integer>
+
+    <!-- Exit timeout (for graceful shutdown) -->
+    <key>ExitTimeOut</key>
+    <integer>60</integer>
+
+    <!-- Disabled by default - must be loaded manually -->
+    <key>Disabled</key>
+    <false/>
+</dict>
+</plist>

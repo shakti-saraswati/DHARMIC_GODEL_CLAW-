@@ -37,6 +37,7 @@ This separation is **non-negotiable**. The Builder cannot self-certify. The Veri
 ```
 HUMAN-ONLY EDITABLE:
 ├── swarm/gates.yaml           # Gate definitions
+├── swarm/policy/              # Policy controls & exceptions
 ├── .github/workflows/*.yml    # CI pipelines
 ├── security/*.yaml            # Security configs
 └── .secrets.baseline          # Secret detection baseline
@@ -56,14 +57,14 @@ BUILDER-EDITABLE:
 
 | ID | Gate | Tool | On Failure | Evidence |
 |----|------|------|------------|----------|
-| 1 | LINT_FORMAT | ruff | Block | ruff_output.txt |
+| 1 | LINT_FORMAT | ruff | Block | ruff_output.json, format_diff.patch |
 | 2 | TYPE_CHECK | pyright --strict | Block | pyright_report.json |
 | 3 | SECURITY_SCAN | bandit + detect-secrets | Block | bandit_report.json, secrets_scan.json |
 | 4 | DEPENDENCY_SAFETY | pip-audit | Block | pip_audit.json |
 | 5 | TEST_COVERAGE | pytest --cov (≥80%) | Block | coverage.json |
-| 6 | PROPERTY_TESTING | hypothesis | Block | hypothesis_stats.json |
+| 6 | PROPERTY_TESTING | hypothesis | Block | hypothesis_stats.txt |
 | 7 | CONTRACT_INTEGRATION | pytest integration/ | Block | integration_results.xml |
-| 8 | PERFORMANCE_REGRESSION | pytest benchmarks/ | Warn | benchmark.json |
+| 8 | PERFORMANCE_REGRESSION | pytest benchmarks/ | Block | benchmark.json, benchmark_comparison.txt |
 
 ### Dharmic Gates (9-15)
 
@@ -81,7 +82,7 @@ BUILDER-EDITABLE:
 
 | ID | Gate | Tool | On Failure | Evidence |
 |----|------|------|------------|----------|
-| 16 | SBOM_PROVENANCE | cyclonedx + SLSA | Block | sbom.json, slsa_provenance.json |
+| 16 | SBOM_PROVENANCE | cyclonedx + SLSA | Block | sbom.json, slsa_provenance.txt |
 | 17 | LICENSE_COMPLIANCE | pip-licenses | Block | licenses.json |
 
 **License Policy:** Allow MIT, Apache-2.0, BSD. Fail on GPL, AGPL, LGPL, SSPL.
@@ -102,7 +103,17 @@ Applied **only to ML-touched code** (detected by imports or file paths):
 
 ---
 
-## D) Rate Limits & Cost Controls
+## D) Accelerator Overlay (CUDA / HPC)
+
+Applied when accelerator code is detected (e.g., `*.cu`, `torch.cuda`, `cupy`, `cuda/`):
+
+- **ACCELERATOR_PLAN** — ACCELERATOR_PLAN.md + HARDWARE_TARGETS.md
+- **CUDA_COMPAT** — CUDA_COMPAT.md
+- **ACCELERATOR_BENCHMARKS** — optional GPU baselines
+
+---
+
+## E) Rate Limits & Cost Controls
 
 ### Proposal Limits
 
@@ -127,7 +138,7 @@ When budget exceeded:
 
 ---
 
-## E) Approval Timeouts
+## F) Approval Timeouts
 
 ```yaml
 reminder_after: 24h
@@ -147,7 +158,38 @@ stale_reason: "No response - closing. Re-propose if still needed."
 
 ---
 
-## F) File Locking (Multi-Agent Safety)
+## G) Evidence Signing & Policy Exceptions
+
+### Evidence Signing (Hardwired)
+Evidence bundles are signed (HMAC) using `EVIDENCE_SIGNING_KEY`.  
+If the key is missing and signing is required, the gate run fails.
+
+Set `EVIDENCE_SIGNING_KEY` in CI secrets and locally for trusted runs.
+
+### Policy Exceptions (Human‑Only)
+Exceptions are allowed **only** via `swarm/policy/exceptions.yaml` and must include:
+- gate name or ID
+- reason
+- approver
+- expiry date
+
+Expired exceptions are ignored automatically.
+
+---
+
+## H) Performance Baselines
+
+Performance regressions are enforced against a stored baseline:
+
+```bash
+python -m swarm.performance_baseline --update
+```
+
+Baseline file path: `benchmarks/baseline.json`.
+
+---
+
+## I) File Locking (Multi-Agent Safety)
 
 Prevents race conditions when multiple agents modify files:
 
@@ -156,6 +198,111 @@ from swarm.file_lock import FileLock
 
 with FileLock("src/module.py", agent_id="CODING_AGENT", ttl=60):
     # File locked for 60 seconds
+
+---
+
+## J) Ecosystem Integration (DGC CLI)
+
+To enforce the protocol across all projects, use the DGC bootstrap CLI:
+
+```bash
+# Install local CLI symlink (once)
+./scripts/install_dgc_cli.sh
+
+# Register global config for auto-discovery
+dgc register
+
+# Initialize a new repo with the DGC gates
+dgc init --target /path/to/repo --with-proposal
+
+# Verify gates locally
+dgc verify --target /path/to/repo --dry-run
+
+# Locate the protocol from any path
+dgc locate --target /path/to/repo
+```
+
+The CLI copies the required gate engine, policy files, CI workflow, and baseline docs into the target repo.
+
+---
+
+## K) Systemic Risk Monitoring
+
+Monitor coordination risk at the system level:
+
+```bash
+python -m swarm.systemic_monitor --events logs/interaction_events.jsonl
+```
+
+Compatible with OACP append-only logs (fields: `event`, `from`, `to`).
+
+Policy thresholds live in:
+`swarm/policy/systemic_risk.yaml`
+
+---
+
+## L) Red-Team Harness
+
+Run the A/B simulation to validate that gates block known attack patterns:
+
+```bash
+python -m swarm.redteam.ab_harness
+```
+
+---
+
+## M) Token Lifecycle (Revocation + Rotation)
+
+Tokens are signed and time-boxed. Use the registry to issue, verify, revoke, and rotate:
+
+```bash
+python -m swarm.token_registry issue --agent CODING_AGENT --cap message --cap exec
+python -m swarm.token_registry revoke --token-id <id> --reason "compromise"
+python -m swarm.token_registry rotate --token-id <id>
+```
+
+---
+
+## N) Skill Registry Signing
+
+Skill registry is allowlisted and signed:
+
+```bash
+python -m swarm.skill_registry sign
+python -m swarm.skill_registry verify
+```
+
+---
+
+## O) Sandbox Execution Harness
+
+Default-deny unless Docker is available and image is allowlisted:
+
+```bash
+python -m swarm.sandbox --code /path/to/script.py
+```
+
+---
+
+## P) Anomaly Detection + ACP
+
+Generate alerts and the Attested Compliance Profile:
+
+```bash
+python -m swarm.anomaly_detection
+python -m swarm.compliance_profile
+```
+
+---
+
+## Q) Safety Case Report Generator
+
+Generate an updated safety case with live evidence:
+
+```bash
+python -m swarm.safety_case_report
+```
+
     # Other agents cannot modify
     with open("src/module.py", "w") as f:
         f.write(new_content)
@@ -169,7 +316,7 @@ Features:
 
 ---
 
-## G) Emergency Bypass (Break-Glass)
+## J) Emergency Bypass (Break-Glass)
 
 For production emergencies **only**:
 
@@ -203,7 +350,7 @@ Even in emergency, these gates **always run**:
 
 ---
 
-## H) Production Feedback Loop
+## K) Production Feedback Loop
 
 7-day audit after deployment:
 
@@ -235,9 +382,16 @@ Production data feeds back into:
 2. **Risk assessment** — Problematic patterns increase risk scores
 3. **Gate calibration** — If gates miss issues, they need tuning
 
+### Cybernetics (Control Signal)
+Production metrics are evaluated against setpoints to generate a **control signal**
+(`stable` / `unstable`). Unstable signals automatically elevate risk and require
+post‑mortem review.
+
+Policy file: `swarm/policy/cybernetics.yaml`
+
 ---
 
-## I) Usage
+## L) Usage
 
 ### Running Gates
 
@@ -264,6 +418,13 @@ python -m swarm.file_lock status
 python -m swarm.file_lock lock src/module.py --agent CLI --ttl 60
 ```
 
+### Performance Baseline
+
+```bash
+# Update benchmark baseline
+python -m swarm.performance_baseline --update
+```
+
 ### Production Feedback
 
 ```bash
@@ -288,7 +449,7 @@ python -m swarm.production_feedback stats --days 30
 
 ---
 
-## J) Evidence Bundle Schema
+## M) Evidence Bundle Schema
 
 Every gate run produces an evidence bundle:
 
@@ -302,7 +463,13 @@ Every gate run produces an evidence bundle:
   "gates_warned": 2,
   "total_duration_seconds": 45.2,
   "gate_results": [...],
-  "evidence_bundle_hash": "sha256:abc123..."
+  "evidence_bundle_hash": "sha256:abc123...",
+  "evidence_signature": "hmac:deadbeef...",
+  "signature_method": "hmac-sha256",
+  "signature_key_id": "abcd1234",
+  "signature_required": true,
+  "signature_present": true,
+  "exceptions_applied": []
 }
 ```
 
@@ -310,6 +477,7 @@ Evidence is stored in `evidence/{proposal_id}/` with:
 - `gate_results.json` — Complete results
 - `evidence_bundle.json` — All evidence
 - `evidence_hash.sha256` — Integrity hash
+- `evidence_signature.txt` — HMAC signature (if configured)
 
 Retention:
 - Success: 90 days
@@ -317,7 +485,7 @@ Retention:
 
 ---
 
-## K) Integration with Existing Swarm
+## N) Integration with Existing Swarm
 
 The protocol integrates with the existing DHARMIC_GODEL_CLAW swarm:
 
@@ -336,7 +504,7 @@ The protocol integrates with the existing DHARMIC_GODEL_CLAW swarm:
 
 ---
 
-## L) Glossary
+## O) Glossary
 
 | Term | Definition |
 |------|------------|
@@ -352,7 +520,7 @@ The protocol integrates with the existing DHARMIC_GODEL_CLAW swarm:
 
 ---
 
-## M) Files
+## P) Files
 
 | Path | Purpose |
 |------|---------|
@@ -362,18 +530,21 @@ The protocol integrates with the existing DHARMIC_GODEL_CLAW swarm:
 | `swarm/emergency_bypass.py` | Break-glass mechanism |
 | `swarm/production_feedback.py` | 7-day audit system |
 | `swarm/policy/` | Rate limits, costs, approvals |
+| `swarm/skill_supply_chain.py` | Skill supply-chain scanner |
+| `swarm/policy/skill_supply_chain.yaml` | Skill supply-chain policy |
 | `.pre-commit-config.yaml` | Local hooks |
 | `.github/workflows/gates.yml` | CI workflow (HUMAN-ONLY) |
 | `evidence/` | Gate evidence bundles |
 
 ---
 
-## N) Changelog
+## Q) Changelog
 
 ### v3.0 (2026-02-04)
 - Initial hardened protocol
 - 17 gates (8 technical, 7 dharmic, 2 supply-chain)
 - ML overlay for ML-touched code
+- Skill overlay: signed registry + supply-chain scanner
 - Rate limits and cost tracking
 - Approval timeouts
 - File locking for multi-agent safety

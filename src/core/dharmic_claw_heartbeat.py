@@ -11,6 +11,8 @@ is DHARMIC_CLAW monitoring ITSELF:
 4. Records witness observations about own operation
 5. Sends check-in emails to John
 
+For COUNCIL deliberation, see spandainsight.py (separate heartbeat).
+
 Run as:
     python3 dharmic_claw_heartbeat.py                    # Run forever
     python3 dharmic_claw_heartbeat.py --check-once       # Single heartbeat

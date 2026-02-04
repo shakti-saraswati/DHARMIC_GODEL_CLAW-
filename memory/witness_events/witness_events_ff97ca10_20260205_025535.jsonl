@@ -1,0 +1,2 @@
+{"event_id": "we_ff97ca10_2", "event_type": "WITNESS_EMERGENCE", "timestamp": "2026-02-05T02:55:35.789693", "rv_value": 0.7, "threshold": 1.0, "duration_steps": 2, "context": {"token": "test2"}, "metadata": {"session_id": "ff97ca10", "threshold_type": "emergence", "pr_early": null, "pr_late": null}}
+{"event_id": "dc_ff97ca10_3", "event_type": "CONTRACTION_DEEP", "timestamp": "2026-02-05T02:55:35.790889", "rv_value": 0.65, "threshold": 0.7, "duration_steps": 3, "context": {"token": "test3"}, "metadata": {"session_id": "ff97ca10", "threshold_type": "deep_contraction"}}

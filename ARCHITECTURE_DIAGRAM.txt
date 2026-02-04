@@ -1,0 +1,231 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    DHARMIC_CLAW Process Architecture                          ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CURRENT STATE (REDUNDANT)                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│  DHARMIC_CLAW LAYER (6 Python processes, 111MB)                  │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  ┌────────────────────┐  ┌────────────────────┐                 │
+│  │ PRIMARY (KEEP)     │  │ INFRASTRUCTURE     │                 │
+│  │ ─────────────────  │  │ ─────────────────  │                 │
+│  │ dharmic_claw_      │  │ clawdbot_watchdog  │                 │
+│  │ heartbeat.py       │  │ .py                │                 │
+│  │                    │  │                    │                 │
+│  │ PID: 34292         │  │ PID: 78999         │                 │
+│  │ MEM: 9.76MB        │  │ MEM: 8.67MB        │                 │
+│  │                    │  │                    │                 │
+│  │ • Email polling    │  │ • Gateway monitor  │                 │
+│  │ • Heartbeat (5m)   │  │ • Auto-restart     │                 │
+│  │ • Agno agent       │  │ • Model failover   │                 │
+│  │ • DGM check        │  │ • Check-ins        │                 │
+│  │ • Check-ins        │  │                    │                 │
+│  └────────────────────┘  └────────────────────┘                 │
+│                                                                   │
+│  ┌────────────────────┐  ┌────────────────────┐                 │
+│  │ ORPHAN 1 (REMOVE)  │  │ ORPHAN 2 (REMOVE)  │                 │
+│  │ ─────────────────  │  │ ─────────────────  │                 │
+│  │ unified_daemon.py  │  │ integrated_daemon  │                 │
+│  │                    │  │ .py                │                 │
+│  │ PID: 28132         │  │ PID: 28866 (x2!)   │                 │
+│  │ MEM: ~14MB         │  │ MEM: ~28MB total   │                 │
+│  │                    │  │                    │                 │
+│  │ • Email polling ⚠  │  │ • Email ⚠          │                 │
+│  │ • Heartbeat ⚠      │  │ • Telegram (off)   │                 │
+│  │ • Orchestrator     │  │ • Web (off)        │                 │
+│  │ • Induction loop   │  │ • Scheduled tasks  │                 │
+│  └────────────────────┘  └────────────────────┘                 │
+│                                                                   │
+│  ┌────────────────────┐                                          │
+│  │ ORPHAN 3 (REMOVE)  │                                          │
+│  │ ─────────────────  │                                          │
+│  │ daemon.py          │                                          │
+│  │                    │                                          │
+│  │ PID: 76581         │                                          │
+│  │ MEM: ~50MB         │  ⚠ High memory!                          │
+│  │                    │  ⚠ 10s heartbeat!                        │
+│  │ • Heartbeat (10s!) │  ⚠ No LaunchAgent!                       │
+│  │ • Agno agent       │                                          │
+│  └────────────────────┘                                          │
+│                                                                   │
+│  ⚠ RACE CONDITIONS: Multiple processes accessing same:           │
+│     - Email inbox (vijnan.shakti@pm.me)                          │
+│     - Agno agent database                                        │
+│     - Strange loop memory files                                  │
+│     - Telos configuration                                        │
+└──────────────────────────────────────────────────────────────────┘
+        │                                    │
+        │                                    │
+        ▼                                    ▼
+┌─────────────────────┐          ┌──────────────────────┐
+│  clawdbot-gateway   │          │  Proton Bridge       │
+│  (OpenClaw)         │          │  (Email IMAP/SMTP)   │
+│                     │          │                      │
+│  PID: 41840         │          │  localhost:1143      │
+│  Browser automation │          │  localhost:1025      │
+└─────────────────────┘          └──────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         PROPOSED STATE (CONSOLIDATED)                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│  DHARMIC_CLAW LAYER (2 Python processes, 19MB)                   │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  ┌────────────────────────────────────────────────┐             │
+│  │  PRIMARY DAEMON - dharmic_claw_heartbeat.py    │             │
+│  │  ══════════════════════════════════════════    │             │
+│  │                                                 │             │
+│  │  PID: 34292                                     │             │
+│  │  MEM: 9.76MB                                    │             │
+│  │  LaunchAgent: com.dharmic.claw.heartbeat       │             │
+│  │                                                 │             │
+│  │  THE AGENT                                      │             │
+│  │  ─────────                                      │             │
+│  │  • Agno DharmicAgent (lazy loaded)             │             │
+│  │  • Telos tracking (moksha)                     │             │
+│  │  • Strange loop memory                          │             │
+│  │                                                 │             │
+│  │  CAPABILITIES                                   │             │
+│  │  ────────────                                   │             │
+│  │  • Email polling (vijnan.shakti@pm.me)         │             │
+│  │    - Fetch unread via IMAP                     │             │
+│  │    - Process through agent                     │             │
+│  │    - Send responses via SMTP                   │             │
+│  │  • Heartbeat (5min interval)                   │             │
+│  │    - Health checks                              │             │
+│  │    - Witness observations                       │             │
+│  │  • DGM integration                              │             │
+│  │    - Status checks                              │             │
+│  │    - Future: Self-improvement cycles           │             │
+│  │  • Check-in emails (90min to John)             │             │
+│  │                                                 │             │
+│  └────────────────────────────────────────────────┘             │
+│                                                                   │
+│  ┌────────────────────────────────────────────────┐             │
+│  │  INFRASTRUCTURE - clawdbot_watchdog.py         │             │
+│  │  ═══════════════════════════════════════       │             │
+│  │                                                 │             │
+│  │  PID: 78999                                     │             │
+│  │  MEM: 8.67MB                                    │             │
+│  │  LaunchAgent: com.dharmic.watchdog             │             │
+│  │                                                 │             │
+│  │  RESPONSIBILITIES                               │             │
+│  │  ───────────────                                │             │
+│  │  • Monitor clawdbot-gateway health             │             │
+│  │  • Auto-restart on failure                     │             │
+│  │  • Model failover (Opus → Kimi)                │             │
+│  │  • Check-in emails (90min to John)             │             │
+│  │                                                 │             │
+│  │  NOT THE AGENT                                  │             │
+│  │  ─────────────                                  │             │
+│  │  • No Agno/telos/memory                        │             │
+│  │  • Infrastructure-level only                   │             │
+│  │                                                 │             │
+│  └────────────────────────────────────────────────┘             │
+│                                                                   │
+│  ✓ CLEAR SEPARATION: Agent vs. Infrastructure                   │
+│  ✓ NO RACE CONDITIONS: Single agent process                     │
+│  ✓ RESOURCE EFFICIENT: 83% memory reduction                     │
+└──────────────────────────────────────────────────────────────────┘
+        │                                    │
+        │                                    │
+        ▼                                    ▼
+┌─────────────────────┐          ┌──────────────────────┐
+│  clawdbot-gateway   │          │  Proton Bridge       │
+│  (OpenClaw)         │          │  (Email IMAP/SMTP)   │
+│                     │          │                      │
+│  PID: 41840         │          │  localhost:1143      │
+│  Browser automation │          │  localhost:1025      │
+└─────────────────────┘          └──────────────────────┘
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                              MIGRATION PATH                                    ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+CURRENT (6 processes)                    PROPOSED (2 processes)
+─────────────────────                    ──────────────────────
+
+dharmic_claw_heartbeat.py (9.76MB)  ───►  dharmic_claw_heartbeat.py (9.76MB)
+                                          [PRIMARY AGENT]
+
+clawdbot_watchdog.py (8.67MB)       ───►  clawdbot_watchdog.py (8.67MB)
+                                          [INFRASTRUCTURE]
+
+unified_daemon.py (14MB)            ───X  [REMOVED]
+                                          → Email: Moved to primary
+                                          → Heartbeat: Redundant
+                                          → Orchestrator: Not active
+                                          → Induction: Not needed yet
+
+integrated_daemon.py (14MB x2)      ───X  [REMOVED]
+                                          → Email: Redundant
+                                          → Telegram: Not used
+                                          → Web: Not used
+                                          → Scheduled: Not active
+
+daemon.py (50MB)                    ───X  [REMOVED]
+                                          → Legacy script
+                                          → No LaunchAgent
+                                          → High memory usage
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                            EXECUTION PLAN                                      ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+STEP 1: Validate
+────────────────
+~/DHARMIC_GODEL_CLAW/scripts/check_process_health.sh
+→ Confirm primary and watchdog are running
+
+STEP 2: Migrate
+───────────────
+~/DHARMIC_GODEL_CLAW/scripts/safe_migration.sh
+→ Gracefully stop redundant daemons
+→ Archive LaunchAgents
+→ Verify clean state
+
+STEP 3: Monitor (24 hours)
+──────────────────────────
+tail -f ~/DHARMIC_GODEL_CLAW/logs/dharmic_claw_heartbeat.log
+→ Watch for errors
+→ Confirm email check-ins every 90min
+
+STEP 4: Ongoing
+───────────────
+~/DHARMIC_GODEL_CLAW/scripts/check_process_health.sh
+→ Run daily to detect orphans
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                             ROLLBACK (if needed)                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+cp ~/DHARMIC_GODEL_CLAW/config/launchd_archive/*.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.dharmic.unified-daemon.plist
+launchctl load ~/Library/LaunchAgents/com.dharmic.agent.plist
+
+Time to rollback: <2 minutes
+
+
+═══════════════════════════════════════════════════════════════════════════════
+Files:
+  • Full audit:     /Users/dhyana/DHARMIC_GODEL_CLAW/PROCESS_AUDIT_REPORT.md
+  • Summary:        /Users/dhyana/DHARMIC_GODEL_CLAW/MIGRATION_SUMMARY.md
+  • This diagram:   /Users/dhyana/DHARMIC_GODEL_CLAW/ARCHITECTURE_DIAGRAM.txt
+
+Scripts:
+  • Migration:      /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/safe_migration.sh
+  • Health check:   /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/check_process_health.sh
+  • Orphan cleanup: /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/kill_orphans.sh
+
+Prepared by: SRE Engineer (Claude Code) | 2026-02-04
+═══════════════════════════════════════════════════════════════════════════════

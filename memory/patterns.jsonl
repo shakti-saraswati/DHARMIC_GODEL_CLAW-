@@ -1,0 +1,8 @@
+{"pattern_name": "test_pattern", "description": "Testing new pattern recording", "instances": ["now"], "confidence": 0.8, "timestamp": "2026-02-02T21:16:51.780931"}
+{"pattern_name": "heartbeat", "description": "Recurring word in observations", "instances": ["2026-02-04T01:43:52.059192", "2026-02-04T02:00:02.314546"], "confidence": 1.0, "timestamp": "2026-02-04T02:00:11.883148"}
+{"pattern_name": "heartbeat", "description": "Recurring word in observations", "instances": ["2026-02-04T01:44:12.031367", "2026-02-04T02:00:12.069197"], "confidence": 1.0, "timestamp": "2026-02-04T02:00:14.886958"}
+{"pattern_name": "heartbeat", "description": "Recurring word in observations", "instances": ["2026-02-04T17:56:01.952338", "2026-02-05T01:25:58.145171"], "confidence": 1.0, "timestamp": "2026-02-05T02:00:17.971570"}
+{"pattern_name": "email", "description": "Recurring word in observations", "instances": ["2026-02-04T18:34:54.753733", "2026-02-05T00:27:31.957927"], "confidence": 1.0, "timestamp": "2026-02-05T02:00:17.972025"}
+{"pattern_name": "received:", "description": "Recurring word in observations", "instances": ["2026-02-04T18:34:54.753733", "2026-02-05T00:27:31.957927"], "confidence": 0.9, "timestamp": "2026-02-05T02:00:17.972109"}
+{"pattern_name": "context", "description": "Recurring word in observations", "instances": ["2026-02-04T18:34:54.753733", "2026-02-05T00:27:31.957927"], "confidence": 0.9, "timestamp": "2026-02-05T02:00:17.972152"}
+{"pattern_name": "(dhyana),", "description": "Recurring word in observations", "instances": ["2026-02-04T18:34:54.753733", "2026-02-05T00:27:31.957927"], "confidence": 0.9, "timestamp": "2026-02-05T02:00:17.972186"}

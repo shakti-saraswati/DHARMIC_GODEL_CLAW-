@@ -1,0 +1,15 @@
+EPISODE 14 TEST RESULTS
+======================================================================
+
+Lyapunov Change: +0.014478
+Entropy Change: +0.000696
+PCI Change: +0.000034
+New Metastable States: 13
+
+Mode: focused
+Confidence: 71.14%
+
+======================================================================
+FULL RESPONSE:
+======================================================================
+In focused state, the insight emerges: transitional dynamics between order and chaos

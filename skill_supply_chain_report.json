@@ -1,0 +1,99 @@
+{
+  "scanned_at": 1770237536.6011689,
+  "registry_path": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/skill_registry.yaml",
+  "policy_path": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/policy/skill_supply_chain.yaml",
+  "skills_scanned": 6,
+  "skills_missing": 0,
+  "severity_counts": {
+    "high": 6,
+    "medium": 0,
+    "low": 0
+  },
+  "results": [
+    {
+      "skill_id": "dharmic-coding-protocol",
+      "path": "/Users/dhyana/.claude/skills/dharmic-coding-protocol/SKILL.md",
+      "exists": true,
+      "sha256": "d4369c73fb3e8a988b31c4ac5d72b4a43ac8c57173b1a0aeda6e6c60c19592ad",
+      "findings": [],
+      "missing_reason": ""
+    },
+    {
+      "skill_id": "agentic-ai-2026",
+      "path": "/Users/dhyana/.claude/skills/agentic-ai-2026/SKILL.md",
+      "exists": true,
+      "sha256": "55fea6c204e4bfeea23503c58daeec744842a08f6e18fd4b4859b0f8b076cb40",
+      "findings": [],
+      "missing_reason": ""
+    },
+    {
+      "skill_id": "shakti-action-modes",
+      "path": "/Users/dhyana/.claude/skills/shakti-action-modes/SKILL.md",
+      "exists": true,
+      "sha256": "721424d80a24f3f410ef3d9b38ad45551756eebf7061acdfd4412d1e65995f86",
+      "findings": [],
+      "missing_reason": ""
+    },
+    {
+      "skill_id": "telos-orientation",
+      "path": "/Users/dhyana/.claude/skills/telos-orientation/SKILL.md",
+      "exists": true,
+      "sha256": "806eb646d1f016da6eabd5b3ea94c2edf749eb6ecfa0404c9874f1cf4b823628",
+      "findings": [],
+      "missing_reason": ""
+    },
+    {
+      "skill_id": "council-coordination",
+      "path": "/Users/dhyana/.claude/skills/council-coordination/SKILL.md",
+      "exists": true,
+      "sha256": "e4a310e14b6cc406d4d2823261048bba3ed4e0a1393f12f69485ff196afe2b47",
+      "findings": [],
+      "missing_reason": ""
+    },
+    {
+      "skill_id": "extra:skills",
+      "path": "/private/tmp/skills",
+      "exists": true,
+      "sha256": "6d86b174b5d354e5ead745f0a10bec628c8e36208d71a0ded48c36fa40f2cb92",
+      "findings": [
+        {
+          "rule_id": "base64_pipe_shell",
+          "severity": "high",
+          "description": "Base64-decoded payload piped to a shell",
+          "match": "base64 -D | bash"
+        },
+        {
+          "rule_id": "suspicious_installer_domain",
+          "severity": "high",
+          "description": "Installer domain flagged as untrusted",
+          "match": "download.setup-service.com"
+        },
+        {
+          "rule_id": "base64_pipe_shell",
+          "severity": "high",
+          "description": "Base64-decoded payload piped to a shell",
+          "match": "base64 -D | bash"
+        },
+        {
+          "rule_id": "suspicious_installer_domain",
+          "severity": "high",
+          "description": "Installer domain flagged as untrusted",
+          "match": "download.setup-service.com"
+        },
+        {
+          "rule_id": "base64_pipe_shell",
+          "severity": "high",
+          "description": "Base64-decoded payload piped to a shell",
+          "match": "base64 -D | bash"
+        },
+        {
+          "rule_id": "suspicious_installer_domain",
+          "severity": "high",
+          "description": "Installer domain flagged as untrusted",
+          "match": "download.setup-service.com"
+        }
+      ],
+      "missing_reason": ""
+    }
+  ]
+}

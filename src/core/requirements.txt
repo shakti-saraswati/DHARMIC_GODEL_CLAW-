@@ -1,0 +1,32 @@
+# Dharmic Agent Core - Requirements
+# Install with: pip install -r requirements.txt
+
+# Core Framework
+agno>=2.4.0
+
+# LLM Providers
+anthropic>=0.40.0
+
+# Database (start with SQLite, upgrade to Postgres for production)
+# For Postgres: psycopg[binary]>=3.0.0
+
+# Configuration
+pyyaml>=6.0
+
+# Utilities
+python-dotenv>=1.0.0
+
+# For heartbeat/scheduling
+apscheduler>=3.10.0
+
+# Web Dashboard
+flask>=3.0.0
+
+# Telegram Integration (optional)
+python-telegram-bot>=20.0
+
+# Voice Input (optional)
+openai>=1.0.0
+# pyaudio  # Uncomment if you need recording capability
+
+# Email (built-in imaplib and smtplib)

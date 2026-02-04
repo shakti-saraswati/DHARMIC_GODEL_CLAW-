@@ -12,14 +12,17 @@ import json
 from dataclasses import dataclass, asdict, field
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 import hashlib
+from swarm.cybernetics import evaluate_control, asdict_signal
+from swarm import systemic_monitor
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
 
 FEEDBACK_DIR = Path(__file__).parent.parent / "logs" / "production_feedback"
+INTERACTION_LOG = Path(__file__).parent.parent / "logs" / "interaction_events.jsonl"
 REMINDER_HOURS = [24, 72, 168]  # 1 day, 3 days, 7 days
 
 # =============================================================================
@@ -51,6 +54,8 @@ class FeedbackRecord:
     notes: list[str] = field(default_factory=list)
     final_verdict: Optional[str] = None  # success | partial_success | failure
     lessons_learned: list[str] = field(default_factory=list)
+    control_state: dict[str, Any] = field(default_factory=dict)
+    systemic_risk: dict[str, Any] = field(default_factory=dict)
 
 @dataclass
 class FeedbackReminder:
@@ -126,7 +131,22 @@ class ProductionFeedbackManager:
         
         if notes:
             record.notes.extend(notes)
-        
+
+        # Cybernetics control loop evaluation
+        try:
+            control = evaluate_control(asdict(metrics))
+            record.control_state = asdict_signal(control)
+            if control.status == "unstable" and record.status not in ["rolled_back"]:
+                record.status = "problematic"
+        except Exception:
+            pass
+
+        # Systemic risk snapshot
+        try:
+            record.systemic_risk = self.capture_systemic_risk()
+        except Exception:
+            pass
+
         # Auto-update status based on metrics
         if metrics.rollback_needed:
             record.status = "rolled_back"
@@ -137,6 +157,25 @@ class ProductionFeedbackManager:
         
         self._save_record(record)
         return record
+
+    def capture_systemic_risk(self, events_path: Optional[Path] = None) -> dict:
+        """Capture a systemic risk snapshot from interaction events."""
+        events_path = events_path or INTERACTION_LOG
+        events = systemic_monitor.load_events(events_path)
+        policy = systemic_monitor.load_policy(None)
+        report = systemic_monitor.evaluate(events, policy)
+
+        payload = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "metrics": asdict(report.metrics),
+            "flags": report.flags,
+            "status": report.status,
+        }
+
+        out_path = self.feedback_dir / f"systemic_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.json"
+        with open(out_path, "w") as f:
+            json.dump(payload, f, indent=2)
+        return payload
     
     def record_rollback(
         self,
@@ -396,6 +435,10 @@ def main():
     # Statistics
     stats_parser = subparsers.add_parser("stats", help="Show statistics")
     stats_parser.add_argument("--days", type=int, default=30)
+
+    # Systemic risk snapshot
+    sys_parser = subparsers.add_parser("systemic", help="Capture systemic risk snapshot")
+    sys_parser.add_argument("--events", help="Path to interaction events JSONL")
     
     args = parser.parse_args()
     manager = ProductionFeedbackManager()
@@ -460,6 +503,12 @@ def main():
         print(f"Rollback rate: {stats['rollback_rate']:.1%}")
         print(f"Errors introduced: {stats['total_errors_introduced']}")
         print(f"Avg perf delta: {stats['avg_performance_delta_percent']:.2f}%")
+
+    elif args.command == "systemic":
+        events_path = Path(args.events) if args.events else None
+        report = manager.capture_systemic_risk(events_path)
+        print("Systemic risk snapshot recorded")
+        print(json.dumps(report, indent=2))
 
 
 if __name__ == "__main__":

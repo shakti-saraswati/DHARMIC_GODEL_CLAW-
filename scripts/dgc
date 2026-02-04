@@ -1,0 +1,274 @@
+#!/usr/bin/env python3
+"""
+DGC bootstrap and gate runner for any project.
+
+Usage:
+  dgc init [--target PATH] [--force] [--with-proposal]
+  dgc upgrade [--target PATH] [--force]
+  dgc verify [--target PATH] [--proposal-id ID] [--dry-run]
+  dgc status [--target PATH]
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+DGC_ROOT = Path(__file__).resolve().parents[1]
+GLOBAL_CONFIG = Path.home() / ".config" / "dgc" / "config.yaml"
+
+ASSET_FILES = [
+    "swarm/__init__.py",
+    "swarm/run_gates.py",
+    "swarm/gates.yaml",
+    "swarm/file_lock.py",
+    "swarm/emergency_bypass.py",
+    "swarm/production_feedback.py",
+    "swarm/cybernetics.py",
+    "swarm/performance_baseline.py",
+    "swarm/policy/approval_policy.yaml",
+    "swarm/policy/cost_tracking.yaml",
+    "swarm/policy/proposal_limits.yaml",
+    "swarm/policy/exceptions.yaml",
+    "swarm/policy/evidence_signing.yaml",
+    "swarm/policy/cybernetics.yaml",
+    "swarm/policy/systemic_risk.yaml",
+    "swarm/policy/token_policy.yaml",
+    "swarm/policy/skill_registry.yaml",
+    "swarm/policy/skill_supply_chain.yaml",
+    "swarm/policy/sandbox.yaml",
+    "swarm/policy/anomaly_detection.yaml",
+    ".github/workflows/gates.yml",
+    ".pre-commit-config.yaml",
+    "HAZARDS.md",
+    "ROLLBACK.md",
+    "ACCELERATOR_PLAN.md",
+    "HARDWARE_TARGETS.md",
+    "CUDA_COMPAT.md",
+    "docs/PROTOCOL_V3.md",
+    "docs/OACP_INTEGRATION.md",
+    "benchmarks/README.md",
+    "benchmarks/baseline.json",
+    "benchmarks/cuda_baseline.json",
+    "swarm/token_registry.py",
+    "swarm/skill_registry.py",
+    "swarm/skill_supply_chain.py",
+    "swarm/sandbox.py",
+    "swarm/anomaly_detection.py",
+    "swarm/compliance_profile.py",
+    "swarm/safety_case_report.py",
+]
+
+REQUIRED_PATHS = [
+    "swarm/run_gates.py",
+    "swarm/gates.yaml",
+    "swarm/policy/approval_policy.yaml",
+    ".github/workflows/gates.yml",
+    ".pre-commit-config.yaml",
+    "HAZARDS.md",
+    "ROLLBACK.md",
+]
+
+
+def _copy_item(src: Path, dst: Path, force: bool) -> None:
+    if dst.exists() and not force:
+        print(f"skip  {dst}")
+        return
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    if src.is_dir():
+        if dst.exists() and force:
+            shutil.rmtree(dst)
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+    else:
+        shutil.copy2(src, dst)
+    print(f"write {dst}")
+
+
+def _write_config(target: Path) -> None:
+    config_dir = target / ".dgc"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    config_path = config_dir / "config.yaml"
+    content = (
+        "version: '3.0'\n"
+        f"installed_at: '{datetime.now(timezone.utc).isoformat()}'\n"
+        f"dgc_root: '{DGC_ROOT}'\n"
+    )
+    config_path.write_text(content)
+    print(f"write {config_path}")
+
+
+def _write_global_config() -> None:
+    config_dir = GLOBAL_CONFIG.parent
+    config_dir.mkdir(parents=True, exist_ok=True)
+    content = (
+        f"dgc_root: '{DGC_ROOT}'\n"
+        f"default_gates: '{DGC_ROOT / 'swarm' / 'gates.yaml'}'\n"
+        f"default_policy: '{DGC_ROOT / 'swarm' / 'policy'}'\n"
+        f"cli_path: '{DGC_ROOT / 'scripts' / 'dgc'}'\n"
+    )
+    GLOBAL_CONFIG.write_text(content)
+    print(f"write {GLOBAL_CONFIG}")
+
+
+def _find_repo(start: Path) -> Path | None:
+    current = start
+    while True:
+        if (current / ".dgc" / "config.yaml").exists():
+            return current
+        if (current / "swarm" / "gates.yaml").exists():
+            return current
+        if current == current.parent:
+            break
+        current = current.parent
+    return None
+
+
+def init_repo(target: Path, force: bool, with_proposal: bool) -> None:
+    for rel in ASSET_FILES:
+        src = DGC_ROOT / rel
+        if not src.exists():
+            print(f"missing source: {src}")
+            continue
+        dst = target / rel
+        _copy_item(src, dst, force)
+
+    if with_proposal:
+        template = DGC_ROOT / "templates" / "proposal.yaml"
+        if template.exists():
+            _copy_item(template, target / "proposal.yaml", force=False)
+
+    _write_config(target)
+
+
+def upgrade_repo(target: Path, force: bool) -> None:
+    init_repo(target, force=force, with_proposal=False)
+
+
+def verify_repo(target: Path, proposal_id: str, dry_run: bool) -> int:
+    run_gates = target / "swarm" / "run_gates.py"
+    if not run_gates.exists():
+        print("run_gates.py not found. Run: dgc init")
+        return 1
+    args = [sys.executable, "-m", "swarm.run_gates", "--proposal-id", proposal_id]
+    if dry_run:
+        args.append("--dry-run")
+    return _run(args, cwd=target)
+
+
+def status_repo(target: Path) -> int:
+    missing = []
+    for rel in REQUIRED_PATHS:
+        if not (target / rel).exists():
+            missing.append(rel)
+    if missing:
+        print("Missing required files:")
+        for rel in missing:
+            print(f"  - {rel}")
+        return 1
+    if "EVIDENCE_SIGNING_KEY" not in os.environ:
+        print("Note: EVIDENCE_SIGNING_KEY is not set (required for signed evidence).")
+    print("DGC status: OK")
+    return 0
+
+
+def _run(args: list[str], cwd: Path) -> int:
+    import subprocess
+    proc = subprocess.run(args, cwd=str(cwd))
+    return proc.returncode
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="DGC project bootstrap")
+    sub = parser.add_subparsers(dest="cmd", required=True)
+
+    init_p = sub.add_parser("init", help="Install DGC gates into a repo")
+    init_p.add_argument("--target", default=".", help="Target repo path")
+    init_p.add_argument("--force", action="store_true", help="Overwrite existing files")
+    init_p.add_argument("--with-proposal", action="store_true", help="Create proposal.yaml template")
+
+    up_p = sub.add_parser("upgrade", help="Update DGC assets in a repo")
+    up_p.add_argument("--target", default=".", help="Target repo path")
+    up_p.add_argument("--force", action="store_true", help="Overwrite existing files")
+
+    ver_p = sub.add_parser("verify", help="Run gate checks in a repo")
+    ver_p.add_argument("--target", default=".", help="Target repo path")
+    ver_p.add_argument("--proposal-id", default="LOCAL-VERIFY", help="Proposal ID")
+    ver_p.add_argument("--dry-run", action="store_true", help="Dry run gate evaluation")
+
+    st_p = sub.add_parser("status", help="Check for required files")
+    st_p.add_argument("--target", default=".", help="Target repo path")
+
+    reg_p = sub.add_parser("register", help="Register global DGC config")
+
+    loc_p = sub.add_parser("locate", help="Locate DGC protocol from a path")
+    loc_p.add_argument("--target", default=".", help="Path to search from")
+    loc_p.add_argument("--json", action="store_true", help="Output JSON")
+    loc_p.add_argument("--export", action="store_true", help="Output shell exports")
+
+    args = parser.parse_args()
+    target: Path | None = None
+    if hasattr(args, "target"):
+        target = Path(args.target).expanduser().resolve()
+        if not target.exists():
+            print(f"Target path does not exist: {target}")
+            return 1
+
+    if args.cmd == "init":
+        if target is None:
+            return 1
+        init_repo(target, force=args.force, with_proposal=args.with_proposal)
+        return 0
+    if args.cmd == "upgrade":
+        if target is None:
+            return 1
+        upgrade_repo(target, force=args.force)
+        return 0
+    if args.cmd == "verify":
+        if target is None:
+            return 1
+        return verify_repo(target, proposal_id=args.proposal_id, dry_run=args.dry_run)
+    if args.cmd == "status":
+        if target is None:
+            return 1
+        return status_repo(target)
+    if args.cmd == "register":
+        _write_global_config()
+        return 0
+    if args.cmd == "locate":
+        if target is None:
+            return 1
+        repo = _find_repo(target)
+        if not repo:
+            print("DGC protocol not found from this path.")
+            return 1
+        gates_path = repo / "swarm" / "gates.yaml"
+        policy_path = repo / "swarm" / "policy"
+        if args.json:
+            print(json.dumps({
+                "project_root": str(repo),
+                "gates_path": str(gates_path),
+                "policy_path": str(policy_path),
+                "dgc_root": str(DGC_ROOT),
+            }))
+            return 0
+        if args.export:
+            print(f'export DGC_PROJECT_ROOT=\"{repo}\"')
+            print(f'export DGC_GATES_PATH=\"{gates_path}\"')
+            print(f'export DGC_POLICY_PATH=\"{policy_path}\"')
+            print(f'export DGC_ROOT=\"{DGC_ROOT}\"')
+            return 0
+        print(f"Project: {repo}")
+        print(f"Gates:   {gates_path}")
+        print(f"Policy:  {policy_path}")
+        return 0
+
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,73 @@
+{
+  "name": "@dharmic-agora/components",
+  "version": "1.0.0",
+  "description": "Modern React components for DHARMIC_AGORA landing page",
+  "type": "module",
+  "main": "index.js",
+  "types": "types.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./types.d.ts"
+    },
+    "./FeatureCard": {
+      "import": "./FeatureCard.jsx"
+    },
+    "./SecurityBadge": {
+      "import": "./SecurityBadge.jsx"
+    },
+    "./HowItWorks": {
+      "import": "./HowItWorks.jsx"
+    },
+    "./CodeDemo": {
+      "import": "./CodeDemo.jsx"
+    },
+    "./StatsCounter": {
+      "import": "./StatsCounter.jsx"
+    },
+    "./styles.css": {
+      "import": "./styles.css"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "react",
+    "components",
+    "dharmic",
+    "agora",
+    "landing-page",
+    "ed25519",
+    "security"
+  ],
+  "author": "DHARMIC_CLAW",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "vite": "^5.0.0"
+  },
+  "files": [
+    "*.jsx",
+    "*.js",
+    "*.d.ts",
+    "*.css",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dharmic-claw/agora.git",
+    "directory": "static/components"
+  },
+  "bugs": {
+    "url": "https://github.com/dharmic-claw/agora/issues"
+  },
+  "homepage": "https://github.com/dharmic-claw/agora#readme"
+}

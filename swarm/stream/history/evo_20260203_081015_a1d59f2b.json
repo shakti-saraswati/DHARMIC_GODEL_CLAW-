@@ -1,0 +1,50 @@
+{
+  "id": "evo_20260203_081015_a1d59f2b",
+  "timestamp": "2026-02-03T08:10:15.799712",
+  "state": "evolve",
+  "agent": "evolver",
+  "action": "archived_to_evolution",
+  "parent_id": "evo_20260203_080937_f946d924",
+  "fitness": {
+    "correctness": 0.45,
+    "dharmic_alignment": 0.92,
+    "elegance": 1.0,
+    "efficiency": 1.0,
+    "safety": 1.0
+  },
+  "files_changed": [],
+  "metadata": {
+    "archive_entry": {
+      "timestamp": "2026-02-03T08:10:15.799199",
+      "proposal_id": "proposal_002",
+      "proposal_description": "Add collaborative proposal evaluation system. Currently proposals go directly to implementation without peer review. Implement a multi-agent evaluation phase where Tester and Refiner can assess proposals before Writer begins implementation, reducing failed implementations.",
+      "files": [
+        {
+          "path": "swarm/evaluation.py",
+          "action": "create"
+        },
+        {
+          "path": "swarm/models.py",
+          "action": "modify"
+        },
+        {
+          "path": "swarm/orchestrator.py",
+          "action": "modify"
+        }
+      ],
+      "fitness": {
+        "correctness": 0.45,
+        "dharmic_alignment": 0.92,
+        "elegance": 1.0,
+        "efficiency": 1.0,
+        "safety": 1.0
+      },
+      "content_hash": "9f3951fd35848a39",
+      "parent_id": "evo_20260203_080937_f946d924",
+      "cycle_number": 1,
+      "patterns_extracted": [],
+      "diversity_contribution": 1.0,
+      "id": "evo_20260203_081015_a1d59f2b"
+    }
+  }
+}

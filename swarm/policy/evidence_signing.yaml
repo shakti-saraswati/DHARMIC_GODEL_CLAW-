@@ -1,0 +1,10 @@
+# DHARMIC_CLAW Protocol v3 - Evidence Signing
+# HUMAN-ONLY EDITABLE
+
+version: "1.0"
+updated: "2026-02-04"
+
+evidence_signing:
+  required: true
+  method: "hmac-sha256"
+  key_env: "EVIDENCE_SIGNING_KEY"

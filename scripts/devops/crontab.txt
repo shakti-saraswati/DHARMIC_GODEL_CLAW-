@@ -1,0 +1,23 @@
+# Dharmic Agent - Cron Jobs
+#
+# Install with: crontab /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/devops/crontab.txt
+# View with: crontab -l
+# Remove with: crontab -r
+#
+# Format: minute hour day month weekday command
+#
+
+# Health check and alerting every 5 minutes
+*/5 * * * * /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/devops/alert.sh >> /Users/dhyana/DHARMIC_GODEL_CLAW/logs/cron.log 2>&1
+
+# Log rotation daily at 00:00
+0 0 * * * /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/devops/rotate_logs.sh >> /Users/dhyana/DHARMIC_GODEL_CLAW/logs/cron.log 2>&1
+
+# Memory backup daily at 02:00
+0 2 * * * /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/devops/backup_memory.sh >> /Users/dhyana/DHARMIC_GODEL_CLAW/logs/cron.log 2>&1
+
+# Generate HTML dashboard every minute (for web viewing)
+* * * * * /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/devops/status_dashboard.sh --html >> /Users/dhyana/DHARMIC_GODEL_CLAW/logs/cron.log 2>&1
+
+# Weekly health check report (Sundays at 09:00)
+0 9 * * 0 /Users/dhyana/DHARMIC_GODEL_CLAW/scripts/devops/health_check.sh > /Users/dhyana/DHARMIC_GODEL_CLAW/logs/weekly_health_$(date +\%Y\%m\%d).log 2>&1

@@ -1,0 +1,42 @@
+{
+  "id": "evo_20260202_200817_cd4e47e3",
+  "timestamp": "2026-02-02T20:08:17.376233",
+  "state": "refine",
+  "agent": "refiner",
+  "action": "refinement_complete",
+  "parent_id": "evo_20260202_200714_0385ebac",
+  "fitness": null,
+  "files_changed": [
+    "swarm/metrics/fitness_tracker.py",
+    "swarm/metrics/__init__.py",
+    "swarm/metrics/dharmic_metrics.py"
+  ],
+  "metadata": {
+    "refinements": [
+      {
+        "file": "swarm/metrics/fitness_tracker.py",
+        "original_issue": "FitnessTracker.__init__ method truncated at 'Opt' causing syntax error",
+        "fix_applied": "Fixed truncated parameter type annotation",
+        "original_code": "def __init__(self, storage_path: Optional[Path] = None):ional[Path] = None):",
+        "refined_code": "def __init__(self, storage_path: Optional[Path] = None):",
+        "expected_improvement": 0.3
+      },
+      {
+        "file": "swarm/metrics/__init__.py",
+        "original_issue": "PerformanceTracker class name truncated causing syntax error",
+        "fix_applied": "Fixed truncated class name in fallback implementation",
+        "original_code": "class PerformanceTracke:",
+        "refined_code": "class PerformanceTracker:",
+        "expected_improvement": 0.2
+      },
+      {
+        "file": "swarm/metrics/dharmic_metrics.py",
+        "original_issue": "Weights assignment truncated at 'DharmicPrinci' causing syntax error",
+        "fix_applied": "Fixed truncated enum reference in weights dictionary",
+        "original_code": "self.weights = weights or {\n            DharmicPrinci",
+        "refined_code": "self.weights = weights or {\n            DharmicPrinciple.TRUTH: 1.0,\n            DharmicPrinciple.NON_HARM: 1.2,\n            DharmicPrinciple.COMPASSION: 1.0,\n            DharmicPrinciple.WISDOM: 1.1,\n            DharmicPrinciple.JUSTICE: 1.0,\n            DharmicPrinciple.BALANCE: 0.9",
+        "expected_improvement": 0.25
+      }
+    ]
+  }
+}
