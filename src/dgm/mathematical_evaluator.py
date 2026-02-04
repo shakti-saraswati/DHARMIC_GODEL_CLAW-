@@ -62,6 +62,7 @@ class MathematicalScore:
     redundancy_patterns: List[str] = field(default_factory=list)
     bloat_indicators: List[str] = field(default_factory=list)
     slop_signatures: List[str] = field(default_factory=list)
+    context_notes: List[str] = field(default_factory=list)
     
     # Raw data
     raw_metrics: Dict[str, float] = field(default_factory=dict)
@@ -125,6 +126,8 @@ class MathematicalScore:
             lines.append(f"  Slop signatures: {', '.join(self.slop_signatures)}")
         if self.bloat_indicators:
             lines.append(f"  Bloat: {', '.join(self.bloat_indicators[:3])}")
+        if self.context_notes:
+            lines.append(f"  Context notes: {', '.join(self.context_notes[:3])}")
         return "\n".join(lines)
 
 
@@ -201,6 +204,10 @@ class MathematicalEvaluator:
     def __init__(self):
         self._slop_regexes = [re.compile(p, re.MULTILINE) for p in self.SLOP_PATTERNS]
         self._verbose_regexes = [re.compile(p, re.MULTILINE) for p in self.VERBOSE_PATTERNS]
+        self._context_regexes = [
+            (re.compile(p, re.MULTILINE), label)
+            for p, label in self.CONTEXT_DEPENDENT_PATTERNS
+        ]
 
     def evaluate(self, code: str, context: Optional[str] = None) -> MathematicalScore:
         """
@@ -236,6 +243,7 @@ class MathematicalEvaluator:
         redundancy = self._detect_redundancy(code)
         bloat = self._detect_bloat(code, token_stats)
         slop = self._detect_slop(code)
+        context_notes = self._detect_context_notes(code)
         
         return MathematicalScore(
             compression_elegance=comp_elegance,
@@ -248,6 +256,7 @@ class MathematicalEvaluator:
             redundancy_patterns=redundancy,
             bloat_indicators=bloat,
             slop_signatures=slop,
+            context_notes=context_notes,
             raw_metrics={
                 "compression_ratio": comp_ratio,
                 "unique_tokens": token_stats.get("unique", 0),
@@ -282,8 +291,9 @@ class MathematicalEvaluator:
         
         # Handle LZMA overhead for small files (< 200 bytes can have ratio > 1)
         if len(code_bytes) < 200:
-            # For small files, assume they're dense (benefit of doubt)
-            ratio = 0.9
+            overhead = len(lzma.compress(b"", preset=9))
+            adjusted = max(len(compressed) - overhead, 1)
+            ratio = min(1.0, adjusted / max(len(code_bytes), 1))
         else:
             ratio = len(compressed) / len(code_bytes)
         
@@ -701,8 +711,9 @@ class MathematicalEvaluator:
         if import_lines > 20:
             issues.append(f"import_heavy:{import_lines}")
         
-        # Low meaningful token ratio
-        if token_stats.get("meaningful_unique", 0) < token_stats.get("total", 1) * 0.1:
+        # Low semantic density (AST nodes per 100 chars)
+        semantic_density = token_stats.get("semantic_density", 0.0)
+        if semantic_density < 3.0:
             issues.append("low_semantic_density")
         
         return issues
@@ -746,6 +757,14 @@ class MathematicalEvaluator:
                     signatures.append("repetitive_docstrings")
         
         return signatures
+
+    def _detect_context_notes(self, code: str) -> List[str]:
+        """Detect context-dependent patterns without penalizing."""
+        notes = []
+        for regex, label in self._context_regexes:
+            if regex.search(code):
+                notes.append(label)
+        return notes
     
     def _count_functions(self, code: str) -> int:
         try:
