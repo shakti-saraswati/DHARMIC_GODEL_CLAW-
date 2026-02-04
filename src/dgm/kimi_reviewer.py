@@ -1,4 +1,8 @@
 """
+# Suppress noisy httpx logging that conflicts with dharmic_logging
+import logging as _logging
+_logging.getLogger("httpx").setLevel(_logging.WARNING)
+
 Kimi Reviewer — Deep Code Review with 128k Context
 ===================================================
 
@@ -996,3 +1000,7 @@ if __name__ == "__main__":
         print(review.summary())
         print("\nFull review:")
         print(json.dumps(review.to_dict(), indent=2))
+
+# Suppress noisy httpx logging
+import logging
+logging.getLogger("httpx").setLevel(logging.WARNING)
