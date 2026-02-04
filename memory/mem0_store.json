@@ -55,6 +55,24 @@
         "layer": "semantic",
         "tags": []
       }
+    },
+    {
+      "id": "ea91bf6cb038",
+      "memory": "Heartbeat #1: 2 emails found, 1 responded",
+      "user_id": "dhyana",
+      "created_at": "2026-02-04T21:30:33.195319",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "heartbeat",
+          "system"
+        ],
+        "beat_number": 1,
+        "emails_found": 2,
+        "emails_responded": 1,
+        "dgm_ran": false,
+        "errors": []
+      }
     }
   ]
 }
