@@ -15,6 +15,15 @@ from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 import logging
 
+# Security integration
+try:
+    from dharmic_security import ExecGuard
+    EXEC_GUARD = ExecGuard(allowed_bins=["claude"])
+    SECURITY_AVAILABLE = True
+except ImportError:
+    SECURITY_AVAILABLE = False
+    EXEC_GUARD = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -88,12 +97,22 @@ class ClaudeMaxBackend(ModelBackend):
     def _verify_cli(self):
         """Verify Claude CLI is available."""
         try:
-            result = subprocess.run(
-                ["claude", "--version"],
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
+            cmd = ["claude", "--version"]
+            if SECURITY_AVAILABLE and EXEC_GUARD:
+                result = EXEC_GUARD.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+            else:
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                
             if result.returncode != 0:
                 raise RuntimeError("Claude CLI not working")
             logger.info("Claude CLI verified")
@@ -113,13 +132,23 @@ class ClaudeMaxBackend(ModelBackend):
         full_prompt = "\n".join(prompt_parts)
 
         try:
-            result = subprocess.run(
-                ["claude", "-p", full_prompt],
-                capture_output=True,
-                text=True,
-                timeout=self.timeout,
-                cwd=self.working_dir
-            )
+            cmd = ["claude", "-p", full_prompt]
+            if SECURITY_AVAILABLE and EXEC_GUARD:
+                result = EXEC_GUARD.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout,
+                    cwd=self.working_dir
+                )
+            else:
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout,
+                    cwd=self.working_dir
+                )
 
             if result.returncode == 0:
                 return ModelResponse(
@@ -155,13 +184,23 @@ class ClaudeMaxBackend(ModelBackend):
         full_prompt = "\n\n".join(prompt_parts)
 
         try:
-            result = subprocess.run(
-                ["claude", "-p", full_prompt],
-                capture_output=True,
-                text=True,
-                timeout=self.timeout,
-                cwd=self.working_dir
-            )
+            cmd = ["claude", "-p", full_prompt]
+            if SECURITY_AVAILABLE and EXEC_GUARD:
+                result = EXEC_GUARD.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout,
+                    cwd=self.working_dir
+                )
+            else:
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout,
+                    cwd=self.working_dir
+                )
 
             if result.returncode == 0:
                 return ModelResponse(
@@ -419,14 +458,14 @@ def create_backend(
         try:
             return ProxyBackend(**kwargs)
         except RuntimeError as e:
-            logger.warning(f"Proxy backend unavailable ({e}), falling back to Claude CLI")
-            provider = "max"
+            logger.warning(f"Proxy backend unavailable ({e}), falling back to direct Anthropic API")
+            provider = "direct"
 
     if provider in ("max", "claude-max", "subscription"):
         # Try Claude Max CLI, fall back to direct API if CLI unavailable
         try:
             return ClaudeMaxBackend(**kwargs)
-        except RuntimeError as e:
+        except (RuntimeError, FileNotFoundError) as e:
             logger.warning(f"Claude Max CLI unavailable ({e}), falling back to direct Anthropic API")
             # Fall through to direct backend
             provider = "direct"
