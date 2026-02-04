@@ -234,36 +234,64 @@ Heartbeat #{self.beats} | Uptime: {datetime.now() - self.start_time}"""
         return responded
 
     def run_dgm_check(self) -> Dict:
-        """Check if DGM loop should run and execute if appropriate."""
-        result = {"ran": False, "reason": "not_checked"}
+        """
+        Run a DGM improvement cycle if conditions are met.
+        
+        This is the heart of the self-improving machine — actually executing
+        the Darwin-Gödel loop to evolve the codebase.
+        """
+        result = {"ran": False, "reason": "not_checked", "cycle_id": None}
 
         try:
-            # Check if DGM files exist
-            dgm_lite_path = Path(__file__).parent / "dgm_lite.py"
-            if not dgm_lite_path.exists():
-                result["reason"] = "dgm_lite.py not found"
-                return result
-
-            # For now, just check status rather than running
-            # Full autonomous execution requires more safety gates
-            import subprocess
-            proc = subprocess.run(
-                ["python3", str(dgm_lite_path), "--status"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-                cwd=str(dgm_lite_path.parent)
+            # Import the orchestrator
+            import sys
+            project_root = Path(__file__).parent.parent.parent
+            sys.path.insert(0, str(project_root))
+            
+            from src.dgm.dgm_orchestrator import DGMOrchestrator
+            
+            # Create orchestrator (dry_run=False for real execution!)
+            # Set dry_run=True for testing, False for production
+            dry_run = os.getenv("DGM_DRY_RUN", "false").lower() == "true"
+            
+            logger.info(f"[DGM] Initializing orchestrator (dry_run={dry_run})...")
+            orch = DGMOrchestrator(
+                project_root=project_root,
+                dry_run=dry_run
             )
-
-            result["dgm_status"] = proc.stdout[:500] if proc.stdout else "no output"
-            result["ran"] = False
-            result["reason"] = "status_check_only"
-
-            logger.info(f"DGM check: {result['reason']}")
-
+            
+            # Run an improvement cycle
+            logger.info("[DGM] Running improvement cycle...")
+            cycle_result = orch.run_improvement_cycle(
+                target_component=None,  # Auto-select
+                run_tests=False  # Skip tests for speed (can enable later)
+            )
+            
+            # Record results
+            result["ran"] = True
+            result["success"] = cycle_result.success
+            result["status"] = str(cycle_result.status)
+            result["cycle_id"] = cycle_result.cycle_id
+            result["component"] = cycle_result.component
+            result["duration"] = cycle_result.duration_seconds
+            result["models_used"] = cycle_result.models_used
+            
+            if cycle_result.success:
+                result["reason"] = f"SUCCESS: {cycle_result.component}"
+                logger.info(f"[DGM] ✅ Cycle SUCCESS: {cycle_result.cycle_id} | {cycle_result.component}")
+                self.dgm_cycles_run += 1
+            else:
+                result["reason"] = f"FAILED: {cycle_result.error or cycle_result.status}"
+                logger.info(f"[DGM] ❌ Cycle FAILED: {cycle_result.cycle_id} | {result['reason']}")
+            
+        except ImportError as e:
+            result["reason"] = f"import_error: {e}"
+            logger.error(f"[DGM] Import failed: {e}")
         except Exception as e:
             result["reason"] = f"error: {e}"
-            logger.error(f"DGM check failed: {e}")
+            logger.error(f"[DGM] Cycle failed with exception: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
 
         return result
 
