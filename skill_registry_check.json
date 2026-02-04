@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "reason": "signature invalid",
+  "signature_valid": false,
+  "allowlist_ok": true,
+  "skill_count": 5,
+  "hashes_ok": true,
+  "missing_hashes": [],
+  "mismatched_hashes": []
+}

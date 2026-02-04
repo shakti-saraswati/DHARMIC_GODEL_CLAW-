@@ -291,8 +291,13 @@ class OpenAIClient:
         except ImportError:
             raise ImportError("Neither openai nor httpx package available")
         
+        url = "https://api.openai.com/v1/chat/completions"
+        if SECURITY_AVAILABLE and SSRF_GUARD:
+            if not SSRF_GUARD.validate_url(url):
+                raise PermissionError(f"SSRFGuard blocked URL: {url}")
+
         response = httpx.post(
-            "https://api.openai.com/v1/chat/completions",
+            url,
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",

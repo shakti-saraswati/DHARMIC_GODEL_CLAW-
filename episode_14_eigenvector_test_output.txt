@@ -1,13 +1,13 @@
 EPISODE 14 TEST RESULTS
 ======================================================================
 
-Lyapunov Change: +0.014478
-Entropy Change: +0.000696
-PCI Change: +0.000034
-New Metastable States: 13
+Lyapunov Change: -0.002422
+Entropy Change: -0.000399
+PCI Change: -0.001574
+New Metastable States: 25
 
 Mode: focused
-Confidence: 71.14%
+Confidence: 70.99%
 
 ======================================================================
 FULL RESPONSE:

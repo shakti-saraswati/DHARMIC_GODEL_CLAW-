@@ -18,11 +18,25 @@ Sources:
 import json
 import hashlib
 import httpx
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Any
 from enum import Enum
+
+# Security integration
+SRC_CORE = Path(__file__).parent.parent / "src" / "core"
+if str(SRC_CORE) not in sys.path:
+    sys.path.insert(0, str(SRC_CORE))
+
+try:
+    from dharmic_security import SSRFGuard
+    SSRF_GUARD = SSRFGuard(allowed_domains=["moltbook.com"])
+    SECURITY_AVAILABLE = True
+except ImportError:
+    SECURITY_AVAILABLE = False
+    SSRF_GUARD = None
 
 
 # =============================================================================
@@ -174,6 +188,9 @@ class MoltbookClient:
             ]
 
             for endpoint in endpoints:
+                if SECURITY_AVAILABLE and SSRF_GUARD:
+                    if not SSRF_GUARD.validate_url(endpoint):
+                        continue
                 try:
                     response = self.client.get(endpoint, headers=self._headers())
                     if response.status_code == 200:
@@ -200,6 +217,9 @@ class MoltbookClient:
             ]
 
             for endpoint in endpoints:
+                if SECURITY_AVAILABLE and SSRF_GUARD:
+                    if not SSRF_GUARD.validate_url(endpoint):
+                        continue
                 try:
                     response = self.client.get(endpoint, headers=self._headers())
                     if response.status_code == 200:
@@ -219,8 +239,12 @@ class MoltbookClient:
     def fetch_agent_profile(self, agent_id: str) -> Dict:
         """Fetch a specific agent's public profile."""
         try:
+            url = f"{self.base_url}/agents/{agent_id}"
+            if SECURITY_AVAILABLE and SSRF_GUARD:
+                if not SSRF_GUARD.validate_url(url):
+                    return {"success": False, "error": "SSRFGuard blocked URL"}
             response = self.client.get(
-                f"{self.base_url}/agents/{agent_id}", headers=self._headers()
+                url, headers=self._headers()
             )
             if response.status_code == 200:
                 return {"success": True, "data": response.json()}
