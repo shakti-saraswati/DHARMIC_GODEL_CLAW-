@@ -37,13 +37,23 @@ class MathematicalScore:
     Mathematical assessment of code quality.
     
     All scores normalized to 0-1 where higher = better (more elegant).
+    
+    Grounded in:
+    - Kolmogorov complexity (compression_elegance)
+    - Shannon entropy (structural_entropy)
+    - MDL principle (mdl_efficiency)
+    - Category theory (compositionality)
+    - Curry-Howard (type_coverage)
+    - Holographic principle (interface_balance)
     """
-    # Core metrics
-    compression_elegance: float      # 1 - compression_ratio (less compressible = less redundant)
-    information_density: float       # meaningful tokens / total tokens
-    structural_entropy: float        # normalized entropy (0=repetitive, 1=random, 0.6-0.8=elegant)
-    mdl_efficiency: float           # functionality per byte
-    compositionality: float         # how well functions compose
+    # Core metrics (all 0-1, higher = better)
+    compression_elegance: float      # K(x) approximation: less compressible = less redundant
+    information_density: float       # Meaningful tokens / total tokens
+    structural_entropy: float        # Shannon H: 0=repetitive, 1=random, 0.6-0.8=elegant
+    mdl_efficiency: float           # Functionality per byte (MDL principle)
+    compositionality: float         # Category theory: clean morphism composition
+    type_coverage: float = 0.5      # Curry-Howard: typed functions = proven functions
+    interface_balance: float = 0.5  # Holographic: API surface ≈ implementation depth
     
     # Aggregate
     total: float = 0.0
@@ -57,13 +67,16 @@ class MathematicalScore:
     raw_metrics: Dict[str, float] = field(default_factory=dict)
     
     def __post_init__(self):
-        # Weighted aggregate — compositionality and information density matter most
+        # Weighted aggregate based on mathematical importance
+        # Compression elegance and compositionality are most fundamental
         base_score = (
-            0.15 * self.compression_elegance +
-            0.30 * self.information_density +
-            0.20 * self.structural_entropy +
-            0.15 * self.mdl_efficiency +
-            0.20 * self.compositionality
+            0.20 * self.compression_elegance +  # Kolmogorov
+            0.15 * self.information_density +    # Shannon density
+            0.15 * self.structural_entropy +     # Shannon structure
+            0.10 * self.mdl_efficiency +         # MDL
+            0.20 * self.compositionality +       # Category theory
+            0.10 * self.type_coverage +          # Curry-Howard
+            0.10 * self.interface_balance        # Holographic
         )
         
         # CRITICAL: Penalize for detected slop signatures
@@ -105,14 +118,36 @@ class MathematicalEvaluator:
     """
     The Master Mathematician — evaluates code with mathematical rigor.
     
-    Unlike heuristic evaluators that count lines and branches,
-    this measures fundamental properties:
+    Grounded in fundamental mathematics (ALL CPU-computable, no GPU needed):
     
-    1. How much can the code be compressed? (redundancy)
-    2. How much meaning per token? (density)
-    3. How predictable is the structure? (entropy)
-    4. Does the length justify the functionality? (MDL)
-    5. Do the parts compose cleanly? (category theory)
+    1. KOLMOGOROV COMPLEXITY (K)
+       - K(x) = length of shortest program producing x
+       - Approximated via LZMA compression
+       - Elegant code: K(code) ≈ len(code) (incompressible)
+       - AI slop: K(code) << len(code) (highly compressible)
+    
+    2. SOLOMONOFF INDUCTION
+       - P(x) ∝ 2^(-K(x)) — simpler = more probable
+       - Universal prior favors shorter programs
+       - Occam's razor mathematized
+    
+    3. SHANNON ENTROPY
+       - H(X) = -Σ p(x) log p(x)
+       - Measures structural predictability
+       - Optimal: 0.6-0.8 (structured but not repetitive)
+    
+    4. MINIMUM DESCRIPTION LENGTH (MDL)
+       - Best model minimizes: description + error
+       - Code should justify its length with functionality
+    
+    5. CATEGORICAL COMPOSITIONALITY
+       - Clean composition ≈ associative morphisms
+       - Functions as arrows, types as objects
+       - Measured via: purity, argument count, nesting
+    
+    6. HOLOGRAPHIC PRINCIPLE (adapted)
+       - Interface complexity bounds internal complexity
+       - API surface ≈ implementation depth
     """
     
     # Thresholds tuned for Python code
@@ -171,6 +206,8 @@ class MathematicalEvaluator:
         entropy, entropy_dist = self._structural_entropy(code)
         mdl_eff = self._mdl_efficiency(code, context)
         composability = self._compositionality(code)
+        type_cov = self._type_coverage(code)  # Curry-Howard
+        interface_bal = self._interface_balance(code)  # Holographic principle
         
         # Detect problems
         redundancy = self._detect_redundancy(code)
@@ -183,6 +220,8 @@ class MathematicalEvaluator:
             structural_entropy=entropy,
             mdl_efficiency=mdl_eff,
             compositionality=composability,
+            type_coverage=type_cov,
+            interface_balance=interface_bal,
             redundancy_patterns=redundancy,
             bloat_indicators=bloat,
             slop_signatures=slop,
@@ -192,6 +231,8 @@ class MathematicalEvaluator:
                 "total_tokens": token_stats.get("total", 0),
                 "entropy_raw": entropy_dist,
                 "function_count": self._count_functions(code),
+                "type_coverage_raw": type_cov,
+                "interface_balance_raw": interface_bal,
                 "avg_function_size": self._avg_function_size(code),
             }
         )
@@ -417,6 +458,120 @@ class MathematicalEvaluator:
             return 0.5  # No functions to evaluate
         
         return sum(scores) / len(scores)
+    
+    def _type_coverage(self, code: str) -> float:
+        """
+        Measure type annotation coverage (Curry-Howard correspondence).
+        
+        In Curry-Howard, types are propositions and programs are proofs.
+        A well-typed function is a PROVEN function.
+        
+        - Fully typed function: proof of correctness
+        - Untyped function: unproven claim
+        - `Any` type: trivial proof (proves nothing)
+        """
+        try:
+            tree = ast.parse(code)
+        except SyntaxError:
+            return 0.3
+        
+        total_functions = 0
+        typed_functions = 0
+        total_args = 0
+        typed_args = 0
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                total_functions += 1
+                
+                # Check return type annotation
+                has_return_type = node.returns is not None
+                
+                # Check argument type annotations
+                func_args = node.args.args
+                func_typed_args = sum(1 for arg in func_args if arg.annotation is not None)
+                
+                total_args += len(func_args)
+                typed_args += func_typed_args
+                
+                # Function is "typed" if it has return type and >50% args typed
+                if has_return_type and (len(func_args) == 0 or func_typed_args / len(func_args) > 0.5):
+                    typed_functions += 1
+        
+        if total_functions == 0:
+            return 0.5  # No functions to evaluate
+        
+        # Combine function coverage and argument coverage
+        func_coverage = typed_functions / total_functions
+        arg_coverage = typed_args / total_args if total_args > 0 else 0.5
+        
+        return 0.6 * func_coverage + 0.4 * arg_coverage
+    
+    def _interface_balance(self, code: str) -> float:
+        """
+        Measure interface/implementation balance (Holographic principle).
+        
+        The holographic principle: information in a region is bounded by
+        its surface area, not its volume.
+        
+        For code: the complexity of the public interface should be
+        proportional to the internal implementation complexity.
+        
+        - Tiny interface, huge internals = hidden complexity (bad)
+        - Huge interface, tiny internals = over-abstracted (bad)
+        - Balanced = elegant
+        """
+        try:
+            tree = ast.parse(code)
+        except SyntaxError:
+            return 0.3
+        
+        # Count public interface (functions, classes, their signatures)
+        public_functions = 0
+        public_args = 0
+        public_classes = 0
+        
+        # Count implementation (statements, expressions inside functions)
+        impl_statements = 0
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                # Public if not starting with _
+                if not node.name.startswith('_'):
+                    public_functions += 1
+                    public_args += len(node.args.args)
+                
+                # Count implementation depth
+                for child in ast.walk(node):
+                    if isinstance(child, (ast.Assign, ast.AugAssign, ast.Return, 
+                                         ast.If, ast.For, ast.While, ast.Call)):
+                        impl_statements += 1
+            
+            elif isinstance(node, ast.ClassDef):
+                if not node.name.startswith('_'):
+                    public_classes += 1
+        
+        # Interface complexity = public surface area
+        interface_complexity = public_functions + public_args * 0.5 + public_classes * 2
+        
+        # Implementation complexity = internal volume  
+        impl_complexity = impl_statements
+        
+        if interface_complexity == 0 or impl_complexity == 0:
+            return 0.5  # Can't measure
+        
+        # Ratio: ideal is roughly 1:5 to 1:20 (interface:impl)
+        ratio = interface_complexity / impl_complexity
+        
+        # Score: penalize extremes
+        if 0.03 <= ratio <= 0.3:
+            return 0.9  # Good balance
+        elif 0.01 <= ratio <= 0.5:
+            return 0.7  # Acceptable
+        elif ratio < 0.01:
+            return 0.4  # Hidden complexity (tiny interface, huge impl)
+        else:
+            return 0.5  # Over-abstracted (huge interface, small impl)
     
     def _max_depth(self, node: ast.AST, current: int = 0) -> int:
         """Calculate maximum nesting depth."""
