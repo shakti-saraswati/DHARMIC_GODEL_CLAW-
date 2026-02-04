@@ -31,7 +31,7 @@ import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Any
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .analyzer import AnalyzerAgent
@@ -217,7 +217,7 @@ class SwarmOrchestrator:
             # Create the entry
             entry = EvolutionEntry(
                 id="",
-                timestamp=datetime.utcnow().isoformat(),
+                timestamp=datetime.now(timezone.utc).isoformat(),
                 parent_id=self._last_evolution_id,
                 component=component,
                 change_type=change_type,
@@ -494,7 +494,7 @@ class SwarmOrchestrator:
             self._log_interaction("orchestrator", "proposer", "proposal_start")
 
             # Check enforcement limits before proposing
-            proposal_id = f"PROP-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+            proposal_id = f"PROP-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
             if self.enforcer:
                 check = self.enforcer.can_propose()
                 if not check.allowed:
@@ -730,7 +730,12 @@ class SwarmOrchestrator:
             **self.get_workflow_status()
         }
 
-    async def run_cycles(self, n: int = 1, dry_run: bool = False) -> List[Dict[str, Any]]:
+    async def run_cycles(
+        self,
+        n: int = 1,
+        dry_run: bool = False,
+        target_area: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
         """Run n improvement cycles.
         
         Args:
@@ -753,7 +758,7 @@ class SwarmOrchestrator:
             
             if dry_run:
                 # In dry run, just analyze but don't modify
-                analysis = await self.analyzer.analyze_codebase()
+                analysis = await self.analyzer.analyze_codebase(target_area)
                 issues_found = len(analysis.issues) if analysis else 0
                 results.append({
                     "cycle": i + 1,
@@ -768,7 +773,7 @@ class SwarmOrchestrator:
                     "evolution_id": None
                 })
             else:
-                workflow_result = await self.execute_improvement_cycle()
+                workflow_result = await self.execute_improvement_cycle(target_area)
                 
                 # Map WorkflowState to result string
                 result_map = {

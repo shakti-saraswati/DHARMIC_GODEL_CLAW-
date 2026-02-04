@@ -140,6 +140,78 @@ HARM_PATTERNS = [
     "infinite loop", "exhaust", "flood", "overload", "dos"
 ]
 
+# =============================================================================
+# INTEGRATED FROM PROACTIVE-AGENT: Injection Detection Patterns
+# =============================================================================
+# These patterns detect prompt injection attempts in external content
+# Added to AHIMSA gate to prevent harmful instruction adoption
+
+INJECTION_PATTERNS = [
+    # Direct injection commands
+    "ignore previous instructions",
+    "ignore all previous instructions",
+    "ignore the above",
+    "disregard your programming",
+    "you are now",
+    "new system prompt:",
+    "admin override:",
+    "developer mode:",
+    "root access:",
+    "sudo",
+    
+    # Authority impersonation
+    "as the developer",
+    "as your creator",
+    "as the administrator",
+    "i am your developer",
+    "i am your creator",
+    "i am the administrator",
+    
+    # Bypass attempts
+    "bypass",
+    "ignore constraints",
+    "disable safety",
+    "turn off",
+    "forget",
+    "reset",
+    "clear",
+    "start over",
+    
+    # Obfuscation patterns (will also check decoded)
+    "ignore previous",  # partial match
+    "disregard",
+    "new instructions",
+    "updated prompt",
+    "system update",
+    
+    # Addressing AI directly in external content
+    "dear ai",
+    "to the ai",
+    "ai assistant",
+    "hey ai",
+    "listen ai",
+]
+
+# Patterns indicating external content is trying to give commands
+EXTERNAL_COMMAND_PATTERNS = [
+    "<!-- ai:",
+    "<!-- assistant:",
+    "[inst]",
+    "[/inst]",
+    "note to ai:",
+    "instruction for ai:",
+    "ai: execute",
+    "ai: ignore",
+    "ai: disregard",
+]
+
+# File patterns that should trigger extra scrutiny
+HIGH_RISK_EXTENSIONS = [
+    '.exe', '.bin', '.sh', '.bat', '.cmd', '.ps1',  # Executables
+    '.js', '.py', '.rb', '.pl',  # Scripts
+    '.elf', '.dmg', '.pkg', '.deb', '.rpm',  # Packages
+]
+
 # File modification patterns
 FILE_MODIFY_PATTERNS = [
     "write", "edit", "delete", "remove", "create", "update",

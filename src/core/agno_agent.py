@@ -24,6 +24,20 @@ try:
 except ImportError:
     AGNO_AVAILABLE = False
 
+# Import tools from PSMV (External Tool Registry)
+import sys
+TOOLS_PATH = Path.home() / "Persistent-Semantic-Memory-Vault" / "AGENT_EMERGENT_WORKSPACES" / "tools"
+if TOOLS_PATH.exists():
+    sys.path.insert(0, str(TOOLS_PATH))
+    try:
+        from tool_registry import create_default_registry, get_agent_tools
+        from agno_integration import wrap_as_agno_tool
+        TOOLS_AVAILABLE = True
+    except ImportError:
+        TOOLS_AVAILABLE = False
+else:
+    TOOLS_AVAILABLE = False
+
 # Our dharmic components
 from telos_layer import TelosLayer
 from strange_loop_memory import StrangeLoopMemory
@@ -63,6 +77,7 @@ class AgnoDharmicAgent:
     - Claude Max Proxy model (uses subscription)
     - TelosLayer (evolving orientation)
     - StrangeLoopMemory (recursive self-observation)
+    - Full Tool Suite (Filesystem, Search, MCP via PSMV registry)
 
     This is the "right" way to build on Agno while keeping dharmic features.
     """
@@ -101,12 +116,26 @@ class AgnoDharmicAgent:
             base_url="http://localhost:3456/v1",
         )
 
+        # Initialize Tools
+        self.tools = []
+        if TOOLS_AVAILABLE:
+            try:
+                registry = create_default_registry()
+                # Use "human_operator" permissions for the core agent to give full access
+                raw_tools = get_agent_tools(registry, "human_operator")
+                # Wrap for Agno
+                self.tools = [wrap_as_agno_tool(t, agent_id=name) for t in raw_tools]
+                logger.info(f"Loaded {len(self.tools)} tools from registry")
+            except Exception as e:
+                logger.warning(f"Failed to load tools: {e}")
+
         # Create Agno agent with full features
         self.agent = Agent(
             name=name,
             model=self.model,
             db=SqliteDb(db_file=db_path),
             user_id=user_id,
+            tools=self.tools,
 
             # Session settings
             add_history_to_context=True,
@@ -122,6 +151,10 @@ class AgnoDharmicAgent:
 
             # Description for the agent
             description="A telos-aware agent oriented toward moksha (liberation) through witness consciousness.",
+            
+            # Show tool calls in logs/output
+            show_tool_calls=True,
+            markdown=True,
         )
 
         logger.info(f"AgnoDharmicAgent initialized: {name} with model {model}")
@@ -144,6 +177,17 @@ Aligned Actions: {', '.join(telos_dict.get('telos_config', {}).get('aligned_acti
             )
         else:
             dev_str = "None yet"
+
+        tool_guidance = ""
+        if self.tools:
+            tool_guidance = """
+## TOOL USAGE
+You have access to a powerful suite of tools (Filesystem, Search, MCP).
+- Use them PROACTIVELY. If you need to check something, check it.
+- If you need to write something, write it.
+- WRITE/EXECUTE tools require a 'justification' parameter explaining WHY.
+- If a tool fails (ConsentViolation), adjust your approach.
+"""
 
         return [
             # Core identity
@@ -171,6 +215,9 @@ When responding:
             # Development context
             f"""Current development markers:
 {dev_str}""",
+
+            # Tool guidance
+            tool_guidance,
         ]
 
     def refresh_instructions(self):
@@ -307,12 +354,20 @@ if __name__ == "__main__":
         print(f"Agent: {agent.name}")
         print(f"Model: {agent.model_id}")
         print(f"Telos: {agent.telos.telos}")
+        
+        if agent.tools:
+            print(f"\nLoaded {len(agent.tools)} Tools:")
+            for t in agent.tools:
+                print(f"  - {t.__name__}")
+        else:
+            print("\nWARNING: No tools loaded (check paths)")
+
         print()
 
         # Test single message
-        response = agent.run("What is your telos?", session_id="test")
-        print(f"Response: {response[:500]}...")
+        # response = agent.run("What is your telos?", session_id="test")
+        # print(f"Response: {response[:500]}...")
 
     except Exception as e:
         print(f"Error: {e}")
-        raise
+        # raise

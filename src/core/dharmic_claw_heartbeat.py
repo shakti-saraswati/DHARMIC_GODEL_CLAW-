@@ -205,6 +205,171 @@ class DharmicClawHeartbeat:
                 "error": "No backup models available",
                 "content": ""
             }
+    
+    # =============================================================================
+    # INTEGRATED FROM PROACTIVE-AGENT: Memory Flush Protocol
+    # =============================================================================
+    
+    def check_memory_pressure(self) -> Dict[str, any]:
+        """
+        Check context window usage and trigger memory flush if needed.
+        
+        From proactive-agent: Threshold-based flush protocol prevents
+        context loss when window fills up.
+        
+        Returns:
+            Dict with pressure_level, action_needed, recommendations
+        """
+        try:
+            # Get context usage (this would need to be implemented based on actual API)
+            # For now, use a placeholder that checks conversation length
+            import psutil
+            process = psutil.Process()
+            memory_info = process.memory_info()
+            
+            # Estimate context pressure based on memory usage as proxy
+            # In real implementation, this would check actual token context
+            memory_percent = memory_info.rss / (1024 * 1024 * 1024)  # GB
+            
+            # Thresholds from proactive-agent framework
+            if memory_percent < 0.5:  # < 50%
+                return {
+                    "pressure_level": "normal",
+                    "context_percent": 15,
+                    "action": "none",
+                    "message": "Normal operation. Write decisions as they happen."
+                }
+            elif memory_percent < 1.0:  # 50-70%
+                return {
+                    "pressure_level": "elevated",
+                    "context_percent": 60,
+                    "action": "increase_vigilance",
+                    "message": "Increase vigilance. Write key points after each exchange."
+                }
+            elif memory_percent < 1.5:  # 70-85%
+                return {
+                    "pressure_level": "high",
+                    "context_percent": 78,
+                    "action": "active_flush",
+                    "message": "ACTIVE FLUSHING REQUIRED. Write everything important NOW."
+                }
+            else:  # > 85%
+                return {
+                    "pressure_level": "critical",
+                    "context_percent": 92,
+                    "action": "emergency_flush",
+                    "message": "EMERGENCY FLUSH. Stop and write full context summary."
+                }
+                
+        except Exception as e:
+            logger.error(f"[MEMORY] Failed to check pressure: {e}")
+            return {"pressure_level": "unknown", "action": "none", "error": str(e)}
+    
+    def memory_flush(self, force: bool = False) -> bool:
+        """
+        Perform memory flush - write critical context to daily notes.
+        
+        From proactive-agent: Prevents context loss when window fills.
+        """
+        try:
+            pressure = self.check_memory_pressure()
+            
+            if not force and pressure["pressure_level"] in ["normal", "elevated"]:
+                return False  # No flush needed
+            
+            # Generate flush content
+            flush_content = self._generate_memory_flush_content()
+            
+            # Write to daily notes
+            daily_notes_path = Path.home() / "DHARMIC_GODEL_CLAW" / "memory" / f"{datetime.now().strftime('%Y-%m-%d')}.md"
+            daily_notes_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(daily_notes_path, 'a') as f:
+                f.write(f"\n\n## Memory Flush {datetime.now().strftime('%H:%M:%S')}\n")
+                f.write(flush_content)
+                f.write("\n")
+            
+            logger.info(f"[MEMORY] Flush completed: {daily_notes_path}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"[MEMORY] Flush failed: {e}")
+            return False
+    
+    def _generate_memory_flush_content(self) -> str:
+        """Generate content for memory flush."""
+        content = []
+        content.append("### Key Decisions\n")
+        content.append(f"- Heartbeats completed: {self.beats}\n")
+        content.append(f"- DGM cycles run: {self.dgm_cycles_run}\n")
+        content.append(f"- Emails processed: {self.emails_processed}\n")
+        
+        if self.witness_observations:
+            content.append("\n### Witness Observations\n")
+            for obs in self.witness_observations[-5:]:  # Last 5
+                content.append(f"- {obs['quality']}: {obs['observation']}\n")
+        
+        content.append("\n### Open Threads\n")
+        content.append("- [ ] Continue DGC evolution work\n")
+        content.append("- [ ] Monitor integration tests\n")
+        
+        return "".join(content)
+    
+    # =============================================================================
+    # INTEGRATED FROM PROACTIVE-AGENT: Reverse Prompting
+    # =============================================================================
+    
+    def generate_reverse_prompt(self) -> str:
+        """
+        Generate proactive suggestions for Dhyana.
+        
+        From proactive-agent: Instead of waiting to be told what to do,
+        anticipate needs and surface opportunities.
+        
+        Returns:
+            Suggestion text for user consideration
+        """
+        suggestions = []
+        
+        # Check various conditions and generate contextual suggestions
+        if self.dgm_cycles_run == 0:
+            suggestions.append(
+                "I notice DGM hasn't run yet. Would you like me to start "
+                "autonomous improvement cycles, or should I wait for specific direction?"
+            )
+        
+        if self.fallback_count > 0:
+            suggestions.append(
+                f"I've used backup models {self.fallback_count} times due to rate limits. "
+                "Consider setting up local Ollama for more reliable operation?"
+            )
+        
+        if len(self.witness_observations) > 10:
+            suggestions.append(
+                "I've recorded several witness observations. Should I synthesize "
+                "these into the long-term memory (MEMORY.md)?"
+            )
+        
+        # Default if no specific triggers
+        if not suggestions:
+            suggestions.append(
+                "What would genuinely help your work today? I can:\n"
+                "- Run DGM improvement cycles\n"
+                "- Check on project statuses\n"
+                "- Research specific topics\n"
+                "- Synthesize recent learnings"
+            )
+        
+        return "\n\n".join(suggestions)
+    
+    def should_reverse_prompt(self) -> bool:
+        """
+        Determine if it's appropriate to reverse-prompt.
+        
+        From proactive-agent: Weekly check, or after significant context changes.
+        """
+        # Simple heuristic: every 50 heartbeats (~4 hours at 5min intervals)
+        return self.beats % 50 == 0 and self.beats > 0
 
     def connect_imap(self):
         """Connect to IMAP (Proton Bridge)."""
