@@ -79,10 +79,24 @@ class MathematicalScore:
             0.10 * self.interface_balance        # Holographic
         )
         
-        # CRITICAL: Penalize for detected slop signatures
-        slop_penalty = len(self.slop_signatures) * 0.15
-        bloat_penalty = len(self.bloat_indicators) * 0.05
-        redundancy_penalty = len(self.redundancy_patterns) * 0.10
+        # Penalty approach revised per audit: slop is a gate, not a heavy subtraction
+        # Use diminishing returns to avoid 2 hits erasing the score
+        slop_count = len(self.slop_signatures)
+        bloat_count = len(self.bloat_indicators)
+        redundancy_count = len(self.redundancy_patterns)
+        
+        # Diminishing penalty: first hit = 0.08, second = 0.05, third+ = 0.03 each
+        def diminishing_penalty(count: int, base: float, decay: float) -> float:
+            if count == 0:
+                return 0.0
+            penalty = base  # First hit
+            for i in range(1, count):
+                penalty += max(base * (decay ** i), 0.02)
+            return penalty
+        
+        slop_penalty = diminishing_penalty(slop_count, 0.08, 0.6)
+        bloat_penalty = diminishing_penalty(bloat_count, 0.03, 0.7)
+        redundancy_penalty = diminishing_penalty(redundancy_count, 0.05, 0.6)
         
         self.total = base_score - slop_penalty - bloat_penalty - redundancy_penalty
         self.total = max(0.0, min(1.0, self.total))
@@ -155,24 +169,33 @@ class MathematicalEvaluator:
     MIN_INFORMATION_DENSITY = 0.3
     MAX_COMPRESSION_RATIO = 0.7  # If code compresses more than 70%, it's redundant
     
-    # AI slop signatures (patterns that indicate low-quality generation)
+    # AI slop signatures — ONLY clear indicators of lazy generation
+    # (Revised per audit: avoid false positives on legitimate patterns)
     SLOP_PATTERNS = [
-        r'# TODO: implement',
-        r'# This function',
-        r'"""[\s\S]{0,20}"""',  # Empty or near-empty docstrings
-        r'pass\s*$',  # Stub implementations
-        r'\.\.\.(\s*#.*)?$',  # Ellipsis placeholders
-        r'raise NotImplementedError',
-        r'return None\s*$',  # Meaningless returns
+        r'# TODO: implement\s*$',           # Unfinished placeholder
+        r'# This function\s+\w+',           # AI-style "This function does X" comment
+        r'"""[\s]{0,5}"""',                 # TRULY empty docstrings only (not short ones)
+        r'def\s+\w+\([^)]*\):\s*\n\s*pass\s*$',  # pass ONLY if entire function body is pass
+        r'\.\.\.(\s*#.*)?$',                # Ellipsis placeholders (but allow in type stubs)
     ]
     
-    # Verbose patterns that indicate AI padding
+    # Patterns legitimate in some contexts (ABC, protocols, stubs)
+    # These are NOT penalized, just noted
+    CONTEXT_DEPENDENT_PATTERNS = [
+        (r'raise NotImplementedError', 'abstract_method'),
+        (r'return None\s*$', 'explicit_none_return'),
+        (r'pass\s*$', 'stub_or_protocol'),
+    ]
+    
+    # Verbose patterns that indicate AI padding / non-idiomatic Python
     VERBOSE_PATTERNS = [
-        r'if\s+\w+\s+is\s+not\s+None\s+and\s+len\(\w+\)\s*>\s*0',  # verbose truthiness
-        r'== True|== False',  # explicit boolean comparison
-        r'if\s+len\(\w+\)\s*==\s*0',  # instead of `if not x`
-        r'\.append\([^)]+\)\s*\n.*\.append\(',  # repeated appends (should be extend)
-        r'for\s+\w+\s+in\s+range\(len\(',  # instead of enumerate
+        r'if\s+\w+\s+is\s+not\s+None\s+and\s+len\(\w+\)\s*>\s*0',  # verbose truthiness combo
+        r'== True(?!\w)|== False(?!\w)',    # explicit boolean comparison
+        r'if\s+len\(\w+\)\s*[=<>]+\s*0',    # if len(x) == 0, > 0, etc. (use truthiness)
+        r'for\s+\w+\s+in\s+range\(len\(',   # instead of enumerate
+        r'if\s+\w+\s+is\s+not\s+None:\s*\n\s*if\s+',  # nested None check then condition
+        r'\[\w+\].*\[\w+\].*\[\w+\]',       # triple indexing (use unpacking)
+        r'\.append\([^)]+\)\s*\n\s*\w+\.append\(',  # repeated appends (use extend)
     ]
 
     def __init__(self):
@@ -239,10 +262,15 @@ class MathematicalEvaluator:
     
     def _compression_elegance(self, code: str) -> Tuple[float, float]:
         """
-        Measure elegance via compression ratio.
+        Measure elegance via compression ratio (Kolmogorov approximation).
         
-        Intuition: Highly compressible code has lots of redundancy.
-        Elegant code is already "compressed" conceptually.
+        Intuition: 
+        - ratio = compressed_size / original_size
+        - Low ratio (0.2) = compresses to 20% = HIGHLY redundant = SLOP
+        - High ratio (0.9) = compresses to 90% = barely compressible = ELEGANT
+        
+        Elegant code is already conceptually compressed — can't be reduced further.
+        AI slop is verbose and repetitive — compresses dramatically.
         
         Returns:
             (elegance_score, raw_compression_ratio)
@@ -251,31 +279,43 @@ class MathematicalEvaluator:
         
         # Use LZMA for better pattern detection than gzip
         compressed = lzma.compress(code_bytes, preset=9)
-        ratio = len(compressed) / len(code_bytes)
         
-        # Transform: lower compression ratio = more elegant
-        # But very low ratio might mean trivial code
-        if ratio < 0.2:
-            elegance = 0.5  # Suspicious: maybe too simple
-        elif ratio < 0.4:
-            elegance = 0.9  # Great: dense, non-redundant
-        elif ratio < 0.6:
-            elegance = 0.7  # Good: some structure, not too redundant
-        elif ratio < 0.8:
-            elegance = 0.5  # Mediocre: getting redundant
+        # Handle LZMA overhead for small files (< 200 bytes can have ratio > 1)
+        if len(code_bytes) < 200:
+            # For small files, assume they're dense (benefit of doubt)
+            ratio = 0.9
         else:
-            elegance = 0.3  # Poor: highly compressible = redundant
+            ratio = len(compressed) / len(code_bytes)
+        
+        # CORRECT mapping: HIGHER ratio = LESS compressible = MORE elegant
+        # (Previous version was inverted!)
+        if ratio > 0.85:
+            elegance = 0.95  # Excellent: barely compressible, very dense
+        elif ratio > 0.7:
+            elegance = 0.85  # Great: low redundancy
+        elif ratio > 0.55:
+            elegance = 0.7   # Good: moderate compression
+        elif ratio > 0.4:
+            elegance = 0.5   # Mediocre: notable redundancy
+        elif ratio > 0.25:
+            elegance = 0.3   # Poor: high redundancy
+        else:
+            elegance = 0.15  # Very poor: extremely compressible = slop
         
         return elegance, ratio
     
     def _information_density(self, code: str) -> Tuple[float, Dict[str, int]]:
         """
-        Measure meaningful tokens per total tokens.
+        Measure semantic information per byte of code.
         
-        High density = every token carries meaning
-        Low density = lots of boilerplate, repeated identifiers
+        Revised per audit: lexical diversity (unique/total) is NOT a good metric
+        because repeated consistent identifiers are GOOD in real code.
+        
+        Better approach: Measure semantic content per character
+        - Subtract boilerplate (whitespace, brackets, keywords-only lines)
+        - Reward high AST node count per byte (lots of semantics packed in)
         """
-        # Tokenize (simple approach - split on non-alphanumeric)
+        # Tokenize
         tokens = re.findall(r'[a-zA-Z_][a-zA-Z0-9_]*', code)
         
         if not tokens:
@@ -284,25 +324,31 @@ class MathematicalEvaluator:
         total = len(tokens)
         unique = len(set(tokens))
         
-        # Filter out Python keywords and very common tokens
-        COMMON = {'self', 'def', 'return', 'if', 'else', 'for', 'in', 'is', 'not', 
-                  'and', 'or', 'None', 'True', 'False', 'class', 'import', 'from',
-                  'try', 'except', 'with', 'as', 'lambda', 'yield', 'raise'}
+        # Calculate semantic density: AST nodes per non-whitespace character
+        try:
+            tree = ast.parse(code)
+            ast_nodes = sum(1 for _ in ast.walk(tree))
+        except SyntaxError:
+            ast_nodes = 0
         
-        meaningful = [t for t in tokens if t not in COMMON and len(t) > 1]
-        meaningful_unique = len(set(meaningful))
+        # Non-whitespace, non-comment characters
+        code_chars = len(re.sub(r'\s+|#[^\n]*', '', code))
         
-        # Density = unique meaningful / total
-        density = meaningful_unique / total if total > 0 else 0
+        # AST nodes per 100 characters (semantic density)
+        if code_chars > 0:
+            semantic_density = (ast_nodes / code_chars) * 100
+        else:
+            semantic_density = 0
         
-        # Normalize to 0-1 (empirically, good code is 0.15-0.4)
-        normalized = min(1.0, density / 0.35)
+        # Normalize (empirically, good code has 5-15 AST nodes per 100 chars)
+        normalized = min(1.0, semantic_density / 12.0)
         
         return normalized, {
             "unique": unique,
             "total": total,
-            "meaningful_unique": meaningful_unique,
-            "meaningful_total": len(meaningful),
+            "ast_nodes": ast_nodes,
+            "code_chars": code_chars,
+            "semantic_density": semantic_density,
         }
     
     def _structural_entropy(self, code: str) -> Tuple[float, float]:
@@ -418,6 +464,7 @@ class MathematicalEvaluator:
         - Return statement presence
         - Global/nonlocal usage (bad)
         - Nested function depth
+        - Cyclomatic complexity (fewer paths = simpler to compose)
         """
         try:
             tree = ast.parse(code)
@@ -439,7 +486,7 @@ class MathematicalEvaluator:
                 has_return = any(isinstance(n, ast.Return) and n.value is not None 
                                for n in ast.walk(node))
                 if not has_return:
-                    func_score -= 0.2
+                    func_score -= 0.15  # Reduced from 0.2
                 
                 # Penalty for global/nonlocal
                 for child in ast.walk(node):
@@ -452,12 +499,43 @@ class MathematicalEvaluator:
                 if depth > 4:
                     func_score -= 0.1 * (depth - 4)
                 
+                # Cyclomatic complexity penalty (per audit recommendation)
+                # CC = E - N + 2P, approximated by counting decision points
+                cyclomatic = self._cyclomatic_complexity(node)
+                if cyclomatic > 10:
+                    func_score -= 0.15 * ((cyclomatic - 10) / 10)  # Gradual penalty
+                elif cyclomatic > 5:
+                    func_score -= 0.05  # Small penalty for moderate complexity
+                
                 scores.append(max(0.0, func_score))
         
         if not scores:
             return 0.5  # No functions to evaluate
         
         return sum(scores) / len(scores)
+    
+    def _cyclomatic_complexity(self, node: ast.AST) -> int:
+        """
+        Calculate cyclomatic complexity for a function.
+        
+        CC = number of decision points + 1
+        Decision points: if, for, while, and, or, except, with, assert
+        """
+        complexity = 1  # Base complexity
+        
+        for child in ast.walk(node):
+            # Branching statements
+            if isinstance(child, (ast.If, ast.For, ast.While, ast.ExceptHandler,
+                                   ast.With, ast.Assert, ast.comprehension)):
+                complexity += 1
+            # Boolean operators add paths
+            elif isinstance(child, ast.BoolOp):
+                complexity += len(child.values) - 1
+            # Ternary expressions
+            elif isinstance(child, ast.IfExp):
+                complexity += 1
+        
+        return complexity
     
     def _type_coverage(self, code: str) -> float:
         """
@@ -630,31 +708,42 @@ class MathematicalEvaluator:
         return issues
     
     def _detect_slop(self, code: str) -> List[str]:
-        """Detect AI slop signatures."""
+        """
+        Detect AI slop signatures.
+        
+        Revised per audit: be conservative, avoid false positives.
+        """
         signatures = []
         
-        # Check slop patterns
+        # Check definite slop patterns only
         for i, regex in enumerate(self._slop_regexes):
             if regex.search(code):
                 signatures.append(f"slop_pattern_{i}")
         
-        # Check verbose patterns
+        # Check verbose patterns — require 3+ hits to flag (was 2)
         verbose_count = sum(1 for r in self._verbose_regexes if r.search(code))
-        if verbose_count >= 2:
+        if verbose_count >= 3:
             signatures.append("verbose_idioms")
         
-        # Check for excessive comments relative to code
+        # Comment ratio check — MUCH more lenient
+        # Only flag if comments > 80% of code lines (extreme case)
         lines = code.split('\n')
         comment_lines = sum(1 for l in lines if l.strip().startswith('#'))
         code_lines = sum(1 for l in lines if l.strip() and not l.strip().startswith('#'))
-        if code_lines > 0 and comment_lines / code_lines > 0.5:
+        if code_lines > 0 and comment_lines > code_lines * 0.8:
             signatures.append("over_commented")
         
-        # Check for very long docstrings (AI loves verbose docs)
+        # Docstring check — only flag if >50% AND docstrings are repetitive
         docstring_matches = re.findall(r'"""[\s\S]*?"""', code)
         total_docstring_len = sum(len(d) for d in docstring_matches)
-        if total_docstring_len > len(code) * 0.3:
-            signatures.append("docstring_heavy")
+        if total_docstring_len > len(code) * 0.5:
+            # Additional check: are docstrings actually repetitive?
+            if len(docstring_matches) > 1:
+                # Check for copy-paste patterns
+                ds_texts = [d.lower() for d in docstring_matches]
+                unique_ratio = len(set(ds_texts)) / len(ds_texts)
+                if unique_ratio < 0.7:  # >30% duplicated docstrings
+                    signatures.append("repetitive_docstrings")
         
         return signatures
     
