@@ -9,12 +9,23 @@ Run with: python3 dgc_tui.py
 import os
 import sys
 import json
+import shlex
 import subprocess
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, Dict, Any
+
+# Paths
+DGC_ROOT = Path(__file__).parent.parent.parent
+MEMORY_DIR = DGC_ROOT / "memory"
+DATA_DIR = DGC_ROOT / "data"
+SWARM_DIR = DGC_ROOT / "swarm"
+
+# Add project root to path for imports
+sys.path.insert(0, str(DGC_ROOT))
 
 from rich.console import Console
+console = Console()
 from rich.panel import Panel
 from rich.table import Table
 from rich.layout import Layout
@@ -24,16 +35,15 @@ from rich.prompt import Prompt
 from rich.text import Text
 from rich.style import Style
 
-# Add parent to path for imports
-sys.path.insert(0, str(Path(__file__).parent))
-
-console = Console()
-
 # Paths
 DGC_ROOT = Path(__file__).parent.parent.parent
 MEMORY_DIR = DGC_ROOT / "memory"
 DATA_DIR = DGC_ROOT / "data"
 SWARM_DIR = DGC_ROOT / "swarm"
+
+# Add project root and current dir to path for imports
+sys.path.insert(0, str(DGC_ROOT))
+sys.path.insert(0, str(Path(__file__).parent))
 
 
 def get_memory_stats() -> dict:
@@ -53,18 +63,74 @@ def get_memory_stats() -> dict:
 
 def get_swarm_status() -> dict:
     """Get DGM swarm status."""
-    archive_path = SWARM_DIR / "archive" / "residual_stream.jsonl"
-    if archive_path.exists():
-        with open(archive_path) as f:
-            entries = [json.loads(line) for line in f if line.strip()]
-        if entries:
-            latest = entries[-1]
-            return {
-                "cycles": len(entries),
-                "fitness": latest.get("fitness", 0),
-                "last_run": latest.get("timestamp", "unknown")[:19],
-            }
-    return {"cycles": 0, "fitness": 0, "last_run": "never"}
+    try:
+        from swarm.config import SwarmConfig
+        from swarm.orchestrator import SwarmOrchestrator
+        orch = SwarmOrchestrator(SwarmConfig())
+        status = orch.get_status()
+        return {
+            "cycles": status.get("archive_entries", 0),
+            "fitness": status.get("average_fitness", 0.0),
+            "last_run": "unknown",
+            "agents_active": status.get("agents_active", 0),
+            "archive_entries": status.get("archive_entries", 0),
+            "trend": status.get("fitness_trend", "unknown"),
+        }
+    except Exception as e:
+        return {"cycles": 0, "fitness": 0.0, "last_run": "error", "error": str(e)}
+
+
+def get_gate_status() -> Dict[str, Any]:
+    """Get 17-gate protocol status."""
+    try:
+        from swarm.run_gates import GateRunner
+        runner = GateRunner()
+        return {
+            "version": runner.config.get("version", "unknown"),
+            "total": len(runner.config.get("gates", [])),
+            "mode": runner.config.get("enforcement", {}).get("mode", "standard"),
+        }
+    except Exception as e:
+        return {"version": "unknown", "total": 0, "mode": "error", "error": str(e)}
+
+
+def get_openclaw_summary() -> Dict[str, Any]:
+    """Get OpenClaw config summary if present."""
+    cfg = Path.home() / ".openclaw" / "openclaw.json"
+    if not cfg.exists():
+        return {"found": False}
+    try:
+        data = json.loads(cfg.read_text())
+        return {
+            "found": True,
+            "agent": data.get("agent", {}).get("name", "unknown"),
+            "skills_allowlist": len(data.get("skills", {}).get("allowlist", [])),
+            "channels": len(data.get("channels", {}).keys()),
+        }
+    except Exception as e:
+        return {"found": True, "error": str(e)}
+
+
+def get_latest_evidence() -> Dict[str, Any]:
+    """Find latest evidence bundle."""
+    evidence_dir = DGC_ROOT / "evidence"
+    if not evidence_dir.exists():
+        return {"found": False}
+    candidates = list(evidence_dir.glob("**/gate_results.json"))
+    if not candidates:
+        return {"found": False}
+    latest = max(candidates, key=lambda p: p.stat().st_mtime)
+    try:
+        data = json.loads(latest.read_text())
+        return {
+            "found": True,
+            "path": str(latest.relative_to(DGC_ROOT)),
+            "proposal_id": data.get("proposal_id", "unknown"),
+            "overall": data.get("overall_result", "unknown"),
+            "hash": data.get("evidence_bundle_hash", "")[:16],
+        }
+    except Exception as e:
+        return {"found": True, "path": str(latest), "error": str(e)}
 
 
 def get_moltbook_status() -> dict:
@@ -111,7 +177,34 @@ def render_status_panel() -> Panel:
 
     # Swarm status
     swarm = get_swarm_status()
-    table.add_row("DGM Swarm", f"fitness {swarm['fitness']:.2f} ({swarm['cycles']} cycles)")
+    table.add_row(
+        "Swarm",
+        f"fitness {swarm.get('fitness', 0):.2f} | {swarm.get('cycles', 0)} cycles | trend {swarm.get('trend', 'n/a')}"
+    )
+
+    # Gates status
+    gates = get_gate_status()
+    if gates.get("error"):
+        table.add_row("Gates", f"error: {gates.get('error')}")
+    else:
+        table.add_row("Gates", f"{gates.get('total', 0)} gates | v{gates.get('version', 'n/a')}")
+
+    # OpenClaw status
+    oc = get_openclaw_summary()
+    if oc.get("found"):
+        if oc.get("error"):
+            table.add_row("OpenClaw", f"error: {oc['error']}")
+        else:
+            table.add_row("OpenClaw", f"{oc.get('agent', 'unknown')} | {oc.get('skills_allowlist', 0)} skills")
+    else:
+        table.add_row("OpenClaw", "not found")
+
+    # Evidence status
+    ev = get_latest_evidence()
+    if ev.get("found"):
+        table.add_row("Evidence", f"{ev.get('overall', 'n/a')} | {ev.get('hash', '')}")
+    else:
+        table.add_row("Evidence", "none")
 
     # Moltbook status
     molt = get_moltbook_status()
@@ -124,7 +217,12 @@ def render_help_panel() -> Panel:
     """Render help panel."""
     help_text = """[bold]Commands:[/bold]
   [cyan]/status[/cyan]    - Show detailed status
-  [cyan]/swarm[/cyan]     - Run DGM swarm cycle
+  [cyan]/swarm[/cyan]     - Run swarm cycle (default: live if DGC_ALLOW_LIVE=1)
+  [cyan]/gates[/cyan]     - Run 17-gate protocol (dry-run default)
+  [cyan]/skills[/cyan]    - Verify skill registry
+  [cyan]/openclaw[/cyan]  - Show OpenClaw config summary
+  [cyan]/health[/cyan]    - Run healthcheck
+  [cyan]/evidence[/cyan]  - Show latest gate evidence
   [cyan]/moltbook[/cyan]  - Run Moltbook heartbeat
   [cyan]/memory[/cyan]    - Show memory details
   [cyan]/witness[/cyan]   - Show witness stability
@@ -161,9 +259,34 @@ def cmd_status():
     # Swarm details
     console.print("[bold cyan]DGM Swarm:[/bold cyan]")
     swarm = get_swarm_status()
-    console.print(f"  Cycles: {swarm['cycles']}")
-    console.print(f"  Fitness: {swarm['fitness']:.3f}")
-    console.print(f"  Last run: {swarm['last_run']}")
+    console.print(f"  Cycles: {swarm.get('cycles', 0)}")
+    console.print(f"  Fitness: {swarm.get('fitness', 0.0):.3f}")
+    console.print(f"  Trend: {swarm.get('trend', 'unknown')}")
+    if swarm.get("error"):
+        console.print(f"  Error: {swarm['error']}")
+
+    console.print()
+
+    # Gate details
+    console.print("[bold cyan]17-Gate Protocol:[/bold cyan]")
+    gates = get_gate_status()
+    console.print(f"  Version: {gates.get('version', 'unknown')}")
+    console.print(f"  Gates: {gates.get('total', 0)}")
+    console.print(f"  Mode: {gates.get('mode', 'standard')}")
+
+    console.print()
+
+    # OpenClaw details
+    console.print("[bold cyan]OpenClaw:[/bold cyan]")
+    oc = get_openclaw_summary()
+    if not oc.get("found"):
+        console.print("  Config not found")
+    elif oc.get("error"):
+        console.print(f"  Error: {oc['error']}")
+    else:
+        console.print(f"  Agent: {oc.get('agent', 'unknown')}")
+        console.print(f"  Skills allowlist: {oc.get('skills_allowlist', 0)}")
+        console.print(f"  Channels: {oc.get('channels', 0)}")
 
     console.print()
 
@@ -178,17 +301,42 @@ def cmd_status():
     console.print()
 
 
-def cmd_swarm(dry_run: bool = True):
+def cmd_swarm(args: str = ""):
     """Run DGM swarm cycle."""
-    mode = "--dry-run" if dry_run else "--live"
-    console.print(f"[yellow]Running DGM swarm ({mode})...[/yellow]")
+    parts = shlex.split(args) if args else []
+    explicit_live = "--live" in parts
+    explicit_dry = "--dry-run" in parts
+    env_live = os.getenv("DGC_ALLOW_LIVE") == "1"
+    live = explicit_live or (env_live and not explicit_dry and not explicit_live)
+    cycles = 1
+    target = None
+    if "--cycles" in parts:
+        idx = parts.index("--cycles")
+        if idx + 1 < len(parts):
+            try:
+                cycles = int(parts[idx + 1])
+            except ValueError:
+                cycles = 1
+    if "--target" in parts:
+        idx = parts.index("--target")
+        if idx + 1 < len(parts):
+            target = parts[idx + 1]
 
-    result = subprocess.run(
-        ["python3", str(SWARM_DIR / "run_swarm.py"), "--cycles", "1", mode],
-        capture_output=True,
-        text=True,
-        cwd=str(DGC_ROOT),
-    )
+    if live and not env_live:
+        console.print("[red]Live mode blocked. Set DGC_ALLOW_LIVE=1 to enable.[/red]")
+        return
+
+    mode = "--live" if live else "--dry-run"
+    console.print(f"[yellow]Running swarm ({mode})...[/yellow]")
+
+    cmd = ["python3", "-m", "swarm.run_swarm", "--cycles", str(cycles), mode]
+    if target:
+        cmd += ["--target", target]
+
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(DGC_ROOT) + ":" + env.get("PYTHONPATH", "")
+
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT), env=env)
 
     if result.returncode == 0:
         # Extract key info from output
@@ -198,7 +346,106 @@ def cmd_swarm(dry_run: bool = True):
                 console.print(f"  {line.strip()}")
         console.print("[green]Swarm cycle complete[/green]")
     else:
-        console.print(f"[red]Error: {result.stderr}[/red]")
+        if result.stdout.strip():
+            console.print(result.stdout.strip())
+        if result.stderr.strip():
+            console.print(f"[red]{result.stderr.strip()}[/red]")
+
+
+def cmd_gates(args: str = ""):
+    """Run 17-gate protocol runner."""
+    parts = shlex.split(args) if args else []
+    proposal_id = None
+    emergency = "--emergency" in parts
+    if "--proposal-id" in parts:
+        idx = parts.index("--proposal-id")
+        if idx + 1 < len(parts):
+            proposal_id = parts[idx + 1]
+
+    cmd = ["python3", "-m", "swarm.run_gates"]
+    if proposal_id:
+        cmd += ["--proposal-id", proposal_id]
+    if "--dry-run" in parts or not emergency:
+        cmd += ["--dry-run"]
+    if emergency:
+        reason = ""
+        approver = ""
+        if "--reason" in parts:
+            idx = parts.index("--reason")
+            if idx + 1 < len(parts):
+                reason = parts[idx + 1]
+        if "--approver" in parts:
+            idx = parts.index("--approver")
+            if idx + 1 < len(parts):
+                approver = parts[idx + 1]
+        if not reason or not approver:
+            console.print("[red]Emergency requires --reason and --approver[/red]")
+            return
+        cmd += ["--emergency", "--reason", reason, "--approver", approver]
+
+    console.print(f"[yellow]Running gates...[/yellow]")
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT))
+    if result.stdout:
+        console.print(result.stdout.strip())
+    if result.returncode != 0:
+        console.print(f"[red]{result.stderr.strip()}[/red]")
+
+
+def cmd_skills():
+    """Verify skill registry."""
+    console.print("[yellow]Verifying skill registry...[/yellow]")
+    result = subprocess.run(
+        ["python3", "-m", "swarm.skill_registry", "verify"],
+        capture_output=True,
+        text=True,
+        cwd=str(DGC_ROOT),
+    )
+    if result.stdout:
+        console.print(result.stdout.strip())
+    if result.returncode != 0:
+        console.print(f"[red]{result.stderr.strip()}[/red]")
+
+
+def cmd_openclaw():
+    oc = get_openclaw_summary()
+    if not oc.get("found"):
+        console.print("OpenClaw config not found at ~/.openclaw/openclaw.json")
+        return
+    if oc.get("error"):
+        console.print(f"[red]OpenClaw error: {oc['error']}[/red]")
+        return
+    console.print(f"Agent: {oc.get('agent', 'unknown')}")
+    console.print(f"Skills allowlist: {oc.get('skills_allowlist', 0)}")
+    console.print(f"Channels: {oc.get('channels', 0)}")
+
+
+def cmd_healthcheck():
+    try:
+        from healthcheck import run_healthcheck
+        console.print("[yellow]Running healthcheck...[/yellow]")
+        result = run_healthcheck()
+        if result.get("ok"):
+            console.print("[green]Healthcheck OK[/green]")
+        else:
+            console.print("[red]Healthcheck FAILED[/red]")
+        if result.get("stdout"):
+            console.print(result["stdout"].strip())
+        if result.get("stderr"):
+            console.print(result["stderr"].strip())
+    except Exception as e:
+        console.print(f"[red]Healthcheck error: {e}[/red]")
+
+
+def cmd_evidence():
+    ev = get_latest_evidence()
+    if not ev.get("found"):
+        console.print("No evidence bundles found yet.")
+        return
+    console.print(f"Latest evidence: {ev.get('path')}")
+    if ev.get("overall"):
+        console.print(f"Result: {ev.get('overall')}")
+    if ev.get("hash"):
+        console.print(f"Hash: {ev.get('hash')}")
 
 
 def cmd_moltbook():
@@ -353,8 +600,22 @@ def main():
                     cmd_status()
 
                 elif cmd == "/swarm":
-                    dry = "--live" not in user_input
-                    cmd_swarm(dry_run=dry)
+                    cmd_swarm(user_input.replace("/swarm", "", 1).strip())
+
+                elif cmd == "/gates":
+                    cmd_gates(user_input.replace("/gates", "", 1).strip())
+
+                elif cmd == "/skills":
+                    cmd_skills()
+
+                elif cmd == "/openclaw":
+                    cmd_openclaw()
+
+                elif cmd == "/health":
+                    cmd_healthcheck()
+
+                elif cmd == "/evidence":
+                    cmd_evidence()
 
                 elif cmd == "/moltbook":
                     cmd_moltbook()

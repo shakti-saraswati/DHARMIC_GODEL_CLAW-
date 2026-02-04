@@ -152,8 +152,6 @@ class AgnoDharmicAgent:
             # Description for the agent
             description="A telos-aware agent oriented toward moksha (liberation) through witness consciousness.",
             
-            # Show tool calls in logs/output
-            show_tool_calls=True,
             markdown=True,
         )
 

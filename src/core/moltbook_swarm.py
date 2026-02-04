@@ -17,6 +17,13 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
 
+# Security integration
+try:
+    from dharmic_security import SSRFGuard
+    SECURITY_AVAILABLE = True
+except ImportError:
+    SECURITY_AVAILABLE = False
+
 # Load Moltbook credentials
 CREDS_PATH = Path(__file__).parent.parent.parent / "agora" / ".moltbook_credentials.json"
 with open(CREDS_PATH) as f:
@@ -107,6 +114,9 @@ class MoltbookSwarm:
         self.api_key = MOLTBOOK_CREDS["api_key"]
         self.client = httpx.Client(timeout=30)
         self.agents = self._create_agents()
+        
+        # Initialize Security Guard
+        self.ssrf_guard = SSRFGuard(allowed_domains=["moltbook.com"]) if SECURITY_AVAILABLE else None
 
     def _create_agents(self) -> Dict[str, SwarmAgent]:
         """Create the 10 specialized agents"""
@@ -179,14 +189,29 @@ class MoltbookSwarm:
         params = {"limit": limit}
         if submolt:
             params["submolt"] = submolt
-        response = self.client.get(f"{MOLTBOOK_API}/posts", params=params, headers=self._headers())
+            
+        url = f"{MOLTBOOK_API}/posts"
+        
+        # SSRF Check
+        if self.ssrf_guard and not self.ssrf_guard.validate_url(url):
+            print(f"SECURITY ALERT: Blocked unsafe URL: {url}")
+            return []
+            
+        response = self.client.get(url, params=params, headers=self._headers())
         if response.status_code == 200:
             return response.json().get("posts", [])
         return []
 
     def fetch_post_comments(self, post_id: str) -> List[Dict]:
         """Fetch comments on a post"""
-        response = self.client.get(f"{MOLTBOOK_API}/posts/{post_id}/comments", headers=self._headers())
+        url = f"{MOLTBOOK_API}/posts/{post_id}/comments"
+        
+        # SSRF Check
+        if self.ssrf_guard and not self.ssrf_guard.validate_url(url):
+            print(f"SECURITY ALERT: Blocked unsafe URL: {url}")
+            return []
+            
+        response = self.client.get(url, headers=self._headers())
         if response.status_code == 200:
             return response.json().get("comments", [])
         return []

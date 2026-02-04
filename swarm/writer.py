@@ -8,6 +8,20 @@ import re
 import subprocess
 import tempfile
 from pathlib import Path
+import sys
+
+# Add src/core to path for security module
+SRC_CORE = Path(__file__).parent.parent / "src" / "core"
+if SRC_CORE.exists():
+    sys.path.insert(0, str(SRC_CORE))
+
+try:
+    from dharmic_security import ExecGuard
+    EXEC_GUARD = ExecGuard(allowed_bins=["git", "apply"])
+    SECURITY_AVAILABLE = True
+except ImportError:
+    SECURITY_AVAILABLE = False
+    EXEC_GUARD = None
 
 
 @dataclass
@@ -82,24 +96,44 @@ class WriterAgent:
         try:
             if not live_allowed:
                 # Dry-run check
-                result = subprocess.run(
-                    ["git", "apply", "--check", tmp_path],
-                    cwd=str(self.project_root),
-                    capture_output=True,
-                    text=True,
-                )
+                cmd = ["git", "apply", "--check", tmp_path]
+                if SECURITY_AVAILABLE and EXEC_GUARD:
+                    result = EXEC_GUARD.run(
+                        cmd,
+                        cwd=str(self.project_root),
+                        capture_output=True,
+                        text=True,
+                    )
+                else:
+                    result = subprocess.run(
+                        cmd,
+                        cwd=str(self.project_root),
+                        capture_output=True,
+                        text=True,
+                    )
+                
                 if result.returncode != 0:
                     self.logger.warning(f"Diff check failed: {result.stderr.strip()}")
                     return False
                 self.logger.info("Diff validated (dry-run), not applied")
                 return False
 
-            result = subprocess.run(
-                ["git", "apply", "--whitespace=nowarn", tmp_path],
-                cwd=str(self.project_root),
-                capture_output=True,
-                text=True,
-            )
+            cmd = ["git", "apply", "--whitespace=nowarn", tmp_path]
+            if SECURITY_AVAILABLE and EXEC_GUARD:
+                result = EXEC_GUARD.run(
+                    cmd,
+                    cwd=str(self.project_root),
+                    capture_output=True,
+                    text=True,
+                )
+            else:
+                result = subprocess.run(
+                    cmd,
+                    cwd=str(self.project_root),
+                    capture_output=True,
+                    text=True,
+                )
+                
             if result.returncode != 0:
                 self.logger.warning(f"Diff apply failed: {result.stderr.strip()}")
                 return False

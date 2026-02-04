@@ -309,5 +309,10 @@ def log_fitness(
         logger.info(msg, extra={"context": context})
 
 
+class ModelError(RuntimeError):
+    """Error raised when model backend fails."""
+    pass
+
+
 # Auto-setup on import for convenience
 setup_logging()

@@ -23,6 +23,19 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+# Security integration
+SRC_CORE = Path(__file__).resolve().parents[2] / "src" / "core"
+if str(SRC_CORE) not in sys.path:
+    sys.path.insert(0, str(SRC_CORE))
+
+try:
+    from dharmic_security import SSRFGuard
+    SSRF_GUARD = SSRFGuard(allowed_domains=["api.openai.com"])
+    SECURITY_AVAILABLE = True
+except ImportError:
+    SECURITY_AVAILABLE = False
+    SSRF_GUARD = None
+
 # Import logging with fallback
 try:
     from core.dharmic_logging import get_logger

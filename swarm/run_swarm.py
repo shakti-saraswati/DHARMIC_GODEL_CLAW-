@@ -12,8 +12,14 @@ import argparse
 import asyncio
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+# Ensure repo root is on sys.path when invoked as a script
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from swarm.config import SwarmConfig
 from swarm.orchestrator import SwarmOrchestrator

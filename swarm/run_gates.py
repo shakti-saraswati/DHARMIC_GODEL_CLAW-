@@ -27,6 +27,21 @@ from typing import Any, Optional
 
 import yaml
 
+# Security integration
+SRC_CORE = Path(__file__).parent.parent / "src" / "core"
+if str(SRC_CORE) not in sys.path:
+    sys.path.insert(0, str(SRC_CORE))
+if str(Path(__file__).parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
+try:
+    from dharmic_security import ExecGuard
+    EXEC_GUARD = ExecGuard(allowed_bins=["git", "apply", "pytest", "python3", "sh", "bash", "ls", "grep"])
+    SECURITY_AVAILABLE = True
+except ImportError:
+    SECURITY_AVAILABLE = False
+    EXEC_GUARD = None
+
 # =============================================================================
 # CONSTANTS
 # =============================================================================
@@ -350,14 +365,24 @@ class GateRunner:
         
         try:
             for cmd in commands:
-                result = subprocess.run(
-                    cmd,
-                    shell=True,
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout,
-                    cwd=Path(__file__).parent.parent
-                )
+                if SECURITY_AVAILABLE and EXEC_GUARD:
+                    result = EXEC_GUARD.run(
+                        cmd,
+                        shell=True,
+                        capture_output=True,
+                        text=True,
+                        timeout=timeout,
+                        cwd=Path(__file__).parent.parent
+                    )
+                else:
+                    result = subprocess.run(
+                        cmd,
+                        shell=True,
+                        capture_output=True,
+                        text=True,
+                        timeout=timeout,
+                        cwd=Path(__file__).parent.parent
+                    )
                 all_stdout.append(result.stdout)
                 all_stderr.append(result.stderr)
                 

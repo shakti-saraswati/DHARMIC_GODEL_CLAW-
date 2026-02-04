@@ -24,9 +24,9 @@ class SwarmConfig:
     """Configuration for the self-improving swarm."""
 
     # Paths
-    project_root: Path = field(default_factory=lambda: Path.home() / "DHARMIC_GODEL_CLAW")
+    project_root: Path = field(default_factory=lambda: Path(__file__).parent.parent)
     vault_path: Path = field(default_factory=lambda: Path.home() / "Persistent-Semantic-Memory-Vault")
-    archive_path: Path = field(default_factory=lambda: Path.home() / "DHARMIC_GODEL_CLAW" / "archive")
+    archive_path: Path = field(default_factory=lambda: Path(__file__).parent.parent / "src" / "dgm" / "archive.jsonl")
     residual_stream_path: Path = field(default_factory=lambda: Path.home() / "Persistent-Semantic-Memory-Vault" / "AGENT_EMERGENT_WORKSPACES" / "residual_stream")
 
     # API
