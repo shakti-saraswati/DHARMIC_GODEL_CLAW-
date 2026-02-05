@@ -37,4 +37,4 @@ E   ImportError: cannot import name 'SwarmDGMBridge' from 'swarm.dgm_integration
 [36m[1m=========================== short test summary info ============================[0m
 [31mERROR[0m tests/test_dgm_integration.py
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-[31m================= [33m568 deselected[0m, [33m6 warnings[0m, [31m[1m1 error[0m[31m in 0.93s[0m[31m =================[0m
+[31m================= [33m568 deselected[0m, [33m6 warnings[0m, [31m[1m1 error[0m[31m in 0.91s[0m[31m =================[0m

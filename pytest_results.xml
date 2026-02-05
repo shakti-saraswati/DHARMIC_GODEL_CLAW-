@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="3.528" timestamp="2026-02-05T13:04:14.760203+08:00" hostname="MacBook-Pro-4.local"><testcase classname="" name="tests.test_dgm_integration" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/dhyana/DHARMIC_GODEL_CLAW/tests/test_dgm_integration.py'.
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="2.014" timestamp="2026-02-05T13:23:35.306774+08:00" hostname="MacBook-Pro-4.local"><testcase classname="" name="tests.test_dgm_integration" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/dhyana/DHARMIC_GODEL_CLAW/tests/test_dgm_integration.py'.
 Hint: make sure your test modules/packages have valid Python names.
 Traceback:
 /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module

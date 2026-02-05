@@ -5447,6 +5447,72 @@
     "cell": null,
     "code": "F401",
     "end_location": {
+      "column": 45,
+      "row": 47
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/mcp_server.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from typing import Any, Dict, List",
+          "end_location": {
+            "column": 45,
+            "row": 47
+          },
+          "location": {
+            "column": 1,
+            "row": 47
+          }
+        }
+      ],
+      "message": "Remove unused import: `typing.Optional`"
+    },
+    "location": {
+      "column": 37,
+      "row": 47
+    },
+    "message": "`typing.Optional` imported but unused",
+    "noqa_row": 47,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F541",
+    "end_location": {
+      "column": 46,
+      "row": 593
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/mcp_server.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "\"   Gates: 22 (17 dharmic + 5 ML)\"",
+          "end_location": {
+            "column": 46,
+            "row": 593
+          },
+          "location": {
+            "column": 11,
+            "row": 593
+          }
+        }
+      ],
+      "message": "Remove extraneous `f` prefix"
+    },
+    "location": {
+      "column": 11,
+      "row": 593
+    },
+    "message": "f-string without any placeholders",
+    "noqa_row": 593,
+    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
       "column": 47,
       "row": 35
     },
@@ -8008,6 +8074,39 @@
     "cell": null,
     "code": "F401",
     "end_location": {
+      "column": 24,
+      "row": 3
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/agents/tool_agent.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 4
+          },
+          "location": {
+            "column": 1,
+            "row": 3
+          }
+        }
+      ],
+      "message": "Remove unused import: `typing.List`"
+    },
+    "location": {
+      "column": 20,
+      "row": 3
+    },
+    "message": "`typing.List` imported but unused",
+    "noqa_row": 3,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
       "column": 50,
       "row": 4
     },
@@ -8423,8 +8522,8 @@
     "cell": null,
     "code": "F401",
     "end_location": {
-      "column": 10,
-      "row": 13
+      "column": 24,
+      "row": 3
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/emergency_bypass.py",
     "fix": {
@@ -8434,287 +8533,23 @@
           "content": "",
           "end_location": {
             "column": 1,
-            "row": 14
+            "row": 4
           },
           "location": {
             "column": 1,
-            "row": 13
+            "row": 3
           }
         }
       ],
-      "message": "Remove unused import: `os`"
+      "message": "Remove unused import: `typing.List`"
     },
     "location": {
-      "column": 8,
-      "row": 13
+      "column": 20,
+      "row": 3
     },
-    "message": "`os` imported but unused",
-    "noqa_row": 13,
+    "message": "`typing.List` imported but unused",
+    "noqa_row": 3,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
-  },
-  {
-    "cell": null,
-    "code": "F401",
-    "end_location": {
-      "column": 11,
-      "row": 14
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/emergency_bypass.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "",
-          "end_location": {
-            "column": 1,
-            "row": 15
-          },
-          "location": {
-            "column": 1,
-            "row": 14
-          }
-        }
-      ],
-      "message": "Remove unused import: `sys`"
-    },
-    "location": {
-      "column": 8,
-      "row": 14
-    },
-    "message": "`sys` imported but unused",
-    "noqa_row": 14,
-    "url": "https://docs.astral.sh/ruff/rules/unused-import"
-  },
-  {
-    "cell": null,
-    "code": "F541",
-    "end_location": {
-      "column": 38,
-      "row": 414
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/emergency_bypass.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "\"\\n✓ Bypass requested\"",
-          "end_location": {
-            "column": 38,
-            "row": 414
-          },
-          "location": {
-            "column": 15,
-            "row": 414
-          }
-        }
-      ],
-      "message": "Remove extraneous `f` prefix"
-    },
-    "location": {
-      "column": 15,
-      "row": 414
-    },
-    "message": "f-string without any placeholders",
-    "noqa_row": 414,
-    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
-  },
-  {
-    "cell": null,
-    "code": "F541",
-    "end_location": {
-      "column": 63,
-      "row": 417
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/emergency_bypass.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "\"\\nGates that will STILL run (non-bypassable):\"",
-          "end_location": {
-            "column": 63,
-            "row": 417
-          },
-          "location": {
-            "column": 15,
-            "row": 417
-          }
-        }
-      ],
-      "message": "Remove extraneous `f` prefix"
-    },
-    "location": {
-      "column": 15,
-      "row": 417
-    },
-    "message": "f-string without any placeholders",
-    "noqa_row": 417,
-    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
-  },
-  {
-    "cell": null,
-    "code": "F541",
-    "end_location": {
-      "column": 48,
-      "row": 420
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/emergency_bypass.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "\"\\nGates that will be bypassed:\"",
-          "end_location": {
-            "column": 48,
-            "row": 420
-          },
-          "location": {
-            "column": 15,
-            "row": 420
-          }
-        }
-      ],
-      "message": "Remove extraneous `f` prefix"
-    },
-    "location": {
-      "column": 15,
-      "row": 420
-    },
-    "message": "f-string without any placeholders",
-    "noqa_row": 420,
-    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
-  },
-  {
-    "cell": null,
-    "code": "F541",
-    "end_location": {
-      "column": 36,
-      "row": 423
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/emergency_bypass.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "\"\\nTo approve, run:\"",
-          "end_location": {
-            "column": 36,
-            "row": 423
-          },
-          "location": {
-            "column": 15,
-            "row": 423
-          }
-        }
-      ],
-      "message": "Remove extraneous `f` prefix"
-    },
-    "location": {
-      "column": 15,
-      "row": 423
-    },
-    "message": "f-string without any placeholders",
-    "noqa_row": 423,
-    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
-  },
-  {
-    "cell": null,
-    "code": "F541",
-    "end_location": {
-      "column": 36,
-      "row": 437
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/emergency_bypass.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "\"\\nTo execute, run:\"",
-          "end_location": {
-            "column": 36,
-            "row": 437
-          },
-          "location": {
-            "column": 15,
-            "row": 437
-          }
-        }
-      ],
-      "message": "Remove extraneous `f` prefix"
-    },
-    "location": {
-      "column": 15,
-      "row": 437
-    },
-    "message": "f-string without any placeholders",
-    "noqa_row": 437,
-    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
-  },
-  {
-    "cell": null,
-    "code": "F541",
-    "end_location": {
-      "column": 37,
-      "row": 442
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/emergency_bypass.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "\"\\n✓ Bypass executed\"",
-          "end_location": {
-            "column": 37,
-            "row": 442
-          },
-          "location": {
-            "column": 15,
-            "row": 442
-          }
-        }
-      ],
-      "message": "Remove extraneous `f` prefix"
-    },
-    "location": {
-      "column": 15,
-      "row": 442
-    },
-    "message": "f-string without any placeholders",
-    "noqa_row": 442,
-    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
-  },
-  {
-    "cell": null,
-    "code": "F541",
-    "end_location": {
-      "column": 37,
-      "row": 443
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/emergency_bypass.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "\"\\nRun this command:\"",
-          "end_location": {
-            "column": 37,
-            "row": 443
-          },
-          "location": {
-            "column": 15,
-            "row": 443
-          }
-        }
-      ],
-      "message": "Remove extraneous `f` prefix"
-    },
-    "location": {
-      "column": 15,
-      "row": 443
-    },
-    "message": "f-string without any placeholders",
-    "noqa_row": 443,
-    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
   },
   {
     "cell": null,
@@ -9797,8 +9632,8 @@
     "cell": null,
     "code": "F401",
     "end_location": {
-      "column": 15,
-      "row": 16
+      "column": 24,
+      "row": 3
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/production_feedback.py",
     "fix": {
@@ -9808,56 +9643,23 @@
           "content": "",
           "end_location": {
             "column": 1,
-            "row": 17
+            "row": 4
           },
           "location": {
             "column": 1,
-            "row": 16
+            "row": 3
           }
         }
       ],
-      "message": "Remove unused import: `hashlib`"
+      "message": "Remove unused import: `typing.List`"
     },
     "location": {
-      "column": 8,
-      "row": 16
+      "column": 20,
+      "row": 3
     },
-    "message": "`hashlib` imported but unused",
-    "noqa_row": 16,
+    "message": "`typing.List` imported but unused",
+    "noqa_row": 3,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
-  },
-  {
-    "cell": null,
-    "code": "F541",
-    "end_location": {
-      "column": 64,
-      "row": 451
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/production_feedback.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "\"\\nReminders scheduled for: Day 1, Day 3, Day 7\"",
-          "end_location": {
-            "column": 64,
-            "row": 451
-          },
-          "location": {
-            "column": 15,
-            "row": 451
-          }
-        }
-      ],
-      "message": "Remove extraneous `f` prefix"
-    },
-    "location": {
-      "column": 15,
-      "row": 451
-    },
-    "message": "f-string without any placeholders",
-    "noqa_row": 451,
-    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
   },
   {
     "cell": null,

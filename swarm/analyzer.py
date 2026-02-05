@@ -208,18 +208,18 @@ Return valid JSON only:
         issues: List[Issue] = []
         files_scanned = 0
 
-        # 1. Regex Scan
+        # 1. LLM Analysis (if enabled) - PRIORITY
+        if self.use_llm and self._mutator:
+            llm_issues = await self._analyze_with_llm(target_area)
+            issues.extend(llm_issues)
+
+        # 2. Regex Scan
         for root in search_roots:
             for py_file in self._iter_py_files(root):
                 files_scanned += 1
                 issues.extend(self._scan_file(py_file))
                 if len(issues) >= 50:
                     break
-        
-        # 2. LLM Analysis (if enabled)
-        if self.use_llm and self._mutator:
-            llm_issues = await self._analyze_with_llm(target_area)
-            issues.extend(llm_issues)
 
         return AnalysisResult(
             issues=issues,
