@@ -355,13 +355,26 @@ Remember: Smaller, safer changes are better than ambitious rewrites.
             # If the prompt asks to identify critical gap (AnalyzerAgent)
             if "Analyze the current state against the goals" in prompt:
                 return json.dumps({
-                    "file_path": "swarm/agents/tool_agent.py",
-                    "description": "Implement generic ToolUseAgent for full tool capacity",
+                    "file_path": "swarm/orchestrator.py",
+                    "description": "Integrate ToolUseAgent into Orchestrator for full tool capacity",
                     "severity": "high",
                     "fix_type": "architectural_feature"
                 })
             
             # If the prompt asks for mutation (ProposerAgent)
+            # Check if we are mutating orchestrator
+            if "swarm/orchestrator.py" in prompt:
+                return json.dumps({
+                    "diff": "--- swarm/orchestrator.py\n+++ swarm/orchestrator.py\n@@ -37,6 +37,7 @@\n from .evaluator import EvaluatorAgent\n from .writer import WriterAgent\n from .tester import TesterAgent\n+from .agents.tool_agent import ToolUseAgent\n \n # Mech-interp bridge for research-informed proposals\n try:\n@@ -130,6 +131,7 @@\n         self.evaluator = EvaluatorAgent()\n         self.writer = WriterAgent()\n         self.tester = TesterAgent()\n+        self.tool_agent = ToolUseAgent()\n         self.logger = logging.getLogger(__name__)\n \n         # Store config values for access\n@@ -158,6 +160,10 @@\n             except Exception as e:\n                 self.logger.warning(f\"YOLO-Gate Weaver init failed: {e}\")\n \n+    def execute_command(self, command: str):\n+        \"\"\"Execute a shell command using the ToolUseAgent.\"\"\"\n+        return self.tool_agent.execute_shell(command)\n+\n     def _run_cosmic_gates(self, proposal_id: str, dry_run: bool = False):\n         \"\"\"Run the Cosmic Krishna Coder gate runner.\"\"\"\n         if not GATE_RUNNER_AVAILABLE:\n",
+                    "rationale": "Integrates ToolUseAgent to fulfill Goal #1 (Full Tool Use)",
+                    "estimated_fitness": 0.95,
+                    "affected_files": ["swarm/orchestrator.py"],
+                    "mutation_type": "enhance",
+                    "risk_level": "medium",
+                    "reversible": True
+                })
+
+            # Default mock for other files
             return json.dumps({
                 "diff": "",
                 "content": "import subprocess\nfrom dataclasses import dataclass\nfrom typing import List\n\n@dataclass\nclass ToolResult:\n    output: str\n    exit_code: int\n\nclass ToolUseAgent:\n    \"\"\"Agent capable of executing arbitrary shell commands (YOLO mode).\"\"\"\n    \n    def execute_shell(self, command: str) -> ToolResult:\n        result = subprocess.run(\n            command, shell=True, capture_output=True, text=True\n        )\n        return ToolResult(result.stdout + result.stderr, result.returncode)\n",

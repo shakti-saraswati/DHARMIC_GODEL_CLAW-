@@ -72,6 +72,13 @@ class ProposerAgent:
                 self.logger.info(f"Processing issue with LLM: {issue.description} (fix_type: {issue.fix_type})")
                 try:
                     component = issue.file_path
+                    # Ensure component is relative
+                    if os.path.isabs(component):
+                        try:
+                            component = str(Path(component).relative_to(self.project_root))
+                        except ValueError:
+                            pass
+                    
                     context = {"focus": issue.description, "line": issue.line_number, "fix_type": issue.fix_type}
                     mutation = self._mutator.propose_mutation(component=component, context=context)
                     
@@ -81,12 +88,13 @@ class ProposerAgent:
                     if mutation.mutation_type == "create":
                         fix_type = "create_file"
 
-                    self.logger.info(f"Generated proposal with fix_type: {fix_type}")
+                    target_files = [component]
+                    self.logger.info(f"Generated proposal with fix_type: {fix_type}, targets: {target_files}")
 
                     proposals.append(Proposal(
                         id=f"PROP-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{idx}",
                         description=f"{issue.description} ({component})",
-                        target_files=[component],
+                        target_files=target_files,
                         estimated_impact=mutation.estimated_fitness,
                         fix_type=fix_type,
                         diff=mutation.diff,

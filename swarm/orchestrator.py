@@ -591,6 +591,9 @@ class SwarmOrchestrator:
             
             approved_proposals = [p.proposal for p in evaluation.proposals if p.approved]
             
+            for p in approved_proposals:
+                self.logger.info(f"Approved proposal: {p.id}, fix_type={p.fix_type}, targets={p.target_files}")
+
             if not approved_proposals:
                 self.logger.error("All proposals failed gate evaluation")
                 # Record failed proposal

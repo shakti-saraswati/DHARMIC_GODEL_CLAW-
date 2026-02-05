@@ -4722,51 +4722,132 @@
     "cell": null,
     "code": "F401",
     "end_location": {
-      "column": 31,
-      "row": 7
+      "column": 41,
+      "row": 31
     },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/__init__.py",
-    "fix": null,
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/risk_detector.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from dataclasses import dataclass",
+          "end_location": {
+            "column": 41,
+            "row": 31
+          },
+          "location": {
+            "column": 1,
+            "row": 31
+          }
+        }
+      ],
+      "message": "Remove unused import: `dataclasses.field`"
+    },
+    "location": {
+      "column": 36,
+      "row": 31
+    },
+    "message": "`dataclasses.field` imported but unused",
+    "noqa_row": 31,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 25,
+      "row": 33
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/risk_detector.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 34
+          },
+          "location": {
+            "column": 1,
+            "row": 33
+          }
+        }
+      ],
+      "message": "Remove unused import: `pathlib.Path`"
+    },
     "location": {
       "column": 21,
-      "row": 7
+      "row": 33
     },
-    "message": "`.status.get_status` imported but unused; consider removing, adding to `__all__`, or using a redundant alias",
-    "noqa_row": 7,
+    "message": "`pathlib.Path` imported but unused",
+    "noqa_row": 33,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
     "cell": null,
     "code": "F401",
     "end_location": {
+      "column": 45,
+      "row": 34
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/risk_detector.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from typing import Dict, List, Optional, Any",
+          "end_location": {
+            "column": 57,
+            "row": 34
+          },
+          "location": {
+            "column": 1,
+            "row": 34
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
+      "column": 42,
+      "row": 34
+    },
+    "message": "`typing.Set` imported but unused",
+    "noqa_row": 34,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 52,
+      "row": 34
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/risk_detector.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from typing import Dict, List, Optional, Any",
+          "end_location": {
+            "column": 57,
+            "row": 34
+          },
+          "location": {
+            "column": 1,
+            "row": 34
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
       "column": 47,
-      "row": 7
+      "row": 34
     },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/__init__.py",
-    "fix": null,
-    "location": {
-      "column": 33,
-      "row": 7
-    },
-    "message": "`.status.status_summary` imported but unused; consider removing, adding to `__all__`, or using a redundant alias",
-    "noqa_row": 7,
-    "url": "https://docs.astral.sh/ruff/rules/unused-import"
-  },
-  {
-    "cell": null,
-    "code": "F401",
-    "end_location": {
-      "column": 29,
-      "row": 8
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/__init__.py",
-    "fix": null,
-    "location": {
-      "column": 20,
-      "row": 8
-    },
-    "message": "`.gates.run_gates` imported but unused; consider removing, adding to `__all__`, or using a redundant alias",
-    "noqa_row": 8,
+    "message": "`typing.Tuple` imported but unused",
+    "noqa_row": 34,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
@@ -4801,6 +4882,89 @@
     "message": "`json` imported but unused",
     "noqa_row": 5,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 33,
+      "row": 33
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/yolo_weaver.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from typing import Any, Dict, List, Optional, Tuple",
+          "end_location": {
+            "column": 62,
+            "row": 33
+          },
+          "location": {
+            "column": 1,
+            "row": 33
+          }
+        }
+      ],
+      "message": "Remove unused import: `typing.Callable`"
+    },
+    "location": {
+      "column": 25,
+      "row": 33
+    },
+    "message": "`typing.Callable` imported but unused",
+    "noqa_row": 33,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F541",
+    "end_location": {
+      "column": 72,
+      "row": 314
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/yolo_weaver.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "\"Gate failures detected\"",
+          "end_location": {
+            "column": 72,
+            "row": 314
+          },
+          "location": {
+            "column": 47,
+            "row": 314
+          }
+        }
+      ],
+      "message": "Remove extraneous `f` prefix"
+    },
+    "location": {
+      "column": 47,
+      "row": 314
+    },
+    "message": "f-string without any placeholders",
+    "noqa_row": 314,
+    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
+  },
+  {
+    "cell": null,
+    "code": "E741",
+    "end_location": {
+      "column": 46,
+      "row": 425
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/cosmic_krishna_coder/yolo_weaver.py",
+    "fix": null,
+    "location": {
+      "column": 45,
+      "row": 425
+    },
+    "message": "Ambiguous variable name: `l`",
+    "noqa_row": 425,
+    "url": "https://docs.astral.sh/ruff/rules/ambiguous-variable-name"
   },
   {
     "cell": null,
@@ -5161,16 +5325,16 @@
     "code": "F401",
     "end_location": {
       "column": 49,
-      "row": 52
+      "row": 61
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/dharmic_claw_heartbeat.py",
     "fix": null,
     "location": {
       "column": 34,
-      "row": 52
+      "row": 61
     },
     "message": "`canonical_memory.CanonicalMemory` imported but unused; consider using `importlib.util.find_spec` to test for availability",
-    "noqa_row": 52,
+    "noqa_row": 61,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
@@ -5178,16 +5342,16 @@
     "code": "F401",
     "end_location": {
       "column": 62,
-      "row": 52
+      "row": 61
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/dharmic_claw_heartbeat.py",
     "fix": null,
     "location": {
       "column": 51,
-      "row": 52
+      "row": 61
     },
     "message": "`canonical_memory.MemoryLayer` imported but unused; consider using `importlib.util.find_spec` to test for availability",
-    "noqa_row": 52,
+    "noqa_row": 61,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
@@ -5195,16 +5359,16 @@
     "code": "F401",
     "end_location": {
       "column": 87,
-      "row": 52
+      "row": 61
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/dharmic_claw_heartbeat.py",
     "fix": null,
     "location": {
       "column": 64,
-      "row": 52
+      "row": 61
     },
     "message": "`canonical_memory.create_canonical_memory` imported but unused; consider using `importlib.util.find_spec` to test for availability",
-    "noqa_row": 52,
+    "noqa_row": 61,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
@@ -5212,16 +5376,16 @@
     "code": "E722",
     "end_location": {
       "column": 19,
-      "row": 789
+      "row": 798
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/dharmic_claw_heartbeat.py",
     "fix": null,
     "location": {
       "column": 13,
-      "row": 789
+      "row": 798
     },
     "message": "Do not use bare `except`",
-    "noqa_row": 789,
+    "noqa_row": 798,
     "url": "https://docs.astral.sh/ruff/rules/bare-except"
   },
   {
@@ -5447,55 +5611,90 @@
     "cell": null,
     "code": "F401",
     "end_location": {
-      "column": 45,
-      "row": 47
+      "column": 33,
+      "row": 74
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/mcp_server.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "from typing import Any, Dict, List",
-          "end_location": {
-            "column": 45,
-            "row": 47
-          },
-          "location": {
-            "column": 1,
-            "row": 47
-          }
-        }
-      ],
-      "message": "Remove unused import: `typing.Optional`"
-    },
+    "fix": null,
     "location": {
-      "column": 37,
-      "row": 47
+      "column": 23,
+      "row": 74
     },
-    "message": "`typing.Optional` imported but unused",
-    "noqa_row": 47,
+    "message": "`src.core.cosmic_krishna_coder.RiskResult` imported but unused; consider using `importlib.util.find_spec` to test for availability",
+    "noqa_row": 74,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 43,
+      "row": 74
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/mcp_server.py",
+    "fix": null,
+    "location": {
+      "column": 35,
+      "row": 74
+    },
+    "message": "`src.core.cosmic_krishna_coder.RiskTier` imported but unused; consider using `importlib.util.find_spec` to test for availability",
+    "noqa_row": 74,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 54,
+      "row": 74
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/mcp_server.py",
+    "fix": null,
+    "location": {
+      "column": 45,
+      "row": 74
+    },
+    "message": "`src.core.cosmic_krishna_coder.WeaveMode` imported but unused; consider using `importlib.util.find_spec` to test for availability",
+    "noqa_row": 74,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 32,
+      "row": 75
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/mcp_server.py",
+    "fix": null,
+    "location": {
+      "column": 21,
+      "row": 75
+    },
+    "message": "`src.core.cosmic_krishna_coder.WeaveResult` imported but unused; consider using `importlib.util.find_spec` to test for availability",
+    "noqa_row": 75,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
     "cell": null,
     "code": "F541",
     "end_location": {
-      "column": 46,
-      "row": 593
+      "column": 35,
+      "row": 879
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/mcp_server.py",
     "fix": {
       "applicability": "safe",
       "edits": [
         {
-          "content": "\"   Gates: 22 (17 dharmic + 5 ML)\"",
+          "content": "\"   DGM: Bridge active\"",
           "end_location": {
-            "column": 46,
-            "row": 593
+            "column": 35,
+            "row": 879
           },
           "location": {
             "column": 11,
-            "row": 593
+            "row": 879
           }
         }
       ],
@@ -5503,10 +5702,10 @@
     },
     "location": {
       "column": 11,
-      "row": 593
+      "row": 879
     },
     "message": "f-string without any placeholders",
-    "noqa_row": 593,
+    "noqa_row": 879,
     "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
   },
   {
@@ -7477,7 +7676,7 @@
     "code": "E712",
     "end_location": {
       "column": 53,
-      "row": 588
+      "row": 601
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/dgm/mutator.py",
     "fix": {
@@ -7487,11 +7686,11 @@
           "content": "mutator.is_forbidden_file(\".env\")",
           "end_location": {
             "column": 53,
-            "row": 588
+            "row": 601
           },
           "location": {
             "column": 12,
-            "row": 588
+            "row": 601
           }
         }
       ],
@@ -7499,10 +7698,10 @@
     },
     "location": {
       "column": 12,
-      "row": 588
+      "row": 601
     },
     "message": "Avoid equality comparisons to `True`; use `mutator.is_forbidden_file(\".env\"):` for truth checks",
-    "noqa_row": 588,
+    "noqa_row": 601,
     "url": "https://docs.astral.sh/ruff/rules/true-false-comparison"
   },
   {
@@ -7510,7 +7709,7 @@
     "code": "E712",
     "end_location": {
       "column": 59,
-      "row": 589
+      "row": 602
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/dgm/mutator.py",
     "fix": {
@@ -7520,11 +7719,11 @@
           "content": "mutator.is_forbidden_file(\".env.local\")",
           "end_location": {
             "column": 59,
-            "row": 589
+            "row": 602
           },
           "location": {
             "column": 12,
-            "row": 589
+            "row": 602
           }
         }
       ],
@@ -7532,10 +7731,10 @@
     },
     "location": {
       "column": 12,
-      "row": 589
+      "row": 602
     },
     "message": "Avoid equality comparisons to `True`; use `mutator.is_forbidden_file(\".env.local\"):` for truth checks",
-    "noqa_row": 589,
+    "noqa_row": 602,
     "url": "https://docs.astral.sh/ruff/rules/true-false-comparison"
   },
   {
@@ -7543,7 +7742,7 @@
     "code": "E712",
     "end_location": {
       "column": 60,
-      "row": 590
+      "row": 603
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/dgm/mutator.py",
     "fix": {
@@ -7553,11 +7752,11 @@
           "content": "mutator.is_forbidden_file(\"secrets.yml\")",
           "end_location": {
             "column": 60,
-            "row": 590
+            "row": 603
           },
           "location": {
             "column": 12,
-            "row": 590
+            "row": 603
           }
         }
       ],
@@ -7565,10 +7764,10 @@
     },
     "location": {
       "column": 12,
-      "row": 590
+      "row": 603
     },
     "message": "Avoid equality comparisons to `True`; use `mutator.is_forbidden_file(\"secrets.yml\"):` for truth checks",
-    "noqa_row": 590,
+    "noqa_row": 603,
     "url": "https://docs.astral.sh/ruff/rules/true-false-comparison"
   },
   {
@@ -7576,7 +7775,7 @@
     "code": "E712",
     "end_location": {
       "column": 61,
-      "row": 591
+      "row": 604
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/dgm/mutator.py",
     "fix": {
@@ -7586,11 +7785,11 @@
           "content": "not mutator.is_forbidden_file(\"src/main.py\")",
           "end_location": {
             "column": 61,
-            "row": 591
+            "row": 604
           },
           "location": {
             "column": 12,
-            "row": 591
+            "row": 604
           }
         }
       ],
@@ -7598,10 +7797,10 @@
     },
     "location": {
       "column": 12,
-      "row": 591
+      "row": 604
     },
     "message": "Avoid equality comparisons to `False`; use `not mutator.is_forbidden_file(\"src/main.py\"):` for false checks",
-    "noqa_row": 591,
+    "noqa_row": 604,
     "url": "https://docs.astral.sh/ruff/rules/true-false-comparison"
   },
   {

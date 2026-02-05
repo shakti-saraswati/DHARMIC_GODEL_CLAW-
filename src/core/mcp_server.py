@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
 """
-DGC MCP Server — Tight Loop Bridge for Cursor CLI
+DGC MCP Server v2 — Full Pipeline: Cursor → CKC → Memory → DGM
 
 Exposes DGC systems to Cursor via Model Context Protocol:
-- capture_build: Store Cursor builds to unified memory + run gates
-- run_gates: Validate code/actions against 22 dharmic gates
+- capture_build: Store Cursor builds + CKC risk scoring + DGM proposals
+- run_gates: Validate via YOLO Weaver (risk-based routing)
 - get_context: Retrieve relevant memories for current task
+- analyze_risk: Get 5-dimensional risk score for task
 
 Architecture:
     Cursor CLI ──MCP──► DGC Server
          │                │
+         │                ├──► CKC RiskDetector (5-dim scoring)
+         │                ├──► YOLO Weaver (gate routing)
          │                ├──► Unified Memory (store)
-         │                ├──► 22 Gates (validate)
-         │                └──► Context Retrieval (recall)
+         │                └──► DGM Bridge (proposals)
          │                │
          └────Returns─────┘
-           memory_id, gate_status, suggestions
+           memory_id, risk_score, gate_status, dgm_proposals
 
 Usage:
     # Start server
@@ -32,7 +34,7 @@ Usage:
       }
     }
 
-Version: 1.0.0
+Version: 2.0.0
 Created: 2026-02-05
 JSCA! 🪷
 """
@@ -65,6 +67,17 @@ try:
 except ImportError:
     UNIFIED_MEMORY_AVAILABLE = False
     print("Warning: Unified memory not available, using stub", file=sys.stderr)
+
+# Import CKC (Cosmic Krishna Coder)
+try:
+    from src.core.cosmic_krishna_coder import (
+        RiskDetector, RiskResult, RiskTier, WeaveMode,
+        YOLOWeaver, WeaveResult, GateStatus
+    )
+    CKC_AVAILABLE = True
+except ImportError:
+    CKC_AVAILABLE = False
+    print("Warning: CKC not available, using basic gates", file=sys.stderr)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -370,6 +383,118 @@ class MemoryStub:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# DGM BRIDGE — Generates evolution proposals from gate failures
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class DGMBridge:
+    """
+    Bridge to Darwin-Gödel Machine for self-improvement.
+    
+    Generates proposals when:
+    - Gate failures indicate systematic issues
+    - Risk patterns suggest new gates needed
+    - Performance bottlenecks detected
+    """
+    
+    def __init__(self):
+        self.proposals_dir = Path.home() / ".dgm" / "proposals"
+        self.proposals_dir.mkdir(parents=True, exist_ok=True)
+        self.proposal_counter = 0
+    
+    def analyze_for_proposals(
+        self,
+        weave_result: Optional[Any] = None,
+        gate_failures: Optional[List[str]] = None,
+        risk_result: Optional[Any] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Analyze results and generate DGM proposals.
+        
+        Returns list of proposals for self-improvement.
+        """
+        proposals = []
+        
+        # From YOLO Weaver results
+        if weave_result and hasattr(weave_result, 'gate_results'):
+            failed_gates = [
+                g for g in weave_result.gate_results
+                if hasattr(g, 'status') and str(g.status) == 'GateStatus.FAIL'
+            ]
+            
+            if len(failed_gates) >= 2:
+                proposals.append(self._create_proposal(
+                    title="Gate Hardening",
+                    type="security_enhancement",
+                    motivation=f"{len(failed_gates)} gates failed consistently",
+                    plan="Analyze failure patterns and strengthen checks",
+                    priority=8
+                ))
+        
+        # From direct gate failures
+        if gate_failures and len(gate_failures) >= 3:
+            proposals.append(self._create_proposal(
+                title="Systematic Gate Failures",
+                type="bug_fix",
+                motivation=f"Gates {gate_failures[:3]} failing repeatedly",
+                plan="Review gate implementations for false positives",
+                priority=7
+            ))
+        
+        # From risk analysis
+        if risk_result and hasattr(risk_result, 'score'):
+            if risk_result.score > 80:
+                proposals.append(self._create_proposal(
+                    title="High Risk Pattern Detected",
+                    type="new_capability",
+                    motivation=f"Risk score {risk_result.score} indicates dangerous pattern",
+                    plan="Add specialized detection for this risk profile",
+                    priority=9
+                ))
+        
+        # Store proposals
+        for p in proposals:
+            self._store_proposal(p)
+        
+        return proposals
+    
+    def _create_proposal(
+        self,
+        title: str,
+        type: str,
+        motivation: str,
+        plan: str,
+        priority: int
+    ) -> Dict[str, Any]:
+        """Create a DGM proposal."""
+        self.proposal_counter += 1
+        return {
+            "proposal_id": f"dgm_{datetime.now().strftime('%Y%m%d')}_{self.proposal_counter}",
+            "title": title,
+            "type": type,
+            "motivation": motivation,
+            "implementation_plan": plan,
+            "priority": priority,
+            "status": "proposed",
+            "source": "mcp_server",
+            "created_at": datetime.now().isoformat()
+        }
+    
+    def _store_proposal(self, proposal: Dict[str, Any]):
+        """Store proposal for DGM processing."""
+        filepath = self.proposals_dir / f"{proposal['proposal_id']}.json"
+        with open(filepath, 'w') as f:
+            json.dump(proposal, f, indent=2)
+    
+    def get_pending_proposals(self, limit: int = 10) -> List[Dict]:
+        """Get pending proposals."""
+        proposals = []
+        for f in sorted(self.proposals_dir.glob("*.json"))[-limit:]:
+            with open(f) as fp:
+                proposals.append(json.load(fp))
+        return proposals
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # MCP SERVER
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -378,6 +503,15 @@ app = Server("dgc-mcp-server")
 
 # Initialize systems
 gate_validator = GateValidator()
+dgm_bridge = DGMBridge()
+
+# CKC components
+if CKC_AVAILABLE:
+    risk_detector = RiskDetector()
+    yolo_weaver = YOLOWeaver()
+else:
+    risk_detector = None
+    yolo_weaver = None
 
 if UNIFIED_MEMORY_AVAILABLE:
     memory_manager = MemoryManager(MemoryConfig(
@@ -393,7 +527,7 @@ async def list_tools() -> List[Tool]:
     return [
         Tool(
             name="capture_build",
-            description="Capture a Cursor build to DGC unified memory with gate validation",
+            description="Capture a Cursor build with CKC risk scoring, gate validation, and DGM proposals",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -410,6 +544,11 @@ async def list_tools() -> List[Tool]:
                         "type": "string",
                         "description": "Representative code snippet for gate validation"
                     },
+                    "branch": {
+                        "type": "string",
+                        "description": "Git branch name",
+                        "default": ""
+                    },
                     "agent_id": {
                         "type": "string",
                         "description": "Cursor agent identifier",
@@ -421,7 +560,7 @@ async def list_tools() -> List[Tool]:
         ),
         Tool(
             name="run_gates",
-            description="Validate code against 22 dharmic gates (17 core + 5 ML)",
+            description="Validate code via YOLO Weaver (risk-based gate routing)",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -432,9 +571,37 @@ async def list_tools() -> List[Tool]:
                     "description": {
                         "type": "string",
                         "description": "What the code does"
+                    },
+                    "files": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Files being modified"
                     }
                 },
                 "required": ["code"]
+            }
+        ),
+        Tool(
+            name="analyze_risk",
+            description="Get 5-dimensional risk score for a task (Impact, Exposure, Persistence, Sensitivity, Reversibility)",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "task": {
+                        "type": "string",
+                        "description": "Task description"
+                    },
+                    "files": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Files involved"
+                    },
+                    "branch": {
+                        "type": "string",
+                        "description": "Git branch"
+                    }
+                },
+                "required": ["task"]
             }
         ),
         Tool(
@@ -469,6 +636,8 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             result = await handle_capture_build(arguments)
         elif name == "run_gates":
             result = await handle_run_gates(arguments)
+        elif name == "analyze_risk":
+            result = await handle_analyze_risk(arguments)
         elif name == "get_context":
             result = await handle_get_context(arguments)
         else:
@@ -492,36 +661,80 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
 
 async def handle_capture_build(args: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Capture a build from Cursor CLI.
+    Capture a build from Cursor CLI — Full CKC Pipeline.
     
-    1. Run 22-gate validation on code
-    2. Store to unified memory
-    3. Return memory_id + gate status
+    1. CKC risk analysis (5-dimensional scoring)
+    2. YOLO Weaver gate validation (risk-based routing)
+    3. Store to unified memory
+    4. Generate DGM proposals if needed
     """
     files = args.get("files", [])
     description = args.get("description", "")
     code_snippet = args.get("code_snippet", "")
+    branch = args.get("branch", "")
     agent_id = args.get("agent_id", "cursor-main")
     
-    # Run gate validation
-    gate_result = gate_validator.validate(code_snippet, description)
+    # Step 1: CKC Risk Analysis
+    risk_data = {}
+    risk = None
+    if CKC_AVAILABLE and risk_detector:
+        risk = risk_detector.analyze(
+            description=description,
+            code=code_snippet,
+            files=files,
+            branch=branch
+        )
+        risk_data = {
+            "score": risk.score,
+            "tier": risk.tier.value,
+            "weave_mode": risk.weave_mode.value,
+            "dimensions": risk.dimensions,
+            "auto_approve": risk.auto_approve,
+            "human_required": risk.human_required
+        }
     
-    # Prepare memory content
+    # Step 2: YOLO Weaver or Basic Gates
+    weave_result = None
+    if CKC_AVAILABLE and yolo_weaver:
+        weave_result = yolo_weaver.execute(
+            task=description,
+            code=code_snippet,
+            files=files,
+            branch=branch
+        )
+        gate_status = "PASS" if weave_result.approved else "FAIL"
+        gate_count = f"{weave_result.gates_passed}/{weave_result.gates_run}"
+        violations = [
+            g.message for g in weave_result.gate_results 
+            if g.status == GateStatus.FAIL
+        ]
+        suggestions = weave_result.suggestions
+        evidence_id = f"weave_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    else:
+        gate_result = gate_validator.validate(code_snippet, description)
+        gate_status = "PASS" if gate_result["passed"] else "FAIL"
+        gate_count = gate_result["gate_count"]
+        violations = gate_result["violations"]
+        suggestions = gate_result["suggestions"]
+        evidence_id = gate_result["evidence_id"]
+    
+    # Step 3: Store to Memory
+    tier_str = risk_data.get('tier', 'unknown')
     content = f"""BUILD: {description}
 Files: {', '.join(files[:5])}{'...' if len(files) > 5 else ''}
-Gate Status: {gate_result['gate_count']}
-Violations: {len(gate_result['violations'])}
+Risk: {risk_data.get('score', 'N/A')}/100 ({tier_str})
+Gate Status: {gate_count}
+Violations: {len(violations)}
 """
     
-    # Store to memory
     if UNIFIED_MEMORY_AVAILABLE:
         memory_id = memory_manager.capture(
             content=content,
             memory_type=MemoryType.EVENT,
             agent_id=agent_id,
             context=description,
-            tags=["cursor-build", "code"] + files[:3],
-            importance=7 if gate_result["passed"] else 5
+            tags=["cursor-build", "code", tier_str] + files[:3],
+            importance=8 if gate_status == "PASS" else 5
         )
     else:
         memory_id = memory_manager.capture(
@@ -530,34 +743,106 @@ Violations: {len(gate_result['violations'])}
             tags=["cursor-build"]
         )
     
-    return {
+    # Step 4: DGM Proposals
+    dgm_proposals = dgm_bridge.analyze_for_proposals(
+        weave_result=weave_result,
+        gate_failures=violations if violations else None,
+        risk_result=risk
+    )
+    
+    # Build Response
+    result = {
         "memory_id": memory_id,
-        "gate_status": "PASS" if gate_result["passed"] else "FAIL",
-        "gate_count": gate_result["gate_count"],
-        "violations": gate_result["violations"],
-        "suggestions": gate_result["suggestions"],
-        "evidence_id": gate_result["evidence_id"],
+        "gate_status": gate_status,
+        "gate_count": gate_count,
+        "violations": violations,
+        "suggestions": suggestions,
+        "evidence_id": evidence_id,
         "files_captured": len(files),
-        "message": f"✅ Build captured. {gate_result['gate_count']} gates passed."
-            if gate_result["passed"]
-            else f"⚠️ Build captured with {len(gate_result['violations'])} violations."
     }
+    
+    if risk_data:
+        result["risk"] = risk_data
+    
+    if dgm_proposals:
+        result["dgm_proposals"] = dgm_proposals
+    
+    if gate_status == "PASS":
+        result["message"] = f"✅ Build captured. {gate_count} gates passed. Risk: {tier_str}"
+    else:
+        result["message"] = f"⚠️ Build captured with {len(violations)} violations. Risk: {tier_str}"
+    
+    return result
 
 
 async def handle_run_gates(args: Dict[str, Any]) -> Dict[str, Any]:
-    """Run 22 gates against code without storing."""
+    """Run gates via YOLO Weaver (risk-based routing)."""
     code = args.get("code", "")
     description = args.get("description", "")
+    files = args.get("files", [])
     
-    result = gate_validator.validate(code, description)
-    
-    # Add summary
-    if result["passed"]:
-        result["summary"] = "✅ All 22 gates passed. Code is dharmic."
+    if CKC_AVAILABLE and yolo_weaver:
+        weave_result = yolo_weaver.execute(
+            task=description,
+            code=code,
+            files=files
+        )
+        return {
+            "passed": weave_result.approved,
+            "risk_score": weave_result.risk.score,
+            "risk_tier": weave_result.risk.tier.value,
+            "weave_mode": weave_result.mode.value,
+            "gate_count": f"{weave_result.gates_passed}/{weave_result.gates_run}",
+            "gates_warned": weave_result.gates_warned,
+            "gates_failed": weave_result.gates_failed,
+            "approval_source": weave_result.approval_source,
+            "suggestions": weave_result.suggestions,
+            "summary": f"✅ Approved by {weave_result.approval_source}" 
+                if weave_result.approved 
+                else f"⚠️ {weave_result.gates_failed} gates failed"
+        }
     else:
-        result["summary"] = f"⚠️ {len(result['failed_gates'])} gates failed: {', '.join(result['failed_gates'][:3])}"
+        result = gate_validator.validate(code, description)
+        if result["passed"]:
+            result["summary"] = "✅ All 22 gates passed. Code is dharmic."
+        else:
+            result["summary"] = f"⚠️ {len(result['failed_gates'])} gates failed: {', '.join(result['failed_gates'][:3])}"
+        return result
+
+
+async def handle_analyze_risk(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Get 5-dimensional risk score for a task."""
+    task = args.get("task", "")
+    files = args.get("files", [])
+    branch = args.get("branch", "")
     
-    return result
+    if not CKC_AVAILABLE or not risk_detector:
+        return {
+            "error": "CKC not available",
+            "suggestion": "Install CKC dependencies"
+        }
+    
+    risk = risk_detector.analyze(
+        description=task,
+        files=files,
+        branch=branch
+    )
+    
+    return {
+        "score": risk.score,
+        "tier": risk.tier.value,
+        "weave_mode": risk.weave_mode.value,
+        "gate_count": risk.gate_count,
+        "dimensions": risk.dimensions,
+        "signals": [
+            {"category": s.category, "pattern": s.pattern}
+            for s in risk.signals[:5]
+        ],
+        "auto_approve": risk.auto_approve,
+        "human_required": risk.human_required,
+        "suggestions": risk.suggestions,
+        "summary": f"Risk: {risk.score}/100 ({risk.tier.value.upper()}) → {risk.gate_count} gates"
+    }
 
 
 async def handle_get_context(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -588,9 +873,11 @@ async def handle_get_context(args: Dict[str, Any]) -> Dict[str, Any]:
 
 async def main():
     """Run the MCP server via stdio."""
-    print("🔥 DGC MCP Server starting...", file=sys.stderr)
+    print("🔥 DGC MCP Server v2 starting...", file=sys.stderr)
     print(f"   Memory: {'Unified Memory v3' if UNIFIED_MEMORY_AVAILABLE else 'Stub'}", file=sys.stderr)
-    print(f"   Gates: 22 (17 dharmic + 5 ML)", file=sys.stderr)
+    print(f"   CKC: {'RiskDetector + YOLOWeaver' if CKC_AVAILABLE else 'Basic Gates'}", file=sys.stderr)
+    print(f"   DGM: Bridge active", file=sys.stderr)
+    print("   Tools: capture_build, run_gates, analyze_risk, get_context", file=sys.stderr)
     print("   Ready for Cursor CLI connections.", file=sys.stderr)
     print("   JSCA! 🪷", file=sys.stderr)
     
