@@ -37,7 +37,6 @@ __all__ = ['DharmicAgent']
 # CLI for testing
 if __name__ == "__main__":
     import json
-    from pathlib import Path
 
     print("=" * 60)
     print("DHARMIC AGENT CORE - Full Integration Test")
@@ -50,7 +49,7 @@ if __name__ == "__main__":
     print(f"Telos: {agent.telos.telos['ultimate']['aim']}")
     print(f"Vault Connected: {agent.vault is not None}")
 
-    print(f"\nProximate aims:")
+    print("\nProximate aims:")
     for aim in agent.telos.telos['proximate']['current']:
         print(f"  - {aim}")
 

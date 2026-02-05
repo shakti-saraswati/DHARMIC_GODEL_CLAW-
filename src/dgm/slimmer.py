@@ -24,8 +24,7 @@ import ast
 import re
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set, Tuple, Any
-from pathlib import Path
+from typing import Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
@@ -375,7 +374,7 @@ class Slimmer:
                     description=f"Repeated code pattern ({len(occurrences)} times)",
                     location=f"{filename}:{occurrences[0]}",
                     severity=0.6,
-                    suggestion=f"Extract to a function or variable",
+                    suggestion="Extract to a function or variable",
                     removable=False,
                     code_snippet=line_text[:60] + "..." if len(line_text) > 60 else line_text
                 ))
@@ -544,7 +543,7 @@ for item in items:
         print("SLIMMER RESULTS")
         print('='*60)
         print(f"\n{result.summary}")
-        print(f"\nBloat Items Found:")
+        print("\nBloat Items Found:")
         for item in result.bloat_items:
             print(f"\n  [{item.category}] {item.description}")
             print(f"    Location: {item.location}")

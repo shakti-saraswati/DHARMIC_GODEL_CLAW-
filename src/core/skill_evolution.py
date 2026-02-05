@@ -634,7 +634,7 @@ async def main():
 
         proposal = await engine.trigger_evolution(args.skill, gap)
         print(f"Evolution triggered: {args.skill}/{gap.name}")
-        print(f"Proposal submitted to residual stream")
+        print("Proposal submitted to residual stream")
 
     elif args.command == "create":
         if not args.skill:

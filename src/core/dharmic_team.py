@@ -11,7 +11,7 @@ Key features:
 - Structured outputs via Pydantic
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Dict, Any
 from pathlib import Path
 from pydantic import BaseModel, Field
 
@@ -24,7 +24,7 @@ except ImportError:
     AGNO_AVAILABLE = False
     print("Warning: Agno not available for Team functionality")
 
-from dharmic_agent import DharmicAgent, TelosLayer
+from dharmic_agent import DharmicAgent
 try:
     from model_factory import create_model, resolve_model_spec
     MODEL_FACTORY_AVAILABLE = True
@@ -389,7 +389,7 @@ if __name__ == "__main__":
 
     # Create team
     team = DharmicTeam(core)
-    print(f"\nTeam status:")
+    print("\nTeam status:")
     print(json.dumps(team.get_status(), indent=2))
 
     # Check for --run flag to actually invoke the team

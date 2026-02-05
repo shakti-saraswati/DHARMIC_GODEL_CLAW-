@@ -24,7 +24,6 @@ Usage:
 import asyncio
 import signal
 import json
-import os
 import sys
 from pathlib import Path
 from datetime import datetime

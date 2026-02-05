@@ -25,16 +25,13 @@ Upgrades from v1.0:
 5. Coordinated decision-making
 """
 
-import asyncio
 import inspect
 import json
 import os
-import subprocess
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from enum import Enum
 import logging
 
 # Agno imports
@@ -223,7 +220,6 @@ Via: vijnan.shakti@pm.me"""
         import imaplib
         import ssl
         import email
-        import json
 
         try:
             context = ssl.create_default_context()
@@ -724,7 +720,7 @@ def main():
     if args.deliberate:
         print(f"\nRunning council deliberation on: {args.deliberate}")
         result = council.deliberate(args.deliberate)
-        print(f"\n=== DELIBERATION RESULT ===")
+        print("\n=== DELIBERATION RESULT ===")
         print(result['deliberation'][:2000])
         print(f"\n... (truncated, see {result['session_id']} for full)")
     

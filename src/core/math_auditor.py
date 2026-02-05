@@ -20,15 +20,12 @@ Telos: rigor-before-reach
 """
 
 import ast
-import inspect
 import json
 import math
-import re
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-import numpy as np
+from typing import Any, Dict, List, Optional, Union
 
 
 class VerificationStatus(Enum):

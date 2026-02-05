@@ -10,7 +10,7 @@ Integrates:
 This gives the agent TRUE persistent identity and memory.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict
 from pathlib import Path
 from datetime import datetime
 import json

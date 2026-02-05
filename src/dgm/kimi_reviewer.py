@@ -45,6 +45,15 @@ try:
 except ImportError:
     REQUESTS_AVAILABLE = False
 
+# Security guard for outbound HTTP
+try:
+    from dharmic_security import SSRFGuard
+    SSRF_GUARD = SSRFGuard(allowed_domains=["api.moonshot.ai"])
+    SECURITY_AVAILABLE = True
+except Exception:
+    SSRF_GUARD = None
+    SECURITY_AVAILABLE = False
+
 
 logger = logging.getLogger(__name__)
 
@@ -727,6 +736,9 @@ Reject if there are blocking problems or high-risk issues.
         }
         
         url = f"{self.API_BASE}/chat/completions"
+        if SECURITY_AVAILABLE and SSRF_GUARD:
+            if not SSRF_GUARD.validate_url(url):
+                raise KimiAPIError(f"SSRFGuard blocked URL: {url}")
         
         if HTTPX_AVAILABLE:
             with httpx.Client(timeout=self.timeout) as client:

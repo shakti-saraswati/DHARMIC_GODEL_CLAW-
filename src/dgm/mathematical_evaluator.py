@@ -24,11 +24,9 @@ import ast
 import lzma
 import math
 import re
-import zlib
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional, Tuple
-import hashlib
+from typing import List, Dict, Optional, Tuple
 
 
 @dataclass

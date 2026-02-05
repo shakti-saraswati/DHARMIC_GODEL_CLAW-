@@ -18,7 +18,7 @@ Queue is SQLite-backed for persistence.
 
 import sqlite3
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, List
@@ -298,7 +298,6 @@ Start with a one-line summary, then detailed work.
 
 def main():
     import argparse
-    from datetime import timedelta
     
     parser = argparse.ArgumentParser(description="Council Bridge")
     parser.add_argument("--status", action="store_true", help="Show bridge status")

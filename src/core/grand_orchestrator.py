@@ -26,12 +26,11 @@ Usage:
     orchestrator.audit_claim(claim, context)  # Check empirical rigor
 """
 
-import os
 import json
 import subprocess
 from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict, List, Any, Tuple
+from typing import Optional, Dict, List, Any
 
 # Local imports
 import sys

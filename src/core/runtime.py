@@ -318,7 +318,7 @@ class DharmicRuntime:
             The spawned Agent, or None if spawning failed
         """
         if not AGNO_AVAILABLE:
-            self._log(f"Cannot spawn specialist: Agno not available")
+            self._log("Cannot spawn specialist: Agno not available")
             return None
 
         # Build specialist instructions

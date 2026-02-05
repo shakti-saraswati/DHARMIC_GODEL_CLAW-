@@ -57,7 +57,6 @@ except Exception as e:
 
 try:
     from web_dashboard import app as dashboard_app, init_agent as init_dashboard_agent
-    from flask import Flask
     import threading
     WEB_AVAILABLE = True
 except Exception as e:

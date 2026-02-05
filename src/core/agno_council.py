@@ -22,13 +22,11 @@ The Protocol is NON-NEGOTIABLE:
 - CI is ultimate authority
 """
 
-import asyncio
-import json
 import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict, Any
 from enum import Enum
 import logging
 
@@ -572,18 +570,18 @@ def main():
         print("\n" + "=" * 60)
         print("AGNO COUNCIL STATUS")
         print("=" * 60)
-        print(f"\nAgents: Gnata, Gneya, Gnan, Shakti")
+        print("\nAgents: Gnata, Gneya, Gnan, Shakti")
         print(f"Shakti Mode: {council.current_mode.value}")
         print(f"Council DB: {COUNCIL_DIR}")
-        print(f"Protocol: 17-gate (BAKED IN)")
+        print("Protocol: 17-gate (BAKED IN)")
         print("=" * 60)
 
     elif args.meeting:
         print(f"\nRunning council meeting on: {args.meeting}")
         result = council.council_meeting(args.meeting)
-        print(f"\n=== COUNCIL RESULT ===")
+        print("\n=== COUNCIL RESULT ===")
         print(f"Session: {result['session_id']}")
-        print(f"\n--- Shakti Action ---")
+        print("\n--- Shakti Action ---")
         print(result['action'][:1000])
 
     elif args.quick:

@@ -10,11 +10,10 @@ Each agent has:
 
 import json
 import httpx
-import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 from enum import Enum
 
 # Security integration

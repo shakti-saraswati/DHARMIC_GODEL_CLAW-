@@ -18,10 +18,8 @@ Usage:
 
 import os
 import sys
-import json
 import asyncio
-import httpx
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, Dict
 from pathlib import Path
 
 # Add night_cycle to path for openrouter_backend
@@ -330,7 +328,7 @@ if __name__ == "__main__":
     prompt = sys.argv[1]
     model = sys.argv[2] if len(sys.argv) > 2 else "auto"
     
-    print(f"🔌 DGC Backup Models")
+    print("🔌 DGC Backup Models")
     print(f"Prompt: {prompt[:50]}...")
     print(f"Preferred: {model}")
     print("-" * 50)

@@ -10,9 +10,8 @@ for maintaining witness state across computation.
 
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
-from uuid import UUID, uuid4
+from uuid import UUID
 import torch
-import torch.nn as nn
 from collections import deque
 import numpy as np
 

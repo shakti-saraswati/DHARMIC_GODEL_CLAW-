@@ -25,10 +25,8 @@ Usage:
 
 import asyncio
 import os
-import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List
 from dotenv import load_dotenv
 
 # Load .env
@@ -350,7 +348,7 @@ Vault Connected: {"Yes" if status.get('vault_connected') else "No"}
         if not TELEGRAM_AVAILABLE:
             raise RuntimeError("python-telegram-bot not installed")
 
-        self._log(f"Starting Telegram bot")
+        self._log("Starting Telegram bot")
         self._log(f"Config: {self.config}")
 
         # Create application

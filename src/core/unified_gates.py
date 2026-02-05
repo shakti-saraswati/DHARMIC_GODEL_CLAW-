@@ -52,8 +52,8 @@ Usage:
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional, Callable, Union
-from enum import Enum, auto
+from typing import Dict, List, Any, Optional, Callable
+from enum import Enum
 from datetime import datetime, timezone
 from pathlib import Path
 import hashlib
@@ -61,8 +61,6 @@ import json
 import logging
 import re
 import subprocess
-import tempfile
-import os
 
 # Configure witness logger
 witness_logger = logging.getLogger("unified_gates.witness")
@@ -1411,7 +1409,7 @@ class UnifiedGateSystem:
         if blocking:
             ahimsa_fail = "AHIMSA" in blocking
             if ahimsa_fail:
-                return f"REJECT: Ahimsa violation - action blocked"
+                return "REJECT: Ahimsa violation - action blocked"
             return f"REJECT: {', '.join(blocking)} failed"
         
         if needs_human:

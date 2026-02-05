@@ -27,13 +27,13 @@ def test_dgm_cycle_with_gates():
     # Create heartbeat instance
     heartbeat = DharmicClawHeartbeat(interval=300)
     
-    print(f"\n[1] Heartbeat initialized")
+    print("\n[1] Heartbeat initialized")
     print(f"    - Gates available: {heartbeat.gate_system is not None}")
     print(f"    - Evidence bundles: {len(heartbeat.dgm_evidence_bundles)}")
     
     # Test gate system directly
     if heartbeat.gate_system:
-        print(f"\n[2] Testing gate system...")
+        print("\n[2] Testing gate system...")
         test_action = "Test DGM improvement cycle"
         test_context = {
             "verified": True,
@@ -52,7 +52,7 @@ def test_dgm_cycle_with_gates():
         print(f"    - Witness hash: {gate_result.witness_hash[:16]}...")
     
     # Test evidence bundle generation
-    print(f"\n[3] Testing evidence bundle generation...")
+    print("\n[3] Testing evidence bundle generation...")
     
     # Mock cycle result for testing
     class MockCycleResult:
@@ -75,7 +75,7 @@ def test_dgm_cycle_with_gates():
     print(f"    - Has DGM cycle: {'dgm_cycle' in evidence_bundle}")
     
     # Test the actual DGM check (with dry_run=True by default)
-    print(f"\n[4] Running actual DGM check with gate enforcement...")
+    print("\n[4] Running actual DGM check with gate enforcement...")
     print("    (This may take a moment...)")
     
     result = heartbeat.run_dgm_check()
@@ -92,7 +92,7 @@ def test_dgm_cycle_with_gates():
         print(f"    - Alignment score: {result.get('alignment_score'):.0%}")
     
     # Summary
-    print(f"\n[5] Test Summary")
+    print("\n[5] Test Summary")
     print(f"    - Gates operational: {heartbeat.gate_system is not None}")
     print(f"    - DGM check executed: {result.get('ran')}")
     print(f"    - Evidence generated: {result.get('evidence_bundle_id') is not None}")

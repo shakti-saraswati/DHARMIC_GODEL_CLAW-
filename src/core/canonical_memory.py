@@ -78,12 +78,11 @@ Usage:
 
 import json
 import hashlib
-import asyncio
 import logging
 from enum import Enum
 from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Any, Tuple, Union, Set
+from typing import Optional, Dict, List, Any, Tuple, Union
 from dataclasses import dataclass, field, asdict
 from collections import defaultdict
 
@@ -218,7 +217,6 @@ class SemanticDeduplicator:
     def get_embedding(self, text: str) -> Optional[List[float]]:
         """Get embedding vector for text."""
         if self.embeddings_available and self.embedder:
-            import numpy as np
             return self.embedder.encode(text).tolist()
         return None
     
@@ -731,7 +729,7 @@ class CanonicalMemory:
         """
         content = f"Skill: {skill_name}\n{description}"
         if steps:
-            content += f"\nSteps:\n" + "\n".join(f"{i+1}. {s}" for i, s in enumerate(steps))
+            content += "\nSteps:\n" + "\n".join(f"{i+1}. {s}" for i, s in enumerate(steps))
         
         return self._store_procedural(
             content=content,

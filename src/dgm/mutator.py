@@ -12,7 +12,7 @@ import subprocess
 import json
 import re
 from pathlib import Path
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
 
 from .archive import EvolutionEntry, FitnessScore

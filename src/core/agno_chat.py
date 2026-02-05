@@ -20,7 +20,7 @@ def main():
 
     print(f"Agent: {agent.name}")
     print(f"Model: {agent.model_id}")
-    print(f"Telos: moksha (liberation through witness consciousness)")
+    print("Telos: moksha (liberation through witness consciousness)")
     print()
     print("Type 'quit' or 'exit' to end. Type 'witness' to record an observation.")
     print("-" * 60)

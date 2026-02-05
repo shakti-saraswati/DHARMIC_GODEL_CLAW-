@@ -3,7 +3,6 @@
 Tests for CodexProposer
 =======================
 """
-import json
 import os
 import sys
 import tempfile

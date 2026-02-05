@@ -45,10 +45,10 @@ Usage:
 import json
 import threading
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Callable, Optional, Any, Set
+from typing import Dict, List, Callable, Optional, Any
 from enum import Enum, auto
 import numpy as np
 

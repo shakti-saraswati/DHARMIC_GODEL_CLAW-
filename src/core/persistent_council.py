@@ -40,9 +40,9 @@ import json
 import hashlib
 import sqlite3
 from dataclasses import dataclass, field, asdict
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Any, Callable
+from typing import Optional
 from enum import Enum
 import os
 
@@ -856,10 +856,10 @@ def main():
         print("=" * 60)
         print(f"\nVision: {council.state.vision_statement}")
         print(f"\nShakti Mode: {council.state.current_shakti_mode.value}")
-        print(f"\nMembers:")
+        print("\nMembers:")
         for m in council.state.members:
             print(f"  - {m.name} ({m.role}) - angle: {m.angle}")
-        print(f"\nActive Missions:")
+        print("\nActive Missions:")
         for mission in council.state.active_missions:
             print(f"  - {mission}")
         print(f"\nDatabase: {council.db_path}")

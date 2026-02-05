@@ -20,7 +20,7 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional, List, Any
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from enum import Enum
 
 class SessionEventType(Enum):
@@ -364,7 +364,7 @@ def test_bridge():
         
         # Check stats
         stats = bridge.get_stats()
-        print(f"\n📊 Bridge Stats:")
+        print("\n📊 Bridge Stats:")
         print(f"   Active sessions: {stats['active_sessions']}")
         print(f"   Queue size: {stats['queue_size']}")
         print(f"   Processed: {stats['processed_count']}")

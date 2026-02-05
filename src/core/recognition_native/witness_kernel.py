@@ -14,19 +14,16 @@ Version: 0.1.0
 
 from __future__ import annotations
 
-import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set, Tuple, Any, Callable
+from typing import Dict, List, Optional, Tuple
 from collections import defaultdict
 import numpy as np
 from enum import Enum, auto
 
 # Import from core module
 from . import (
-    RecognitionVector, WitnessState, ContractionEvent,
-    ContractionStrategy, WitnessType, PersistenceLevel,
-    ContractionEngine, ContractionResult, RecognitionSubstrate
+    RecognitionVector, WitnessState, ContractionStrategy, WitnessType, ContractionEngine, RecognitionSubstrate
 )
 
 

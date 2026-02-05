@@ -257,7 +257,7 @@ class AgentCapabilities:
         # Vault Access
         report.append("\n## VAULT ACCESS (Persistent Semantic Memory Vault)")
         if self.vault is not None:
-            report.append(f"  Status: CONNECTED")
+            report.append("  Status: CONNECTED")
             report.append(f"  Path: {self.vault.vault_path}")
 
             # Crown jewels

@@ -13,7 +13,7 @@ Dimensions:
 import subprocess
 import ast
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from dataclasses import dataclass
 
 from .archive import FitnessScore

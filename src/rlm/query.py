@@ -20,12 +20,11 @@ Usage:
 """
 
 import os
-from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Any, Dict, List, Optional, Union
 
 from .rlm_adapter import RLMAdapter, RLMConfig, RLMResult, AsyncRLMAdapter
-from .psmv_rlm import PSMVQueryEngine, PSMVLoader, quick_search as psmv_quick_search
+from .psmv_rlm import PSMVQueryEngine, quick_search as psmv_quick_search
 
 
 class RLMQueryType(Enum):
@@ -386,7 +385,7 @@ if __name__ == "__main__":
     vault_path = os.path.expanduser("~/Persistent-Semantic-Memory-Vault")
     if os.path.exists(vault_path):
         stats = get_vault_info(vault_path)
-        print(f"\nPSMV Vault Stats:")
+        print("\nPSMV Vault Stats:")
         print(f"  Files: {stats['total_files']:,}")
         print(f"  Crown Jewels: {stats['crown_jewels']}")
         print(f"  Size: {stats['total_size_mb']:.1f} MB")

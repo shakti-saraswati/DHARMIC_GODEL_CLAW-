@@ -22,7 +22,7 @@ import time
 from datetime import datetime
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple, Iterator, Any
+from typing import List, Dict, Optional, Tuple, Any
 from contextlib import contextmanager
 import threading
 
@@ -1141,10 +1141,10 @@ def main():
             print(f"Total Files: {stats['overall']['total_files']}")
             print(f"Embedded Chunks: {stats['overall']['embedded_chunks']}")
             print(f"Embeddings Available: {stats['embeddings_available']}")
-            print(f"\nPer-Source Breakdown:")
+            print("\nPer-Source Breakdown:")
             for source in stats['sources']:
                 print(f"  {source['source_type']}: {source['files']} files, {source['chunks']} chunks")
-            print(f"\nRecent Searches:")
+            print("\nRecent Searches:")
             for search in stats['recent_searches'][:5]:
                 print(f"  '{search['query'][:50]}...' ({search['query_time_ms']:.2f}ms)")
         

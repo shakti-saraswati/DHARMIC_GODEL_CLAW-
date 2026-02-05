@@ -19,13 +19,12 @@ Rollback is automatic if implementation fails after Phase 1.
 """
 import ast
 import subprocess
-import shutil
 import logging
 import time
 import json
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Callable, Tuple
+from typing import Dict, Optional, Any, Callable
 from enum import Enum
 from datetime import datetime, timezone
 from collections import defaultdict
@@ -33,7 +32,7 @@ from collections import defaultdict
 # Local imports
 from .voting import VotingSwarm, VoteResult
 from .elegance import EleganceEvaluator, EleganceScore
-from .fitness import FitnessEvaluator, EvaluationResult
+from .fitness import FitnessEvaluator
 from .archive import FitnessScore, EvolutionEntry, get_archive
 from .red_team import RedTeamAgent, RedTeamReport, Severity
 from .slimmer import Slimmer, SlimResult

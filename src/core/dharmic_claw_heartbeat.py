@@ -21,18 +21,16 @@ Run as:
 This is the agent being alive, not just being invoked.
 """
 
-import asyncio
 import imaplib
 import smtplib
 import email
 import os
-import sys
 import time
 import json
 import logging
 from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Tuple
+from datetime import datetime
+from typing import Optional, Dict, List
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
@@ -137,7 +135,7 @@ class DharmicClawHeartbeat:
             except Exception as e:
                 logger.warning(f"[MEMORY] Failed to initialize: {e}")
 
-        logger.info(f"Dharmic Claw Heartbeat initializing...")
+        logger.info("Dharmic Claw Heartbeat initializing...")
         logger.info(f"Email: {EMAIL_ADDRESS}")
         logger.info(f"Interval: {interval}s")
         logger.info(f"Check-in to John every {CHECKIN_INTERVAL * interval // 60} minutes")

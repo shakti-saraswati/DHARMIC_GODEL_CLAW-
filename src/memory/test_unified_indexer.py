@@ -10,7 +10,6 @@ import sys
 import tempfile
 import shutil
 import unittest
-from pathlib import Path
 
 # Add parent to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,7 +17,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from memory.unified_indexer import (
     UnifiedMemoryIndexer, 
     IndexerConfig, 
-    MemoryChunk,
     EMBEDDINGS_AVAILABLE
 )
 

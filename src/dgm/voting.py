@@ -23,7 +23,7 @@ import random
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Dict, Optional, Any, Tuple
+from typing import List, Dict, Optional, Any
 from collections import Counter
 
 
@@ -706,7 +706,6 @@ def create_proposal(
 # =============================================================================
 
 if __name__ == "__main__":
-    import sys
     
     # Example usage
     async def main():

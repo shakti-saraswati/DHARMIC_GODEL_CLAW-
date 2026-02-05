@@ -15,7 +15,7 @@ import asyncio
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
@@ -116,16 +116,16 @@ class ScheduledTasks:
             for quality, count in quality_counts.items():
                 summary += f"- {quality}: {count}\n"
 
-            summary += f"\n**Key Observations:**\n"
+            summary += "\n**Key Observations:**\n"
             for obs in yesterday_obs[-5:]:  # Last 5
                 summary += f"- {obs.get('content', '')[:100]}\n"
 
-            summary += f"\n**Meta-Observations:**\n"
+            summary += "\n**Meta-Observations:**\n"
             for meta in yesterday_meta[-3:]:  # Last 3
                 summary += f"- [{meta.get('quality')}] {meta.get('notes', '')}\n"
 
             # Check telos alignment
-            summary += f"\n## Telos Alignment\n"
+            summary += "\n## Telos Alignment\n"
             summary += f"Ultimate: {self.agent.telos.telos['ultimate']['aim']}\n"
             summary += f"Proximate aims: {len(self.agent.telos.telos['proximate']['current'])}\n"
 
@@ -247,7 +247,7 @@ Total: {len(jewels)}
                 for pattern in patterns[:5]:
                     self.agent.strange_memory.record_pattern(
                         pattern_name=pattern['word'],
-                        description=f"Recurring word in observations",
+                        description="Recurring word in observations",
                         instances=[pattern['first_seen'], pattern['last_seen']],
                         confidence=min(1.0, pattern['occurrences'] / 10.0)
                     )

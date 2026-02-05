@@ -18,14 +18,13 @@ Run as:
 import subprocess
 import json
 import time
-import sys
 import logging
 import smtplib
 import os
 import shutil
 from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict, Tuple
+from typing import Dict, Tuple
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv

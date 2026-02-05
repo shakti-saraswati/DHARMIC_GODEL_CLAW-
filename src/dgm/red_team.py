@@ -15,7 +15,6 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional, Tuple, Set
 from enum import Enum
 from datetime import datetime
-import textwrap
 
 
 class Severity(Enum):
@@ -295,9 +294,9 @@ vulnerable_func(malicious_input)
                         if node.args:
                             path_arg = ast.unparse(node.args[0]) if hasattr(ast, 'unparse') else '<path>'
                             if '+' in path_arg or 'format' in path_arg or path_arg.startswith('f'):
-                                exploit = f'''# Path traversal exploit:
+                                exploit = '''# Path traversal exploit:
 def vulnerable_read(filename):
-    with open(f"/data/{{filename}}") as f:  # VULNERABLE!
+    with open(f"/data/{filename}") as f:  # VULNERABLE!
         return f.read()
 
 # Attack:
@@ -1014,7 +1013,7 @@ if __name__ == "__main__":
                 print(f"    Location: {vuln.location}")
             if vuln.cwe_id:
                 print(f"    CWE: {vuln.cwe_id}")
-            print(f"\n    Exploit PoC:")
+            print("\n    Exploit PoC:")
             for line in vuln.exploit_poc.split('\n'):
                 print(f"      {line}")
             if vuln.remediation:

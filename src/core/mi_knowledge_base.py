@@ -775,7 +775,7 @@ def create_knowledge_enhanced_auditor():
 if __name__ == "__main__":
     kb = MIKnowledgeBase()
 
-    print(f"MI Knowledge Base loaded:")
+    print("MI Knowledge Base loaded:")
     print(f"  Papers: {len(kb.papers)}")
     print(f"  Experimental findings: {len(kb.experimental_data)}")
     print()

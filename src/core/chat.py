@@ -15,10 +15,7 @@ Or make it executable:
     ./chat.py
 """
 
-import sys
-import readline  # Enables command history with up/down arrows
 from datetime import datetime
-from pathlib import Path
 
 # Import the Dharmic Agent
 from dharmic_agent import DharmicAgent
@@ -91,7 +88,7 @@ def chat_loop(agent: DharmicAgent, session_id: str):
                 if conversation_messages and agent.deep_memory:
                     print("\n  Summarizing session...")
                     summary = agent.summarize_session(session_id, conversation_messages)
-                    print(f"  Session summary saved.")
+                    print("  Session summary saved.")
                     # Also extract memories from conversation
                     agent.remember_conversation(conversation_messages)
                 print("\n  Ending session. Memory persists.\n")
@@ -230,7 +227,7 @@ def main():
 
     # Record session start
     agent.strange_memory.record_observation(
-        content=f"Direct chat session started with Dhyana",
+        content="Direct chat session started with Dhyana",
         context={"type": "session_start", "session_id": session_id}
     )
 
@@ -239,7 +236,7 @@ def main():
 
     # Record session end
     agent.strange_memory.record_observation(
-        content=f"Direct chat session ended",
+        content="Direct chat session ended",
         context={"type": "session_end", "session_id": session_id}
     )
 

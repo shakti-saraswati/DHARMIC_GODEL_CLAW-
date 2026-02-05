@@ -7,7 +7,6 @@ Additional capabilities are in agent_capabilities.py.
 
 from pathlib import Path
 from typing import Optional, List
-import logging
 import os
 
 # Load .env early so model/provider/env settings are available in daemon contexts

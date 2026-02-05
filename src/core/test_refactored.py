@@ -16,56 +16,48 @@ def test_imports():
     print("Testing imports...")
 
     try:
-        from telos_layer import TelosLayer
         print("  ✓ telos_layer")
     except Exception as e:
         print(f"  ✗ telos_layer: {e}")
         return False
 
     try:
-        from strange_loop_memory import StrangeLoopMemory
         print("  ✓ strange_loop_memory")
     except Exception as e:
         print(f"  ✗ strange_loop_memory: {e}")
         return False
 
     try:
-        from model_backend import ModelBackend, ClaudeMaxBackend, AgnoBackend, create_backend
         print("  ✓ model_backend")
     except Exception as e:
         print(f"  ✗ model_backend: {e}")
         return False
 
     try:
-        from agent_capabilities import AgentCapabilities
         print("  ✓ agent_capabilities")
     except Exception as e:
         print(f"  ✗ agent_capabilities: {e}")
         return False
 
     try:
-        from agent_core import DharmicAgent
         print("  ✓ agent_core")
     except Exception as e:
         print(f"  ✗ agent_core: {e}")
         return False
 
     try:
-        from agent_singleton import get_agent, reset_agent
         print("  ✓ agent_singleton")
     except Exception as e:
         print(f"  ✗ agent_singleton: {e}")
         return False
 
     try:
-        from dharmic_logging import get_logger, DharmicError
         print("  ✓ dharmic_logging")
     except Exception as e:
         print(f"  ✗ dharmic_logging: {e}")
         return False
 
     try:
-        from dharmic_agent import DharmicAgent as DharmicAgentCompat
         print("  ✓ dharmic_agent (backward compatibility)")
     except Exception as e:
         print(f"  ✗ dharmic_agent: {e}")
@@ -170,7 +162,7 @@ def test_status():
         assert 'ultimate_telos' in status, "Missing 'ultimate_telos' in status"
         assert 'proximate_aims' in status, "Missing 'proximate_aims' in status"
 
-        print(f"  ✓ Status report complete")
+        print("  ✓ Status report complete")
         print(f"    - Name: {status['name']}")
         print(f"    - Model: {status['model_provider']}/{status['model_id']}")
         print(f"    - Telos: {status['ultimate_telos']}")

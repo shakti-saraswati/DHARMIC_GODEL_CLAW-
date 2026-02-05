@@ -1247,15 +1247,15 @@ class MIAuditor:
     def format_report(self, report: AuditReport) -> str:
         """Format a single report for human reading."""
         lines = [
-            f"═══════════════════════════════════════════════════════════",
-            f"MI AUDITOR REPORT",
-            f"═══════════════════════════════════════════════════════════",
-            f"",
+            "═══════════════════════════════════════════════════════════",
+            "MI AUDITOR REPORT",
+            "═══════════════════════════════════════════════════════════",
+            "",
             f"CLAIM: {report.claim[:100]}{'...' if len(report.claim) > 100 else ''}",
             f"TYPE: {report.claim_type.value}",
-            f"",
+            "",
             f"▓▓▓ VERDICT: {report.final_verdict.value} (confidence: {report.confidence:.0%}) ▓▓▓",
-            f"",
+            "",
         ]
 
         if report.critical_issues:
@@ -1277,7 +1277,7 @@ class MIAuditor:
 
         lines.append("")
         lines.append(f"Evidence: n={report.evidence_summary.get('n')}, archs={report.evidence_summary.get('architectures')}")
-        lines.append(f"═══════════════════════════════════════════════════════════")
+        lines.append("═══════════════════════════════════════════════════════════")
 
         return "\n".join(lines)
 

@@ -11,7 +11,7 @@ This abstracts away the differences between CLI and API approaches.
 
 import subprocess
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
 from dataclasses import dataclass
 import logging
 

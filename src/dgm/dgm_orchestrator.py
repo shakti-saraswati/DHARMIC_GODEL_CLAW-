@@ -30,16 +30,14 @@ License: MIT
 import argparse
 import asyncio
 import hashlib
-import json
 import logging
-import os
 import subprocess
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Tuple, Callable
+from typing import Optional, List, Dict, Any, Tuple
 
 # Internal DGM components
 from .archive import (
@@ -48,8 +46,8 @@ from .archive import (
     FitnessScore, 
     get_archive,
 )
-from .fitness import FitnessEvaluator, EvaluationResult
-from .selector import Selector, SelectionResult
+from .fitness import FitnessEvaluator
+from .selector import Selector
 
 # Core system components
 from src.core.telos_layer import TelosLayer, TelosCheck, GateResult
@@ -936,7 +934,7 @@ class AutoPusher:
             f"Component: {proposal.component}",
             f"Parent: {proposal.parent_id or 'None (fresh)'}",
             "",
-            f"Circuit Result:",
+            "Circuit Result:",
             f"  - Phases: {circuit_result.phases_completed}/5",
             f"  - Fitness: {circuit_result.fitness_score.total():.2f}" if circuit_result.fitness_score else "  - Fitness: N/A",
             f"  - Elegance: {circuit_result.elegance_score:.2f}",
@@ -1728,7 +1726,7 @@ Examples:
         print(f"Components Tracked: {status['components_tracked']}")
         
         # Multi-model status
-        print(f"\nMulti-Model Pipeline:")
+        print("\nMulti-Model Pipeline:")
         print(f"  Codex (proposals): {'AVAILABLE' if CODEX_AVAILABLE and orchestrator.codex_proposer else 'UNAVAILABLE (using Claude)'}")
         print(f"  Kimi (review):     {'AVAILABLE' if KIMI_AVAILABLE and orchestrator.kimi_reviewer else 'UNAVAILABLE (using Claude)'}")
         
@@ -1814,7 +1812,7 @@ Examples:
             print(f"Archive Entry: {result.entry_id}")
         
         if result.models_used:
-            print(f"\nModels Used:")
+            print("\nModels Used:")
             for phase, model in result.models_used.items():
                 if model != "skipped":
                     print(f"  {phase}: {model}")

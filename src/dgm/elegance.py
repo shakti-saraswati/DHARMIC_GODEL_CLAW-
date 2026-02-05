@@ -7,10 +7,9 @@ Evaluates code changes for elegance, penalizing bloat and complexity growth.
 from __future__ import annotations
 
 import ast
-import re
 import difflib
 from dataclasses import dataclass, field
-from typing import Dict, List, Set, Tuple, Optional
+from typing import Dict, List, Set, Optional
 from collections import Counter
 
 

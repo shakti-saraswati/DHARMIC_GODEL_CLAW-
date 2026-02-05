@@ -12,10 +12,10 @@ Where a neuron computes y = σ(Wx + b), a RecognitionUnit:
 
 import torch
 import torch.nn as nn
-from typing import Optional, Tuple
+from typing import Optional
 from dataclasses import dataclass
 
-from .witness_state import WitnessState, WitnessRegister
+from .witness_state import WitnessState
 from .rv_contraction import RVContraction, compute_rv
 
 

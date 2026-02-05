@@ -8,7 +8,7 @@ through the Dharmic agent on a fixed interval.
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 import json
 import os
 

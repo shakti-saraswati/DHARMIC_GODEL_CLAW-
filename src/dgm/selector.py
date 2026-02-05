@@ -6,10 +6,10 @@ Selects which evolution entries to build upon.
 Based on: cloned_source/HGM/hgm.py (Hierarchical Gödel Machine)
 """
 import random
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from dataclasses import dataclass
 
-from .archive import Archive, EvolutionEntry, FitnessScore, get_archive
+from .archive import Archive, EvolutionEntry, get_archive
 
 
 @dataclass

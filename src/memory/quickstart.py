@@ -8,7 +8,6 @@ for cross-system semantic search.
 
 import os
 import sys
-from pathlib import Path
 
 # Add to path if needed
 sys.path.insert(0, os.path.expanduser("~/DHARMIC_GODEL_CLAW/src"))

@@ -30,8 +30,8 @@ import time
 import json
 import logging
 from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Any
+from datetime import datetime
+from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 
 # Load .env

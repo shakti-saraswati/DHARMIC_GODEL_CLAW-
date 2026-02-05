@@ -36,7 +36,11 @@ if str(Path(__file__).parent.parent) not in sys.path:
 
 try:
     from dharmic_security import ExecGuard
-    EXEC_GUARD = ExecGuard(allowed_bins=["git", "apply", "pytest", "python3", "sh", "bash", "ls", "grep"])
+    EXEC_GUARD = ExecGuard(allowed_bins=[
+        "git", "apply", "pytest", "python3", "sh", "bash", "ls", "grep",
+        "ruff", "pyright", "bandit", "detect-secrets", "pip-audit", "pip",
+        "node", "npm", "curl"
+    ])
     SECURITY_AVAILABLE = True
 except ImportError:
     SECURITY_AVAILABLE = False

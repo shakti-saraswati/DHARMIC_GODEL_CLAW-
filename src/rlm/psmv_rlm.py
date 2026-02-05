@@ -22,7 +22,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Set
 
 try:
     import litellm
@@ -871,7 +871,7 @@ Use FINAL("answer") only after finding evidence in the files.'''
             
             # Truncate if needed
             if len(output) > 10000:
-                output = output[:10000] + f"\n\n[Truncated at 10,000 chars]"
+                output = output[:10000] + "\n\n[Truncated at 10,000 chars]"
             
             return output
             

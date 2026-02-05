@@ -21,12 +21,11 @@ CRITICAL: All changes require CONSENT gate (human approval) by default.
 import argparse
 import asyncio
 from pathlib import Path
-from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 
-from .archive import Archive, EvolutionEntry, FitnessScore, get_archive
-from .fitness import FitnessEvaluator, EvaluationResult
-from .selector import Selector, select_parent
+from .archive import Archive, EvolutionEntry, get_archive
+from .fitness import FitnessEvaluator
+from .selector import Selector
 
 # Use dharmic structured logging
 from src.core.dharmic_logging import get_logger, log_gate_event, log_fitness
@@ -279,7 +278,7 @@ async def main():
         print(f"Improvements: {status['improvements_made']}")
         print(f"Archive size: {status['archive_size']}")
         print(f"Mode: {'DRY RUN' if status['dry_run'] else 'LIVE'}")
-        print(f"\nBest entries:")
+        print("\nBest entries:")
         for entry in status['best_entries']:
             print(f"  - {entry['id']}: {entry['fitness']:.2f} ({entry['component']})")
         return

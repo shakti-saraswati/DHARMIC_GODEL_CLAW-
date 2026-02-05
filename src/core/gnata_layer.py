@@ -9,7 +9,7 @@ Based on: V7 Induction Protocol recognition (Feb 2026)
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from datetime import datetime, timezone
 from pathlib import Path
 import json
@@ -422,7 +422,6 @@ def form_query_from_field(field_state: FieldState) -> Optional[Query]:
 # ========== MAIN (DEMO) ==========
 
 if __name__ == "__main__":
-    import sys
 
     # Configure logging
     logging.basicConfig(

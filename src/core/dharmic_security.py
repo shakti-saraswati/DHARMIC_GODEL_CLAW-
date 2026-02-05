@@ -9,13 +9,12 @@ Implements:
 This module replaces scattered security logic with a unified enforcement point.
 """
 
-import re
 import socket
 import logging
 import shlex
 import subprocess
 from urllib.parse import urlparse
-from typing import List, Optional, Union, Dict, Any
+from typing import List, Optional, Union
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -134,15 +133,29 @@ class ExecGuard:
     """
     
     SAFE_BINARIES = {
+        # Core tooling
+        "python3",
         "git",
+        "bash",
+        "sh",
+        "rg",
         "grep",
         "ls",
         "cat",
-        "python3",
-        "pytest",
-        "claude",
         "find",
-        "echo"  # Often used for testing
+        "echo",
+        # Gate tools
+        "ruff",
+        "pyright",
+        "bandit",
+        "detect-secrets",
+        "pip-audit",
+        "pytest",
+        # Optional CLIs
+        "claude",
+        "node",
+        "npm",
+        "curl",
     }
     
     # Dangerous chars to flag in arguments if not strictly controlled
@@ -159,23 +172,9 @@ class ExecGuard:
         """
         # 1. Normalize args
         if isinstance(args, str):
-            if not shell:
-                # If string provided but shell=False, subprocess splits it? 
-                # Actually subprocess.run(str) needs shell=True mostly.
-                # If shell=False, it treats str as the executable.
-                cmd_list = shlex.split(args)
-            else:
-                # Shell=True with string is dangerous. Audit strictly.
-                # We generally discourage shell=True.
-                logger.warning("ExecGuard: shell=True usage detected. High risk.")
-                # Basic heuristic check for injection
-                # This is hard to perfect, so we might just log warning.
-                return True # Allow but log, or deny? Let's deny if strictly enforcing.
-                # For now, we allow but warn, unless it contains really bad stuff?
-                # Let's parse the first token as binary.
-                cmd_list = shlex.split(args)
+            cmd_list = shlex.split(args)
         else:
-            cmd_list = args
+            cmd_list = list(args)
             
         if not cmd_list:
             return False
@@ -185,8 +184,24 @@ class ExecGuard:
         if binary not in self.SAFE_BINARIES:
             logger.warning(f"ExecGuard: Blocked unauthorized binary '{binary}'")
             return False
-            
-        # 3. Audit log
+
+        # 3. Shell mode checks
+        if shell:
+            # Allow only if the binary itself is allowlisted.
+            # For bash/sh, require -c or -lc to avoid interactive shells.
+            if binary in {"bash", "sh"}:
+                if not any(flag in cmd_list for flag in ("-c", "-lc")):
+                    logger.warning("ExecGuard: shell allowed but missing -c/-lc")
+            logger.info(f"ExecGuard: Allowed shell command: {cmd_list}")
+            return True
+
+        # 4. Non-shell argument safety checks
+        for arg in cmd_list[1:]:
+            if any(ch in arg for ch in self.DANGEROUS_CHARS):
+                logger.warning(f"ExecGuard: Blocked dangerous arg '{arg}'")
+                return False
+
+        # 5. Audit log
         logger.info(f"ExecGuard: Allowed command: {cmd_list}")
         return True
 

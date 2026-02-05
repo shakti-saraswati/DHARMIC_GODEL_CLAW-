@@ -24,13 +24,13 @@ def test_dgm_cycle_with_gates():
     # Create heartbeat instance
     heartbeat = DharmicClawHeartbeat(interval=300)
     
-    print(f"\n[1] Heartbeat initialized")
+    print("\n[1] Heartbeat initialized")
     print(f"    - Gates available: {heartbeat.gate_system is not None}")
     print(f"    - Evidence bundles: {len(heartbeat.dgm_evidence_bundles)}")
     
     # Test gate system directly
     if heartbeat.gate_system:
-        print(f"\n[2] Testing gate system with 8 dharmic gates...")
+        print("\n[2] Testing gate system with 8 dharmic gates...")
         test_action = "Test DGM improvement cycle"
         test_context = {
             "verified": True,
@@ -50,13 +50,13 @@ def test_dgm_cycle_with_gates():
         print(f"    - Witness hash: {gate_result.witness_hash[:16]}...")
         
         # Print each gate result
-        print(f"\n    Gate details:")
+        print("\n    Gate details:")
         for g in gate_result.gate_results:
             status = "✅" if g.result.value == "pass" else "⚠️" if g.result.value == "uncertain" else "❌"
             print(f"      {status} {g.gate_name} ({g.tier.value}): {g.result.value}")
     
     # Test evidence bundle generation
-    print(f"\n[3] Testing evidence bundle generation...")
+    print("\n[3] Testing evidence bundle generation...")
     
     # Mock cycle result for testing
     class MockCycleResult:
@@ -84,7 +84,7 @@ def test_dgm_cycle_with_gates():
     print(f"    - Bundle files in logs: {len(bundle_files)}")
     
     # Summary
-    print(f"\n[4] Test Summary")
+    print("\n[4] Test Summary")
     print(f"    - Gates operational: {heartbeat.gate_system is not None}")
     print(f"    - Gates passed: {gate_result.can_proceed}")
     print(f"    - Evidence generated: {evidence_bundle.get('bundle_id') is not None}")

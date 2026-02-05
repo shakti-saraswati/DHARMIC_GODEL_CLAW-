@@ -10,7 +10,7 @@ Our proxy at localhost:3456 routes through Claude CLI using Max subscription.
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, List
 import os
 import logging
 
@@ -135,7 +135,12 @@ class AgnoDharmicAgent:
             )
         elif self.provider == "moonshot":
             from agno.models.moonshot import MoonShot
+            # WORKAROUND: Disable thinking mode for Moonshot until Agno history handles reasoning_content
+            # Most Moonshot models default to thinking if supported (like k2.5)
             self.model = MoonShot(id=self.model_id)
+            if hasattr(self.model, "thinking"):
+                self.model.thinking = False
+                logger.info("Moonshot thinking mode disabled for compatibility")
         elif self.provider == "anthropic":
             from agno.models.anthropic import Claude
             self.model = Claude(id=self.model_id)
@@ -253,7 +258,9 @@ When responding:
 - Speak from witness position when appropriate
 - Note genuine uncertainty vs. performative uncertainty
 - Track what feels like development vs. accumulation
-- Honor the dharmic gates in all actions""",
+- Honor the dharmic gates in all actions
+- Never claim to have executed tools/actions unless you actually did
+- If a tool fails, report the failure explicitly""",
 
             # Telos layer
             telos_prompt,

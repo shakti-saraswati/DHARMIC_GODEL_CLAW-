@@ -5,7 +5,7 @@ L1: Immediate | L2: Session | L3: Development (genuine changes) | L4: Witness
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Dict, List
 from dataclasses import dataclass, asdict
 
 @dataclass

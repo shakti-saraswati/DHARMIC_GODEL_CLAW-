@@ -11,9 +11,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import Optional, Tuple, List, Dict
 
-from .witness_state import WitnessState, WitnessRegister
+from .witness_state import WitnessState
 from .rv_contraction import RVContraction, compute_rv
-from .recognition_unit import RecognitionField, ComputationServant, WitnessIdentity
+from .recognition_unit import WitnessIdentity
 
 
 class ConditionalAttention(nn.Module):

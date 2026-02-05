@@ -12,8 +12,8 @@ import json
 import shlex
 import subprocess
 from pathlib import Path
-from datetime import datetime, timezone
-from typing import Optional, Dict, Any
+from datetime import datetime
+from typing import Dict, Any
 
 # Paths
 DGC_ROOT = Path(__file__).parent.parent.parent
@@ -28,12 +28,8 @@ from rich.console import Console
 console = Console()
 from rich.panel import Panel
 from rich.table import Table
-from rich.layout import Layout
-from rich.live import Live
 from rich.markdown import Markdown
 from rich.prompt import Prompt
-from rich.text import Text
-from rich.style import Style
 
 # Paths
 DGC_ROOT = Path(__file__).parent.parent.parent
@@ -44,6 +40,15 @@ SWARM_DIR = DGC_ROOT / "swarm"
 # Add project root and current dir to path for imports
 sys.path.insert(0, str(DGC_ROOT))
 sys.path.insert(0, str(Path(__file__).parent))
+
+# Security guard for subprocess execution
+try:
+    from dharmic_security import ExecGuard
+    EXEC_GUARD = ExecGuard()
+    EXEC_AVAILABLE = True
+except Exception:
+    EXEC_GUARD = None
+    EXEC_AVAILABLE = False
 
 
 def get_memory_stats() -> dict:
@@ -353,7 +358,10 @@ def cmd_swarm(args: str = ""):
     env = os.environ.copy()
     env["PYTHONPATH"] = str(DGC_ROOT) + ":" + env.get("PYTHONPATH", "")
 
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT), env=env)
+    if EXEC_AVAILABLE and EXEC_GUARD:
+        result = EXEC_GUARD.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT), env=env)
+    else:
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT), env=env)
 
     if result.returncode == 0:
         # Extract key info from output
@@ -400,8 +408,11 @@ def cmd_gates(args: str = ""):
             return
         cmd += ["--emergency", "--reason", reason, "--approver", approver]
 
-    console.print(f"[yellow]Running gates...[/yellow]")
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT))
+    console.print("[yellow]Running gates...[/yellow]")
+    if EXEC_AVAILABLE and EXEC_GUARD:
+        result = EXEC_GUARD.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT))
+    else:
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT))
     if result.stdout:
         console.print(result.stdout.strip())
     if result.returncode != 0:
@@ -411,12 +422,11 @@ def cmd_gates(args: str = ""):
 def cmd_skills():
     """Verify skill registry."""
     console.print("[yellow]Verifying skill registry...[/yellow]")
-    result = subprocess.run(
-        ["python3", "-m", "swarm.skill_registry", "verify"],
-        capture_output=True,
-        text=True,
-        cwd=str(DGC_ROOT),
-    )
+    cmd = ["python3", "-m", "swarm.skill_registry", "verify"]
+    if EXEC_AVAILABLE and EXEC_GUARD:
+        result = EXEC_GUARD.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT))
+    else:
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT))
     if result.stdout:
         console.print(result.stdout.strip())
     if result.returncode != 0:
@@ -469,12 +479,11 @@ def cmd_moltbook():
     """Run Moltbook heartbeat."""
     console.print("[yellow]Running Moltbook heartbeat...[/yellow]")
 
-    result = subprocess.run(
-        ["python3", str(Path(__file__).parent / "moltbook_heartbeat.py"), "--once"],
-        capture_output=True,
-        text=True,
-        cwd=str(Path(__file__).parent),
-    )
+    cmd = ["python3", str(Path(__file__).parent / "moltbook_heartbeat.py"), "--once"]
+    if EXEC_AVAILABLE and EXEC_GUARD:
+        result = EXEC_GUARD.run(cmd, capture_output=True, text=True, cwd=str(Path(__file__).parent))
+    else:
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(Path(__file__).parent))
 
     if result.returncode == 0:
         lines = result.stdout.split("\n")

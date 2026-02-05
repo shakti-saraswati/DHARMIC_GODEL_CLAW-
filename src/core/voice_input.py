@@ -69,7 +69,7 @@ class VoiceInputConfig:
         self.client = OpenAI(api_key=self.openai_api_key) if OPENAI_AVAILABLE else None
 
     def __repr__(self):
-        return f"VoiceInputConfig(api_key=*****)"
+        return "VoiceInputConfig(api_key=*****)"
 
 
 class AudioRecorder:

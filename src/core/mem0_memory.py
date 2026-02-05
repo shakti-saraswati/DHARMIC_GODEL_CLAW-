@@ -61,10 +61,9 @@ Usage:
 
 import json
 import hashlib
-import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional, Dict, List, Any, Tuple
+from typing import Optional, Dict, List, Tuple
 from dataclasses import dataclass, asdict, field
 from enum import Enum
 import difflib
@@ -885,7 +884,7 @@ if __name__ == "__main__":
     # Create instance
     memory = Mem0Memory()
     
-    print(f"\nInitialized with:")
+    print("\nInitialized with:")
     print(f"  - mem0 available: {MEM0_AVAILABLE}")
     print(f"  - embeddings available: {EMBEDDINGS_AVAILABLE}")
     print(f"  - using real mem0: {memory._using_real_mem0}")

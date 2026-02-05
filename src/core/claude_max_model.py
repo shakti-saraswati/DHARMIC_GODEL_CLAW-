@@ -7,9 +7,8 @@ instead of API credits.
 """
 
 import subprocess
-import json
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Iterator
+from typing import Optional, List, Dict
 from dataclasses import dataclass
 
 

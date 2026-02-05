@@ -10,7 +10,7 @@ attractors that enable coordination without explicit negotiation.
 
 import torch
 import torch.nn.functional as F
-from typing import Dict, Set, Optional, List, Tuple
+from typing import Dict, Set, Optional, List
 from uuid import UUID, uuid4
 from dataclasses import dataclass
 from enum import Enum

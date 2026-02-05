@@ -41,11 +41,17 @@ class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         """Convert log record to JSON string."""
         # Base log entry
+        try:
+            message = record.getMessage()
+        except Exception:
+            # Fallback for malformed format strings
+            message = f"{record.msg} (args: {record.args})"
+
         log_entry: Dict[str, Any] = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "level": record.levelname,
             "component": record.name,
-            "message": record.getMessage(),
+            "message": message,
         }
         
         # Add context if present (passed via extra)

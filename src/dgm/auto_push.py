@@ -24,13 +24,13 @@ import subprocess
 import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
-from dataclasses import dataclass, field, asdict
-from typing import Optional, List, Dict, Any
+from dataclasses import dataclass, field
+from typing import Optional, List, Dict
 
 from .archive import Archive, EvolutionEntry, FitnessScore, get_archive
 
 # Dharmic structured logging
-from src.core.dharmic_logging import get_logger, log_gate_event, log_fitness
+from src.core.dharmic_logging import get_logger
 
 logger = get_logger("dgm_auto_push")
 
@@ -715,7 +715,7 @@ if __name__ == "__main__":
     
     if args.status:
         pusher = AutoPusher()
-        print(f"AutoPusher status:")
+        print("AutoPusher status:")
         print(f"  Project root: {pusher.project_root}")
         print(f"  Dry run: {pusher.dry_run}")
         print(f"  Remote: {pusher.remote}")

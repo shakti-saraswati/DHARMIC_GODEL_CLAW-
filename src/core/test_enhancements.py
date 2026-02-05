@@ -75,7 +75,7 @@ def test_telegram_bot():
 
         agent = DharmicAgent()
         bot = DharmicTelegramBot(agent=agent, config=config)
-        print(f"✓ Bot initialized")
+        print("✓ Bot initialized")
 
         print("\n✓ TELEGRAM BOT: PASS")
         return True
@@ -106,7 +106,7 @@ def test_scheduled_tasks():
 
         agent = DharmicAgent()
         tasks = ScheduledTasks(agent=agent)
-        print(f"✓ Tasks initialized")
+        print("✓ Tasks initialized")
 
         # Don't actually start (that would run forever)
         # Just check we can create the object
@@ -140,11 +140,11 @@ def test_voice_input():
         from dharmic_agent import DharmicAgent
 
         config = VoiceInputConfig()
-        print(f"✓ Config loaded (OpenAI client available)")
+        print("✓ Config loaded (OpenAI client available)")
 
         agent = DharmicAgent()
         voice = VoiceInput(agent=agent, config=config)
-        print(f"✓ Voice input initialized")
+        print("✓ Voice input initialized")
         print(f"✓ Log directory created: {voice.log_dir}")
 
         print("\n✓ VOICE INPUT: PASS")
@@ -175,7 +175,7 @@ def test_integrated_daemon():
 
         # Create config
         config = DaemonConfig()
-        print(f"✓ Config loaded")
+        print("✓ Config loaded")
 
         # Test config template generation
         template_path = Path(__file__).parent / "test_daemon_config.yaml"
