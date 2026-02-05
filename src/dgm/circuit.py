@@ -258,7 +258,7 @@ class MutationCircuit:
         
         # Initialize subsystems
         self.voting_system = VotingSwarm()
-        self.elegance_evaluator = EleganceEvaluator(project_root=self.project_root)
+        self.elegance_evaluator = EleganceEvaluator()
         self.fitness_evaluator = FitnessEvaluator(project_root=self.project_root)
         self.telos_layer = TelosLayer()
         self.archive = get_archive()
