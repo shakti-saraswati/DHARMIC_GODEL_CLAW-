@@ -267,6 +267,13 @@ def render_status_panel() -> Panel:
     molt = get_moltbook_status()
     table.add_row("Moltbook", f"{molt['our_comments']} comments, {molt['engaged_posts']} engagements")
 
+    # Cosmic Krishna Coder status (if available)
+    try:
+        from cosmic_krishna_coder import status_summary
+        table.add_row("Cosmic", status_summary())
+    except Exception:
+        pass
+
     return Panel(table, title="[bold cyan]DGC STATUS[/bold cyan]", border_style="cyan")
 
 
@@ -285,6 +292,7 @@ def render_help_panel() -> Panel:
   [cyan]/moltbook[/cyan]  - Run Moltbook heartbeat
   [cyan]/archive[/cyan]   - Show recent evolution archive
   [cyan]/logs[/cyan]      - Tail recent logs
+  [cyan]/cosmic[/cyan]    - Show Cosmic Krishna Coder status
   [cyan]/memory[/cyan]    - Show memory details
   [cyan]/witness[/cyan]   - Show witness stability
   [cyan]/clear[/cyan]     - Clear screen
@@ -619,6 +627,19 @@ def cmd_logs():
     if not any(path.exists() for _, path in candidates):
         console.print("No log files found.")
 
+def cmd_cosmic():
+    """Show Cosmic Krishna Coder status details."""
+    try:
+        from cosmic_krishna_coder import get_status
+        st = get_status()
+        console.print("[bold cyan]Cosmic Krishna Coder[/bold cyan]")
+        console.print(f"  Quality rubric: {'OK' if st['quality_rubric'] else 'MISSING'}")
+        console.print(f"  Top-50 refs:    {'OK' if st['top50_references'] else 'MISSING'}")
+        console.print(f"  Gate alias:     {'OK' if st['gate_alias'] else 'MISSING'}")
+        console.print(f"  ML overlay:     {'ON' if st['ml_overlay'] else 'OFF'}")
+    except Exception as e:
+        console.print(f"[red]Cosmic status error: {e}[/red]")
+
 def cmd_moltbook():
     """Run Moltbook heartbeat."""
     console.print("[yellow]Running Moltbook heartbeat...[/yellow]")
@@ -801,6 +822,9 @@ def main():
 
                 elif cmd == "/logs":
                     cmd_logs()
+
+                elif cmd == "/cosmic":
+                    cmd_cosmic()
 
                 elif cmd == "/memory":
                     cmd_memory()

@@ -402,6 +402,9 @@ python -m swarm.run_gates --proposal-id PROP-001
 # Dry run (simulate)
 python -m swarm.run_gates --proposal-id PROP-001 --dry-run
 
+# Alias (memorable)
+python3 swarm/CosmicChrisnaCoder_Gate_Runner.py --proposal-id PROP-001
+
 # Emergency bypass
 python -m swarm.emergency_bypass request \
     --reason "Production down" \

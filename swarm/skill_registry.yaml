@@ -9,6 +9,17 @@ version: "1.0"
 # =============================================================================
 
 skills:
+  - id: cosmic-krishna-coder
+    path: ~/.claude/skills/cosmic-krishna-coder/SKILL.md
+    sha256: "a77ea2af3fe0f1b07bea2f791e41ec213dba94259d2ca3ac36b268034fbce999"
+    purpose: "Memorable gate runner + quality rubric + ML overlay visibility"
+    iteration_triggers:
+      - "Gate protocol updated"
+      - "Quality rubric updated"
+      - "Top-50 references updated"
+    last_verified: "2026-02-05"
+    owner: "shakti"
+
   - id: dharmic-coding-protocol
     path: ~/.claude/skills/dharmic-coding-protocol/SKILL.md
     sha256: "d4369c73fb3e8a988b31c4ac5d72b4a43ac8c57173b1a0aeda6e6c60c19592ad"
