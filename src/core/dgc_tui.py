@@ -12,6 +12,7 @@ import json
 import shlex
 import subprocess
 from pathlib import Path
+import re
 from datetime import datetime
 from typing import Dict, Any
 
@@ -20,16 +21,19 @@ DGC_ROOT = Path(__file__).parent.parent.parent
 MEMORY_DIR = DGC_ROOT / "memory"
 DATA_DIR = DGC_ROOT / "data"
 SWARM_DIR = DGC_ROOT / "swarm"
+INTEGRATION_STATUS_PATH = DGC_ROOT / "data" / "integration_status.json"
 
 # Add project root to path for imports
 sys.path.insert(0, str(DGC_ROOT))
 
 from rich.console import Console
 console = Console()
+from rich.console import Group
 from rich.panel import Panel
 from rich.table import Table
 from rich.markdown import Markdown
 from rich.prompt import Prompt
+from rich.live import Live
 
 # Paths
 DGC_ROOT = Path(__file__).parent.parent.parent
@@ -152,6 +156,32 @@ def get_moltbook_status() -> dict:
         }
     return {"tracked_posts": 0, "our_comments": 0, "engaged_posts": 0, "last_heartbeat": "never"}
 
+def get_integration_status_cached() -> Dict[str, Any]:
+    """Read cached integration status if present."""
+    if INTEGRATION_STATUS_PATH.exists():
+        try:
+            data = json.loads(INTEGRATION_STATUS_PATH.read_text())
+            return data
+        except Exception:
+            return {"found": False}
+    return {"found": False}
+
+def get_backup_models_status() -> str:
+    """Check backup model configuration (no network calls)."""
+    has_openrouter = bool(os.getenv("OPENROUTER_API_KEY"))
+    has_ollama = bool(os.getenv("OLLAMA_API_KEY"))
+    has_moonshot = bool(os.getenv("MOONSHOT_API_KEY"))
+    if has_openrouter or has_ollama or has_moonshot:
+        parts = []
+        if has_moonshot:
+            parts.append("moonshot")
+        if has_openrouter:
+            parts.append("openrouter")
+        if has_ollama:
+            parts.append("ollama")
+        return "configured: " + ", ".join(parts)
+    return "not configured"
+
 
 def get_proxy_status() -> str:
     """Check if claude-max-api proxy is running."""
@@ -222,6 +252,17 @@ def render_status_panel() -> Panel:
     else:
         table.add_row("Evidence", "none")
 
+    # Integration status (cached)
+    integ = get_integration_status_cached()
+    if integ.get("found"):
+        status = "ok" if integ.get("ok") else "issues"
+        table.add_row("Integration", f"{status} | {integ.get('passed', 0)}/{integ.get('total', 0)}")
+    else:
+        table.add_row("Integration", "not run")
+
+    # Backup models
+    table.add_row("Backups", get_backup_models_status())
+
     # Moltbook status
     molt = get_moltbook_status()
     table.add_row("Moltbook", f"{molt['our_comments']} comments, {molt['engaged_posts']} engagements")
@@ -233,13 +274,17 @@ def render_help_panel() -> Panel:
     """Render help panel."""
     help_text = """[bold]Commands:[/bold]
   [cyan]/status[/cyan]    - Show detailed status
+  [cyan]/dashboard[/cyan] - Live status dashboard (Ctrl+C to exit)
   [cyan]/swarm[/cyan]     - Run swarm cycle (default: live if DGC_ALLOW_LIVE=1; use /swarm --live)
   [cyan]/gates[/cyan]     - Run 17-gate protocol (dry-run default)
   [cyan]/skills[/cyan]    - Verify skill registry
   [cyan]/openclaw[/cyan]  - Show OpenClaw config summary
   [cyan]/health[/cyan]    - Run healthcheck
+  [cyan]/integration[/cyan] - Run integration test (cached)
   [cyan]/evidence[/cyan]  - Show latest gate evidence
   [cyan]/moltbook[/cyan]  - Run Moltbook heartbeat
+  [cyan]/archive[/cyan]   - Show recent evolution archive
+  [cyan]/logs[/cyan]      - Tail recent logs
   [cyan]/memory[/cyan]    - Show memory details
   [cyan]/witness[/cyan]   - Show witness stability
   [cyan]/clear[/cyan]     - Clear screen
@@ -464,6 +509,59 @@ def cmd_healthcheck():
     except Exception as e:
         console.print(f"[red]Healthcheck error: {e}[/red]")
 
+def cmd_dashboard(args: str = ""):
+    """Live status dashboard (Ctrl+C to exit)."""
+    refresh = 2
+    parts = shlex.split(args) if args else []
+    if "--refresh" in parts:
+        idx = parts.index("--refresh")
+        if idx + 1 < len(parts):
+            try:
+                refresh = max(1, int(parts[idx + 1]))
+            except ValueError:
+                refresh = 2
+    console.print("[yellow]Starting live dashboard... Press Ctrl+C to exit.[/yellow]")
+    try:
+        with Live(
+            Group(render_status_panel(), render_help_panel()),
+            refresh_per_second=1,
+            console=console,
+        ) as live:
+            while True:
+                live.update(Group(render_status_panel(), render_help_panel()))
+                time.sleep(refresh)
+    except KeyboardInterrupt:
+        console.print("[yellow]Dashboard stopped.[/yellow]")
+
+def cmd_integration():
+    """Run integration test and cache summary."""
+    console.print("[yellow]Running integration test...[/yellow]")
+    cmd = ["python3", str(DGC_ROOT / "core" / "integration_test.py")]
+    if EXEC_AVAILABLE and EXEC_GUARD:
+        result = EXEC_GUARD.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT))
+    else:
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(DGC_ROOT))
+    output = (result.stdout or "") + (result.stderr or "")
+    passed = total = None
+    m = re.search(r"(\\d+)/(\\d+)\\s+checks passed", output)
+    if m:
+        passed = int(m.group(1))
+        total = int(m.group(2))
+    status = {
+        "found": True,
+        "ok": result.returncode == 0,
+        "passed": passed or 0,
+        "total": total or 0,
+        "timestamp": datetime.now().isoformat(),
+    }
+    INTEGRATION_STATUS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    INTEGRATION_STATUS_PATH.write_text(json.dumps(status, indent=2))
+    if result.stdout:
+        console.print(result.stdout.strip()[-1200:])
+    if result.returncode != 0 and result.stderr:
+        console.print(f"[red]{result.stderr.strip()[-400:]}[/red]")
+    console.print(f"[cyan]Cached integration status to {INTEGRATION_STATUS_PATH.relative_to(DGC_ROOT)}[/cyan]")
+
 
 def cmd_evidence():
     ev = get_latest_evidence()
@@ -476,6 +574,50 @@ def cmd_evidence():
     if ev.get("hash"):
         console.print(f"Hash: {ev.get('hash')}")
 
+def cmd_archive():
+    """Show recent evolution archive entries."""
+    archive_path = DGC_ROOT / "src" / "dgm" / "archive.jsonl"
+    if not archive_path.exists():
+        console.print("Archive not found.")
+        return
+    try:
+        lines = archive_path.read_text().strip().split("\n")
+        if not lines or lines == [""]:
+            console.print("Archive empty.")
+            return
+        tail = lines[-5:]
+        console.print("[bold cyan]Recent archive entries:[/bold cyan]")
+        for line in tail:
+            try:
+                entry = json.loads(line)
+                ts = entry.get("timestamp", "")[:19]
+                comp = entry.get("component", "unknown")
+                status = entry.get("status", "unknown")
+                console.print(f"  {ts} | {status} | {comp}")
+            except Exception:
+                continue
+    except Exception as e:
+        console.print(f"[red]Archive error: {e}[/red]")
+
+def cmd_logs():
+    """Tail recent logs."""
+    candidates = [
+        ("Heartbeat", DGC_ROOT / "logs" / "dharmic_claw_heartbeat.log"),
+        ("DGM", DGC_ROOT / "logs" / "dgm.log"),
+        ("Swarm", DGC_ROOT / "swarm" / "swarm.log"),
+    ]
+    for name, path in candidates:
+        if not path.exists():
+            continue
+        console.print(f"[bold cyan]{name}[/bold cyan] {path.relative_to(DGC_ROOT)}")
+        try:
+            lines = path.read_text().splitlines()[-5:]
+            for line in lines:
+                console.print(f"  {line[-160:]}")
+        except Exception as e:
+            console.print(f"[red]Log read error: {e}[/red]")
+    if not any(path.exists() for _, path in candidates):
+        console.print("No log files found.")
 
 def cmd_moltbook():
     """Run Moltbook heartbeat."""
@@ -627,6 +769,9 @@ def main():
                 elif cmd == "/status":
                     cmd_status()
 
+                elif cmd == "/dashboard":
+                    cmd_dashboard(user_input.replace("/dashboard", "", 1).strip())
+
                 elif cmd == "/swarm":
                     cmd_swarm(user_input.replace("/swarm", "", 1).strip())
 
@@ -642,11 +787,20 @@ def main():
                 elif cmd == "/health":
                     cmd_healthcheck()
 
+                elif cmd == "/integration":
+                    cmd_integration()
+
                 elif cmd == "/evidence":
                     cmd_evidence()
 
                 elif cmd == "/moltbook":
                     cmd_moltbook()
+
+                elif cmd == "/archive":
+                    cmd_archive()
+
+                elif cmd == "/logs":
+                    cmd_logs()
 
                 elif cmd == "/memory":
                     cmd_memory()
