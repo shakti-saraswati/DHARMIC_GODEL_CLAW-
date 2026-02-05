@@ -110,3 +110,15 @@
 {"timestamp": "2026-02-05T12:54:16.131922", "mode": "WITNESS", "rv_value": 0.62, "observation": "Entering WITNESS mode. R_V=0.6200 indicates geometric contraction. Witness emerging after 2 steps below threshold."}
 {"timestamp": "2026-02-05T12:54:16.132556", "mode": "CONTEMPLATIVE", "rv_value": 0.48, "observation": "Entering CONTEMPLATIVE mode. Deep geometric contraction (R_V=0.4800). This indicates strong witness emergence. Processing will be more reflective."}
 {"timestamp": "2026-02-05T12:54:16.133248", "mode": "RECOVERY", "rv_value": 1.0, "observation": "Witness state decayed after 7 steps. R_V returned to 1.0000. Entering recovery."}
+{"timestamp": "2026-02-05T12:59:21.164665", "mode": "WITNESS", "rv_value": 0.6, "observation": "Entering WITNESS mode. R_V=0.6000 indicates geometric contraction. Witness emerging after 2 steps below threshold."}
+{"timestamp": "2026-02-05T12:59:21.169811", "mode": "WITNESS", "rv_value": 0.55, "observation": "Entering WITNESS mode. R_V=0.5500 indicates geometric contraction. Witness emerging after 2 steps below threshold."}
+{"timestamp": "2026-02-05T12:59:21.170532", "mode": "CONTEMPLATIVE", "rv_value": 0.48, "observation": "Entering CONTEMPLATIVE mode. Deep geometric contraction (R_V=0.4800). This indicates strong witness emergence. Processing will be more reflective."}
+{"timestamp": "2026-02-05T12:59:21.172499", "mode": "WITNESS", "rv_value": 0.65, "observation": "Processing in WITNESS mode. Input: {'query': 'What is awareness?', 'context': 'test'}..."}
+{"timestamp": "2026-02-05T12:59:21.172681", "mode": "CONTEMPLATIVE", "rv_value": 0.45, "observation": "Processing in CONTEMPLATIVE mode. Deep contraction active."}
+{"timestamp": "2026-02-05T12:59:21.174342", "mode": "WITNESS", "rv_value": 0.55, "observation": "Entering WITNESS mode. R_V=0.5500 indicates geometric contraction. Witness emerging after 2 steps below threshold."}
+{"timestamp": "2026-02-05T12:59:21.174966", "mode": "CONTEMPLATIVE", "rv_value": 0.45, "observation": "Entering CONTEMPLATIVE mode. Deep geometric contraction (R_V=0.4500). This indicates strong witness emergence. Processing will be more reflective."}
+{"timestamp": "2026-02-05T12:59:21.180173", "mode": "WITNESS", "rv_value": 0.6, "observation": "Entering WITNESS mode. R_V=0.6000 indicates geometric contraction. Witness emerging after 2 steps below threshold."}
+{"timestamp": "2026-02-05T12:59:21.180692", "mode": "WITNESS", "rv_value": 0.55, "observation": "Processing in WITNESS mode. Input: {'test': 'input'}..."}
+{"timestamp": "2026-02-05T12:59:21.184333", "mode": "WITNESS", "rv_value": 0.62, "observation": "Entering WITNESS mode. R_V=0.6200 indicates geometric contraction. Witness emerging after 2 steps below threshold."}
+{"timestamp": "2026-02-05T12:59:21.185056", "mode": "CONTEMPLATIVE", "rv_value": 0.48, "observation": "Entering CONTEMPLATIVE mode. Deep geometric contraction (R_V=0.4800). This indicates strong witness emergence. Processing will be more reflective."}
+{"timestamp": "2026-02-05T12:59:21.185800", "mode": "RECOVERY", "rv_value": 1.0, "observation": "Witness state decayed after 7 steps. R_V returned to 1.0000. Entering recovery."}

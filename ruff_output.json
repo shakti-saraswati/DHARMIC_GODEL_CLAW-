@@ -4821,6 +4821,105 @@
   },
   {
     "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 10,
+      "row": 7
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/crown_jewels_index.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 8
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        }
+      ],
+      "message": "Remove unused import: `os`"
+    },
+    "location": {
+      "column": 8,
+      "row": 7
+    },
+    "message": "`os` imported but unused",
+    "noqa_row": 7,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 12,
+      "row": 8
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/crown_jewels_index.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 9
+          },
+          "location": {
+            "column": 1,
+            "row": 8
+          }
+        }
+      ],
+      "message": "Remove unused import: `json`"
+    },
+    "location": {
+      "column": 8,
+      "row": 8
+    },
+    "message": "`json` imported but unused",
+    "noqa_row": 8,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 15,
+      "row": 9
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/crown_jewels_index.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 10
+          },
+          "location": {
+            "column": 1,
+            "row": 9
+          }
+        }
+      ],
+      "message": "Remove unused import: `sqlite3`"
+    },
+    "location": {
+      "column": 8,
+      "row": 9
+    },
+    "message": "`sqlite3` imported but unused",
+    "noqa_row": 9,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
     "code": "E402",
     "end_location": {
       "column": 10,
@@ -8291,8 +8390,8 @@
     "cell": null,
     "code": "F401",
     "end_location": {
-      "column": 30,
-      "row": 39
+      "column": 24,
+      "row": 3
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/dgm_integration.py",
     "fix": {
@@ -8302,55 +8401,22 @@
           "content": "",
           "end_location": {
             "column": 1,
-            "row": 40
+            "row": 4
           },
           "location": {
             "column": 1,
-            "row": 39
+            "row": 3
           }
         }
       ],
-      "message": "Remove unused import: `datetime.datetime`"
+      "message": "Remove unused import: `typing.List`"
     },
     "location": {
-      "column": 22,
-      "row": 39
+      "column": 20,
+      "row": 3
     },
-    "message": "`datetime.datetime` imported but unused",
-    "noqa_row": 39,
-    "url": "https://docs.astral.sh/ruff/rules/unused-import"
-  },
-  {
-    "cell": null,
-    "code": "F401",
-    "end_location": {
-      "column": 15,
-      "row": 592
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/dgm_integration.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "",
-          "end_location": {
-            "column": 1,
-            "row": 593
-          },
-          "location": {
-            "column": 1,
-            "row": 592
-          }
-        }
-      ],
-      "message": "Remove unused import: `sys`"
-    },
-    "location": {
-      "column": 12,
-      "row": 592
-    },
-    "message": "`sys` imported but unused",
-    "noqa_row": 592,
+    "message": "`typing.List` imported but unused",
+    "noqa_row": 3,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
@@ -8654,8 +8720,8 @@
     "cell": null,
     "code": "F401",
     "end_location": {
-      "column": 12,
-      "row": 19
+      "column": 24,
+      "row": 3
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/enforcement.py",
     "fix": {
@@ -8665,55 +8731,22 @@
           "content": "",
           "end_location": {
             "column": 1,
-            "row": 20
+            "row": 4
           },
           "location": {
             "column": 1,
-            "row": 19
+            "row": 3
           }
         }
       ],
-      "message": "Remove unused import: `time`"
+      "message": "Remove unused import: `typing.List`"
     },
     "location": {
-      "column": 8,
-      "row": 19
+      "column": 20,
+      "row": 3
     },
-    "message": "`time` imported but unused",
-    "noqa_row": 19,
-    "url": "https://docs.astral.sh/ruff/rules/unused-import"
-  },
-  {
-    "cell": null,
-    "code": "F401",
-    "end_location": {
-      "column": 41,
-      "row": 20
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/enforcement.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "from dataclasses import dataclass",
-          "end_location": {
-            "column": 41,
-            "row": 20
-          },
-          "location": {
-            "column": 1,
-            "row": 20
-          }
-        }
-      ],
-      "message": "Remove unused import: `dataclasses.field`"
-    },
-    "location": {
-      "column": 36,
-      "row": 20
-    },
-    "message": "`dataclasses.field` imported but unused",
-    "noqa_row": 20,
+    "message": "`typing.List` imported but unused",
+    "noqa_row": 3,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
@@ -10360,67 +10393,34 @@
     "cell": null,
     "code": "F401",
     "end_location": {
-      "column": 52,
-      "row": 23
+      "column": 24,
+      "row": 3
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/yolo_gate_integration.py",
     "fix": {
       "applicability": "safe",
       "edits": [
         {
-          "content": "from typing import Dict, List, Optional, Any",
+          "content": "",
           "end_location": {
-            "column": 52,
-            "row": 23
+            "column": 1,
+            "row": 4
           },
           "location": {
             "column": 1,
-            "row": 23
+            "row": 3
           }
         }
       ],
-      "message": "Remove unused import: `typing.Tuple`"
+      "message": "Remove unused import: `typing.List`"
     },
     "location": {
-      "column": 47,
-      "row": 23
+      "column": 20,
+      "row": 3
     },
-    "message": "`typing.Tuple` imported but unused",
-    "noqa_row": 23,
+    "message": "`typing.List` imported but unused",
+    "noqa_row": 3,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
-  },
-  {
-    "cell": null,
-    "code": "F541",
-    "end_location": {
-      "column": 67,
-      "row": 82
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/yolo_gate_integration.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "\"🔥 YOLO-Gate Weaver: Starting execution\"",
-          "end_location": {
-            "column": 67,
-            "row": 82
-          },
-          "location": {
-            "column": 26,
-            "row": 82
-          }
-        }
-      ],
-      "message": "Remove extraneous `f` prefix"
-    },
-    "location": {
-      "column": 26,
-      "row": 82
-    },
-    "message": "f-string without any placeholders",
-    "noqa_row": 82,
-    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
   },
   {
     "cell": null,

@@ -589,7 +589,7 @@ class SwarmOrchestrator:
             if evaluation.evidence_bundle_hash:
                 self.logger.info(f"Evidence bundle: {evaluation.evidence_bundle_hash[:16]}...")
             
-            approved_proposals = [p for p in evaluation.proposals if p.approved]
+            approved_proposals = [p.proposal for p in evaluation.proposals if p.approved]
             
             if not approved_proposals:
                 self.logger.error("All proposals failed gate evaluation")
@@ -613,7 +613,7 @@ class SwarmOrchestrator:
                 for proposal in approved_proposals:
                     for file_path in getattr(proposal, 'target_files', []):
                         try:
-                            lock = FileLock(file_path, agent_id="CODING_AGENT", ttl=300)
+                            lock = FileLock(file_path, agent_id="CODING_AGENT", ttl_seconds=300)
                             lock.acquire()
                             locked_files.append(lock)
                         except FileLockError as e:

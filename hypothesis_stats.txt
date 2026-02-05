@@ -6,7 +6,35 @@ rootdir: /Users/dhyana/DHARMIC_GODEL_CLAW/tests
 configfile: pytest.ini
 plugins: jaxtyping-0.3.5, asyncio-1.2.0, anyio-4.9.0, hypothesis-6.151.5, typeguard-4.4.4, cov-7.0.0
 asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-[1mcollecting ... [0mcollected 614 items / 614 deselected / 0 selected
+[1mcollecting ... [0mcollected 568 items / 1 error / 568 deselected / 0 selected
 
+==================================== ERRORS ====================================
+[31m[1m___________________ ERROR collecting test_dgm_integration.py ___________________[0m
+[31mImportError while importing test module '/Users/dhyana/DHARMIC_GODEL_CLAW/tests/test_dgm_integration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/_pytest/python.py:498: in importtestmodule
+    mod = import_path(
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
+    exec(co, module.__dict__)
+tests/test_dgm_integration.py:84: in <module>
+    from swarm.dgm_integration import (
+E   ImportError: cannot import name 'SwarmDGMBridge' from 'swarm.dgm_integration' (/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/dgm_integration.py)[0m
 ============================ Hypothesis Statistics =============================
-[33m===================== [33m[1m614 deselected[0m, [33m[1m6 warnings[0m[33m in 1.04s[0m[33m ======================[0m
+[36m[1m=========================== short test summary info ============================[0m
+[31mERROR[0m tests/test_dgm_integration.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+[31m================= [33m568 deselected[0m, [33m6 warnings[0m, [31m[1m1 error[0m[31m in 0.93s[0m[31m =================[0m

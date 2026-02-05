@@ -19,6 +19,19 @@ class SearchResult:
     similarity: float
 
 
+
+# Singleton embedder instance (cached in memory)
+_embedder_instance = None
+
+def get_embedder(model_name="all-MiniLM-L6-v2"):
+    """Get or create singleton embedder."""
+    global _embedder_instance
+    if _embedder_instance is None:
+        from sentence_transformers import SentenceTransformer
+        _embedder_instance = SentenceTransformer(model_name)
+        print(f"[INIT] Embedder loaded: {model_name}")
+    return _embedder_instance
+
 class EmbeddingModel(ABC):
     """Abstract embedding model interface."""
     
@@ -41,11 +54,7 @@ class MiniLMEmbedder(EmbeddingModel):
     """Local MiniLM embeddings — default, no API calls."""
     
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
-        try:
-            from sentence_transformers import SentenceTransformer
-            self.model = SentenceTransformer(model_name)
-        except ImportError:
-            raise ImportError("sentence-transformers required. Install: pip install sentence-transformers")
+        self.model = get_embedder(model_name)
         self._model_name = model_name
     
     def embed(self, text: str) -> np.ndarray:

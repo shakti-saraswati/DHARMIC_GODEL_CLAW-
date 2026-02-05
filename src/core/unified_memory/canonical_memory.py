@@ -273,13 +273,15 @@ class CanonicalStore:
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
             
+            # Use FTS5 query syntax - simple term matching
+            fts_query = query + "*"  # Prefix matching
             sql = """
                 SELECT m.* FROM memories m
-                JOIN memories_fts fts ON m.id = fts.rowid
+                JOIN memories_fts fts ON m.rowid = fts.rowid
                 WHERE memories_fts MATCH ?
                 AND m.importance >= ?
             """
-            params = [query, min_importance]
+            params = [fts_query, min_importance]
             
             if agent_id:
                 sql += " AND m.agent_id = ?"
