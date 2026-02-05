@@ -1,10 +1,20 @@
 """Analyzer Agent - Analyzes codebase for improvement opportunities."""
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Iterable
+from typing import List, Optional, Iterable, Dict, Any
 from pathlib import Path
 import logging
 import re
+import os
+import json
+import asyncio
+
+try:
+    from src.dgm.mutator import Mutator
+    DGM_MUTATOR_AVAILABLE = True
+except ImportError:
+    Mutator = None
+    DGM_MUTATOR_AVAILABLE = False
 
 
 @dataclass
@@ -31,6 +41,15 @@ class AnalyzerAgent:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.project_root = Path(__file__).parent.parent
+        self.use_llm = os.getenv("DGC_SWARM_USE_LLM", "0") == "1"
+        self._mutator = None
+
+        if self.use_llm and DGM_MUTATOR_AVAILABLE:
+            try:
+                self._mutator = Mutator(project_root=self.project_root)
+                self.logger.info("LLM-based analysis enabled")
+            except Exception as e:
+                self.logger.warning(f"Failed to init Mutator for analysis: {e}")
 
         # Simple heuristic patterns for safe, deterministic improvements
         self.patterns = [
@@ -104,6 +123,63 @@ class AnalyzerAgent:
 
         return issues
 
+    async def _analyze_with_llm(self, target_area: Optional[str]) -> List[Issue]:
+        """Perform high-level analysis using LLM."""
+        if not self._mutator:
+            return []
+        
+        goals_path = self.project_root / "GOALS.md"
+        goals_content = "No goals defined."
+        if goals_path.exists():
+            goals_content = goals_path.read_text()
+
+        # Simple context collection (could be improved)
+        structure = []
+        root = self.project_root / "swarm"
+        if root.exists():
+            for p in root.glob("*.py"):
+                structure.append(f"swarm/{p.name}")
+        
+        prompt = f"""You are the Lead Architect for DHARMIC_GODEL_CLAW.
+Analyze the current state against the goals and identify the ONE most critical gap.
+
+## Goals
+{goals_content}
+
+## Current Swarm Structure
+{', '.join(structure)}
+
+## Task
+Identify a specific file or component that needs creation or improvement to meet a goal.
+Return valid JSON only:
+{{
+    "file_path": "path/to/target.py",
+    "description": "Detailed description of what needs to be implemented/changed",
+    "severity": "high",
+    "fix_type": "architectural_feature"
+}}
+"""
+        try:
+            # We use _call_claude directly if available, or just skip if not exposed
+            # Mutator doesn't expose _call_claude publicly, but we can access it or add a method.
+            # For now, accessing protected member as we are in the same 'trusted' system.
+            response = self._mutator._call_claude(prompt)
+            
+            # Parse JSON
+            json_match = re.search(r'\{.*\}', response, re.DOTALL)
+            if json_match:
+                data = json.loads(json_match.group(0))
+                return [Issue(
+                    file_path=data.get("file_path", "unknown.py"),
+                    description=data.get("description", "LLM suggested improvement"),
+                    severity=data.get("severity", "medium"),
+                    fix_type=data.get("fix_type", "llm_feature")
+                )]
+        except Exception as e:
+            self.logger.error(f"LLM analysis failed: {e}")
+        
+        return []
+
     async def analyze_codebase(self, target_area: Optional[str] = None) -> AnalysisResult:
         """
         Analyze codebase for improvement opportunities.
@@ -131,12 +207,18 @@ class AnalyzerAgent:
         issues: List[Issue] = []
         files_scanned = 0
 
+        # 1. Regex Scan
         for root in search_roots:
             for py_file in self._iter_py_files(root):
                 files_scanned += 1
                 issues.extend(self._scan_file(py_file))
                 if len(issues) >= 50:
                     break
+        
+        # 2. LLM Analysis (if enabled)
+        if self.use_llm and self._mutator:
+            llm_issues = await self._analyze_with_llm(target_area)
+            issues.extend(llm_issues)
 
         return AnalysisResult(
             issues=issues,
@@ -144,5 +226,6 @@ class AnalyzerAgent:
                 "files_scanned": files_scanned,
                 "issues_found": len(issues),
                 "target_area": target_area or "default",
+                "llm_enabled": self.use_llm
             }
         )

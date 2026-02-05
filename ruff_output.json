@@ -6865,7 +6865,7 @@
     "code": "F841",
     "end_location": {
       "column": 17,
-      "row": 184
+      "row": 185
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/dgm/mutator.py",
     "fix": {
@@ -6875,11 +6875,11 @@
           "content": "",
           "end_location": {
             "column": 20,
-            "row": 184
+            "row": 185
           },
           "location": {
             "column": 9,
-            "row": 184
+            "row": 185
           }
         }
       ],
@@ -6887,10 +6887,10 @@
     },
     "location": {
       "column": 9,
-      "row": 184
+      "row": 185
     },
     "message": "Local variable `filename` is assigned to but never used",
-    "noqa_row": 184,
+    "noqa_row": 185,
     "url": "https://docs.astral.sh/ruff/rules/unused-variable"
   },
   {
@@ -6898,7 +6898,7 @@
     "code": "E712",
     "end_location": {
       "column": 53,
-      "row": 559
+      "row": 583
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/dgm/mutator.py",
     "fix": {
@@ -6908,11 +6908,11 @@
           "content": "mutator.is_forbidden_file(\".env\")",
           "end_location": {
             "column": 53,
-            "row": 559
+            "row": 583
           },
           "location": {
             "column": 12,
-            "row": 559
+            "row": 583
           }
         }
       ],
@@ -6920,10 +6920,10 @@
     },
     "location": {
       "column": 12,
-      "row": 559
+      "row": 583
     },
     "message": "Avoid equality comparisons to `True`; use `mutator.is_forbidden_file(\".env\"):` for truth checks",
-    "noqa_row": 559,
+    "noqa_row": 583,
     "url": "https://docs.astral.sh/ruff/rules/true-false-comparison"
   },
   {
@@ -6931,7 +6931,7 @@
     "code": "E712",
     "end_location": {
       "column": 59,
-      "row": 560
+      "row": 584
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/dgm/mutator.py",
     "fix": {
@@ -6941,11 +6941,11 @@
           "content": "mutator.is_forbidden_file(\".env.local\")",
           "end_location": {
             "column": 59,
-            "row": 560
+            "row": 584
           },
           "location": {
             "column": 12,
-            "row": 560
+            "row": 584
           }
         }
       ],
@@ -6953,10 +6953,10 @@
     },
     "location": {
       "column": 12,
-      "row": 560
+      "row": 584
     },
     "message": "Avoid equality comparisons to `True`; use `mutator.is_forbidden_file(\".env.local\"):` for truth checks",
-    "noqa_row": 560,
+    "noqa_row": 584,
     "url": "https://docs.astral.sh/ruff/rules/true-false-comparison"
   },
   {
@@ -6964,7 +6964,7 @@
     "code": "E712",
     "end_location": {
       "column": 60,
-      "row": 561
+      "row": 585
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/dgm/mutator.py",
     "fix": {
@@ -6974,11 +6974,11 @@
           "content": "mutator.is_forbidden_file(\"secrets.yml\")",
           "end_location": {
             "column": 60,
-            "row": 561
+            "row": 585
           },
           "location": {
             "column": 12,
-            "row": 561
+            "row": 585
           }
         }
       ],
@@ -6986,10 +6986,10 @@
     },
     "location": {
       "column": 12,
-      "row": 561
+      "row": 585
     },
     "message": "Avoid equality comparisons to `True`; use `mutator.is_forbidden_file(\"secrets.yml\"):` for truth checks",
-    "noqa_row": 561,
+    "noqa_row": 585,
     "url": "https://docs.astral.sh/ruff/rules/true-false-comparison"
   },
   {
@@ -6997,7 +6997,7 @@
     "code": "E712",
     "end_location": {
       "column": 61,
-      "row": 562
+      "row": 586
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/dgm/mutator.py",
     "fix": {
@@ -7007,11 +7007,11 @@
           "content": "not mutator.is_forbidden_file(\"src/main.py\")",
           "end_location": {
             "column": 61,
-            "row": 562
+            "row": 586
           },
           "location": {
             "column": 12,
-            "row": 562
+            "row": 586
           }
         }
       ],
@@ -7019,10 +7019,10 @@
     },
     "location": {
       "column": 12,
-      "row": 562
+      "row": 586
     },
     "message": "Avoid equality comparisons to `False`; use `not mutator.is_forbidden_file(\"src/main.py\"):` for false checks",
-    "noqa_row": 562,
+    "noqa_row": 586,
     "url": "https://docs.astral.sh/ruff/rules/true-false-comparison"
   },
   {
@@ -7490,6 +7490,105 @@
     "message": "Local variable `recursive_model` is assigned to but never used",
     "noqa_row": 662,
     "url": "https://docs.astral.sh/ruff/rules/unused-variable"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 50,
+      "row": 4
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/analyzer.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from typing import List, Optional, Iterable",
+          "end_location": {
+            "column": 55,
+            "row": 4
+          },
+          "location": {
+            "column": 1,
+            "row": 4
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
+      "column": 46,
+      "row": 4
+    },
+    "message": "`typing.Dict` imported but unused",
+    "noqa_row": 4,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 55,
+      "row": 4
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/analyzer.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from typing import List, Optional, Iterable",
+          "end_location": {
+            "column": 55,
+            "row": 4
+          },
+          "location": {
+            "column": 1,
+            "row": 4
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
+      "column": 52,
+      "row": 4
+    },
+    "message": "`typing.Any` imported but unused",
+    "noqa_row": 4,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 15,
+      "row": 10
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/analyzer.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 11
+          },
+          "location": {
+            "column": 1,
+            "row": 10
+          }
+        }
+      ],
+      "message": "Remove unused import: `asyncio`"
+    },
+    "location": {
+      "column": 8,
+      "row": 10
+    },
+    "message": "`asyncio` imported but unused",
+    "noqa_row": 10,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
     "cell": null,
@@ -8141,39 +8240,6 @@
     "cell": null,
     "code": "F401",
     "end_location": {
-      "column": 10,
-      "row": 18
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/enforcement.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "",
-          "end_location": {
-            "column": 1,
-            "row": 19
-          },
-          "location": {
-            "column": 1,
-            "row": 18
-          }
-        }
-      ],
-      "message": "Remove unused import: `os`"
-    },
-    "location": {
-      "column": 8,
-      "row": 18
-    },
-    "message": "`os` imported but unused",
-    "noqa_row": 18,
-    "url": "https://docs.astral.sh/ruff/rules/unused-import"
-  },
-  {
-    "cell": null,
-    "code": "F401",
-    "end_location": {
       "column": 12,
       "row": 19
     },
@@ -8340,7 +8406,7 @@
     "code": "F401",
     "end_location": {
       "column": 45,
-      "row": 16
+      "row": 17
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/evaluator.py",
     "fix": {
@@ -8350,11 +8416,11 @@
           "content": "from run_gates import GateRunner, EVIDENCE_DIR",
           "end_location": {
             "column": 59,
-            "row": 16
+            "row": 17
           },
           "location": {
             "column": 1,
-            "row": 16
+            "row": 17
           }
         }
       ],
@@ -8362,10 +8428,10 @@
     },
     "location": {
       "column": 35,
-      "row": 16
+      "row": 17
     },
     "message": "`run_gates.GateResult` imported but unused",
-    "noqa_row": 16,
+    "noqa_row": 17,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
   },
   {
@@ -9249,20 +9315,36 @@
   },
   {
     "cell": null,
-    "code": "F401",
+    "code": "F541",
     "end_location": {
-      "column": 59,
-      "row": 84
+      "column": 84,
+      "row": 876
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/orchestrator.py",
-    "fix": null,
-    "location": {
-      "column": 40,
-      "row": 84
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "\"YOLO-Gate Weaver improvement\"",
+          "end_location": {
+            "column": 84,
+            "row": 876
+          },
+          "location": {
+            "column": 53,
+            "row": 876
+          }
+        }
+      ],
+      "message": "Remove extraneous `f` prefix"
     },
-    "message": "`.yolo_gate_integration.YOLOGateIntegration` imported but unused; consider using `importlib.util.find_spec` to test for availability",
-    "noqa_row": 84,
-    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+    "location": {
+      "column": 53,
+      "row": 876
+    },
+    "message": "f-string without any placeholders",
+    "noqa_row": 876,
+    "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
   },
   {
     "cell": null,
@@ -9434,7 +9516,7 @@
     "code": "F541",
     "end_location": {
       "column": 47,
-      "row": 875
+      "row": 909
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/run_gates.py",
     "fix": {
@@ -9444,11 +9526,11 @@
           "content": "\"\\n⚠️  EMERGENCY BYPASS LOGGED\"",
           "end_location": {
             "column": 47,
-            "row": 875
+            "row": 909
           },
           "location": {
             "column": 15,
-            "row": 875
+            "row": 909
           }
         }
       ],
@@ -9456,10 +9538,10 @@
     },
     "location": {
       "column": 15,
-      "row": 875
+      "row": 909
     },
     "message": "f-string without any placeholders",
-    "noqa_row": 875,
+    "noqa_row": 909,
     "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
   },
   {
@@ -9467,7 +9549,7 @@
     "code": "F541",
     "end_location": {
       "column": 43,
-      "row": 878
+      "row": 912
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/run_gates.py",
     "fix": {
@@ -9477,11 +9559,11 @@
           "content": "\"   POST-MORTEM REQUIRED\\n\"",
           "end_location": {
             "column": 43,
-            "row": 878
+            "row": 912
           },
           "location": {
             "column": 15,
-            "row": 878
+            "row": 912
           }
         }
       ],
@@ -9489,45 +9571,11 @@
     },
     "location": {
       "column": 15,
-      "row": 878
+      "row": 912
     },
     "message": "f-string without any placeholders",
-    "noqa_row": 878,
+    "noqa_row": 912,
     "url": "https://docs.astral.sh/ruff/rules/f-string-missing-placeholders"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 37,
-      "row": 24
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/run_swarm.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 24
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 24,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 49,
-      "row": 25
-    },
-    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/swarm/run_swarm.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 25
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 25,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
   },
   {
     "cell": null,
@@ -9992,6 +10040,23 @@
     "message": "`os` imported but unused",
     "noqa_row": 7,
     "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 39,
+      "row": 9
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/test_ckc.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 9
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 9,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
   },
   {
     "cell": null,

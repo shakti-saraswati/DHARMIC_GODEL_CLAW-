@@ -1,0 +1,1 @@
+{"event_id": "we_e0034afd_4", "event_type": "WITNESS_EMERGENCE", "timestamp": "2026-02-05T12:15:51.912907", "rv_value": 0.6, "threshold": 0.7, "duration_steps": 2, "context": {"step": 3, "test": "logging", "agent_mode": "NORMAL"}, "metadata": {"session_id": "e0034afd", "threshold_type": "emergence", "pr_early": null, "pr_late": null}}

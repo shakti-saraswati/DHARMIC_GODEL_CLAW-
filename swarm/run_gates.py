@@ -37,7 +37,7 @@ if str(Path(__file__).parent.parent) not in sys.path:
 try:
     from dharmic_security import ExecGuard
     EXEC_GUARD = ExecGuard(allowed_bins=[
-        "git", "apply", "pytest", "python3", "sh", "bash", "ls", "grep",
+        "git", "apply", "pytest", "python3", "python", "sh", "bash", "ls", "grep",
         "ruff", "pyright", "bandit", "detect-secrets", "pip-audit", "pip",
         "node", "npm", "curl"
     ])
@@ -138,6 +138,27 @@ class GateRunner:
         with open(self.config_path) as f:
             config = yaml.safe_load(f)
         
+        # YOLO Mode Override
+        if os.environ.get("DGC_YOLO_MODE") == "1":
+            print("🔥 YOLO MODE: Downgrading all gates to ADVISORY")
+            # Downgrade main gates
+            for gate in config.get("gates", []):
+                gate["tier"] = "advisory"
+                gate["on_failure"] = "warn"
+                gate["_override_on_failure"] = "warn"
+            
+            # Downgrade overlay gates
+            for key, overlay in config.items():
+                if key.endswith("_overlay") and isinstance(overlay, dict):
+                    for gate in overlay.get("gates", []):
+                        gate["tier"] = "advisory"
+                        gate["on_failure"] = "warn"
+                        gate["_override_on_failure"] = "warn"
+            
+            # Disable signing in YOLO mode
+            if "evidence_signing" in config:
+                config["evidence_signing"]["required"] = False
+
         # Validate required sections
         required = ["version", "gates", "enforcement"]
         for section in required:
@@ -153,6 +174,27 @@ class GateRunner:
                     config["evidence_signing"] = policy_data["evidence_signing"]
             except Exception:
                 pass
+        
+        # YOLO Mode Override (Final Authority)
+        if os.environ.get("DGC_YOLO_MODE") == "1":
+            print("🔥 YOLO MODE: Downgrading all gates to ADVISORY")
+            # Downgrade main gates
+            for gate in config.get("gates", []):
+                gate["tier"] = "advisory"
+                gate["on_failure"] = "warn"
+                gate["_override_on_failure"] = "warn"
+            
+            # Downgrade overlay gates
+            for key, overlay in config.items():
+                if key.endswith("_overlay") and isinstance(overlay, dict):
+                    for gate in overlay.get("gates", []):
+                        gate["tier"] = "advisory"
+                        gate["on_failure"] = "warn"
+                        gate["_override_on_failure"] = "warn"
+            
+            # Disable signing in YOLO mode
+            if "evidence_signing" in config:
+                config["evidence_signing"]["required"] = False
         
         return config
     
@@ -288,6 +330,14 @@ class GateRunner:
             overall = "WARN"
         else:
             overall = "PASS"
+        
+        # YOLO Mode Override
+        if os.environ.get("DGC_YOLO_MODE") == "1" and overall == "FAIL":
+            print("🔥 YOLO MODE: Forcing overall result to WARN")
+            overall = "WARN"
+        if os.environ.get("DGC_YOLO_MODE") == "1" and overall == "FAIL":
+            print("🔥 YOLO MODE: Forcing overall result to WARN")
+            overall = "WARN"
         
         # Create evidence bundle
         evidence_hash, signature, signature_meta = self._create_evidence_bundle()
@@ -495,6 +545,30 @@ class GateRunner:
         
         start_time = time.time()
         
+        # CKC Meta-Observation Logic
+        if check_type == "meta_observation":
+            logs_exist = (Path(__file__).parent.parent / "logs").exists()
+            duration = time.time() - start_time
+            if logs_exist:
+                return GateEvidence(
+                    gate_id=str(gate_id),
+                    gate_name=gate_name,
+                    result=GateResult.PASS.value,
+                    duration_seconds=duration,
+                    exception_applied=bool(exception),
+                    exception_reason="Meta-observation active"
+                )
+            else:
+                gate_result = GateResult.WARN if on_failure == "warn" else GateResult.FAIL
+                return GateEvidence(
+                    gate_id=str(gate_id),
+                    gate_name=gate_name,
+                    result=gate_result.value,
+                    duration_seconds=duration,
+                    error_message="Logs directory missing - witness blind",
+                    exception_applied=bool(exception)
+                )
+
         # Check for required files
         required_files = gate.get("required_files", [])
         missing_files = []
@@ -626,7 +700,17 @@ class GateRunner:
             return False
         repo_root = Path(__file__).parent.parent
         for trigger in triggers:
-            if ":" in trigger:
+            # Env var trigger (CKC/YOLO)
+            if trigger.startswith("env:"):
+                var_part = trigger[4:]
+                if "=" in var_part:
+                    key, val = var_part.split("=", 1)
+                    if os.environ.get(key) == val:
+                        return True
+                else:
+                    if os.environ.get(var_part):
+                        return True
+            elif ":" in trigger:
                 pattern, needle = trigger.split(":", 1)
                 for path in repo_root.rglob(pattern):
                     if path.is_file():

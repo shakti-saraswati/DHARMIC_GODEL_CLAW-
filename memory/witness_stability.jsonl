@@ -355,3 +355,79 @@
 {"timestamp": "2026-02-05T11:29:27.233152", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
 {"timestamp": "2026-02-05T11:34:27.340009", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
 {"timestamp": "2026-02-05T11:39:27.511385", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T11:44:27.640908", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T11:49:27.757374", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T11:54:27.862467", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T11:59:27.928200", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T12:04:28.024554", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T12:05:16.477221", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:05:16.475942"}
+{"timestamp": "2026-02-05T12:05:16.477910", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:05:16.479793", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:05:16.479317"}
+{"timestamp": "2026-02-05T12:05:16.479953", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:05:16.480449", "quality": "contracted", "genuine_confidence": 0.5, "context": "Deep contraction at 2026-02-05T12:05:16.480029"}
+{"timestamp": "2026-02-05T12:05:16.480516", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:05:16.480713", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:05:16.480894", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:05:16.481073", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:05:16.484404", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:05:16.483944"}
+{"timestamp": "2026-02-05T12:05:16.484549", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:05:16.484967", "quality": "contracted", "genuine_confidence": 0.5, "context": "Deep contraction at 2026-02-05T12:05:16.484610"}
+{"timestamp": "2026-02-05T12:05:16.485027", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:05:16.491039", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:05:16.489552"}
+{"timestamp": "2026-02-05T12:05:16.491263", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:05:16.494878", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:05:16.494340"}
+{"timestamp": "2026-02-05T12:05:16.495044", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:05:16.495508", "quality": "contracted", "genuine_confidence": 0.5, "context": "Deep contraction at 2026-02-05T12:05:16.495129"}
+{"timestamp": "2026-02-05T12:05:16.495578", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:05:16.495759", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:05:16.496269", "quality": "expansive", "genuine_confidence": 0.6, "context": "Witness decay at 2026-02-05T12:05:16.495873"}
+{"timestamp": "2026-02-05T12:05:16.496406", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: WITNESS_DECAY"}
+{"timestamp": "2026-02-05T12:09:28.068436", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T12:14:31.817687", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T12:15:51.899610", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:15:51.898329"}
+{"timestamp": "2026-02-05T12:15:51.901031", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:15:51.903391", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:15:51.902781"}
+{"timestamp": "2026-02-05T12:15:51.903617", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:15:51.904280", "quality": "contracted", "genuine_confidence": 0.5, "context": "Deep contraction at 2026-02-05T12:15:51.903730"}
+{"timestamp": "2026-02-05T12:15:51.904365", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:15:51.904638", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:15:51.904833", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:15:51.905025", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:15:51.908867", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:15:51.908371"}
+{"timestamp": "2026-02-05T12:15:51.909012", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:15:51.909469", "quality": "contracted", "genuine_confidence": 0.5, "context": "Deep contraction at 2026-02-05T12:15:51.909065"}
+{"timestamp": "2026-02-05T12:15:51.909519", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:15:51.913400", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:15:51.912907"}
+{"timestamp": "2026-02-05T12:15:51.913558", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:15:51.916019", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:15:51.915561"}
+{"timestamp": "2026-02-05T12:15:51.916162", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:15:51.916630", "quality": "contracted", "genuine_confidence": 0.5, "context": "Deep contraction at 2026-02-05T12:15:51.916235"}
+{"timestamp": "2026-02-05T12:15:51.916685", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:15:51.916863", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:15:51.917377", "quality": "expansive", "genuine_confidence": 0.6, "context": "Witness decay at 2026-02-05T12:15:51.916981"}
+{"timestamp": "2026-02-05T12:15:51.917504", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: WITNESS_DECAY"}
+{"timestamp": "2026-02-05T12:19:31.962663", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T12:21:58.099042", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:21:58.096895"}
+{"timestamp": "2026-02-05T12:21:58.099574", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:21:58.102521", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:21:58.101843"}
+{"timestamp": "2026-02-05T12:21:58.102704", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:21:58.103239", "quality": "contracted", "genuine_confidence": 0.5, "context": "Deep contraction at 2026-02-05T12:21:58.102772"}
+{"timestamp": "2026-02-05T12:21:58.103295", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:21:58.103483", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:21:58.103671", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:21:58.103830", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:21:58.107525", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:21:58.106973"}
+{"timestamp": "2026-02-05T12:21:58.107703", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:21:58.108158", "quality": "contracted", "genuine_confidence": 0.5, "context": "Deep contraction at 2026-02-05T12:21:58.107761"}
+{"timestamp": "2026-02-05T12:21:58.108210", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:21:58.112389", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:21:58.111818"}
+{"timestamp": "2026-02-05T12:21:58.112544", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:21:58.115285", "quality": "present", "genuine_confidence": 0.5, "context": "Witness emergence at 2026-02-05T12:21:58.114782"}
+{"timestamp": "2026-02-05T12:21:58.115426", "quality": "expansive", "genuine_confidence": 0.65, "context": "Witness detector: WITNESS_EMERGENCE"}
+{"timestamp": "2026-02-05T12:21:58.115873", "quality": "contracted", "genuine_confidence": 0.5, "context": "Deep contraction at 2026-02-05T12:21:58.115500"}
+{"timestamp": "2026-02-05T12:21:58.115923", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:21:58.116084", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: CONTRACTION_DEEP"}
+{"timestamp": "2026-02-05T12:21:58.116576", "quality": "expansive", "genuine_confidence": 0.6, "context": "Witness decay at 2026-02-05T12:21:58.116183"}
+{"timestamp": "2026-02-05T12:21:58.116697", "quality": "contracted", "genuine_confidence": 0.55, "context": "Witness detector: WITNESS_DECAY"}
+{"timestamp": "2026-02-05T12:24:32.137474", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-05T12:29:32.201627", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}

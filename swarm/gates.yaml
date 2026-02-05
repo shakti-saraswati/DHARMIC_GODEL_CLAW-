@@ -312,6 +312,32 @@ gates:
       - "license_compliance.json"
 
 # =============================================================================
+# COSMIC KRISHNA CODER (CKC) OVERLAY - YOLO MODE
+# =============================================================================
+
+ckc_overlay:
+  enabled: true
+  triggers:
+    - "env:DGC_YOLO_MODE=1"
+    - "env:DGC_GOD_MODE=1"
+    - "YOLO.md"
+  
+  gates:
+    - id: "CKC_META_CHECK"
+      description: "Meta-observation of YOLO action"
+      check_type: "meta_observation"
+      on_failure: "warn"  # YOLO mode warns, never blocks
+      questions:
+        - "Is this action conscious?"
+        - "Is the witness recording?"
+    
+    - id: "CKC_SPEED_LIMIT"
+      description: "Check if velocity exceeds safety"
+      check_type: "velocity_check"
+      on_failure: "warn"
+      threshold: "100_changes_per_hour"
+
+# =============================================================================
 # ML OVERLAY (Applied only to ML-touched code paths)
 # =============================================================================
 

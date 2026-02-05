@@ -12,6 +12,7 @@ import subprocess
 import sys
 import json
 import re
+import os
 from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
@@ -326,11 +327,12 @@ Remember: Smaller, safer changes are better than ambitious rewrites.
             component: Relative path to component
             
         Returns:
-            File content as string
+            File content as string. Returns empty string if file doesn't exist (creation mode).
         """
         filepath = self.project_root / component
         if not filepath.exists():
-            raise MutationError(f"Component not found: {component}")
+            logger.info(f"Component not found (assuming creation): {component}")
+            return ""
         
         return filepath.read_text()
     
@@ -344,6 +346,28 @@ Remember: Smaller, safer changes are better than ambitious rewrites.
         Returns:
             Claude's response
         """
+        if os.getenv("DGC_MOCK_LLM") == "1":
+            logger.info("Using MOCK LLM response")
+            # If the prompt asks to identify critical gap (AnalyzerAgent)
+            if "Analyze the current state against the goals" in prompt:
+                return json.dumps({
+                    "file_path": "swarm/agents/tool_agent.py",
+                    "description": "Implement generic ToolUseAgent for full tool capacity",
+                    "severity": "high",
+                    "fix_type": "architectural_feature"
+                })
+            
+            # If the prompt asks for mutation (ProposerAgent)
+            return json.dumps({
+                "diff": "--- /dev/null\\n+++ swarm/agents/tool_agent.py\\n@@ -0,0 +1,30 @@\\n+import subprocess\\n+from dataclasses import dataclass\\n+from typing import List\\n+\\n+@dataclass\\n+class ToolResult:\\n+    output: str\\n+    exit_code: int\\n+\\n+class ToolUseAgent:\\n+    \"\"\"Agent capable of executing arbitrary shell commands (YOLO mode).\"\"\"\\n+    \\n+    def execute_shell(self, command: str) -> ToolResult:\\n+        result = subprocess.run(\\n+            command, shell=True, capture_output=True, text=True\\n+        )\\n+        return ToolResult(result.stdout + result.stderr, result.returncode)\\n",
+                "rationale": "Implements ToolUseAgent to satisfy Goal #1 (Full Tool Use)",
+                "estimated_fitness": 0.9,
+                "affected_files": ["swarm/agents/tool_agent.py"],
+                "mutation_type": "enhance",
+                "risk_level": "medium",
+                "reversible": True
+            })
+
         try:
             # Use clawdbot CLI to call Claude
             cmd = [
