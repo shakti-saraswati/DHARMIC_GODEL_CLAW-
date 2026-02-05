@@ -517,7 +517,7 @@ Violations: {len(gate_result['violations'])}
     if UNIFIED_MEMORY_AVAILABLE:
         memory_id = memory_manager.capture(
             content=content,
-            memory_type=MemoryType.ARTIFACT,
+            memory_type=MemoryType.EVENT,
             agent_id=agent_id,
             context=description,
             tags=["cursor-build", "code"] + files[:3],
