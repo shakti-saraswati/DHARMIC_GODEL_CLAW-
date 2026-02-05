@@ -34,6 +34,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from .risk_detector import RiskDetector, RiskResult, RiskTier, WeaveMode
 from . import gates as real_gates
+from .dgm_evolver import get_evolver, DGMEvolver
 
 
 class GateStatus(Enum):
@@ -138,10 +139,14 @@ class YOLOWeaver:
     SELF_APPROVE_CONFIDENCE = 0.85
     SELF_APPROVE_MAX_WARNINGS = 2
     
-    def __init__(self, evidence_dir: Optional[Path] = None):
+    def __init__(self, evidence_dir: Optional[Path] = None, enable_evolution: bool = True):
         self.risk_detector = RiskDetector()
         self.evidence_dir = evidence_dir or Path.home() / ".agno_council" / "weave_evidence"
         self.evidence_dir.mkdir(parents=True, exist_ok=True)
+        
+        # DGM Evolution
+        self.enable_evolution = enable_evolution
+        self.evolver = get_evolver() if enable_evolution else None
     
     def execute(
         self,
@@ -225,7 +230,37 @@ class YOLOWeaver:
         # Store evidence
         self._store_evidence(result)
         
+        # DGM Evolution: Learn from failures
+        if self.enable_evolution and self.evolver and failed > 0:
+            self._evolve_from_result(result, code)
+        
         return result
+    
+    def _evolve_from_result(self, result: WeaveResult, code: str = ""):
+        """Record failures and potentially generate evolution proposals."""
+        try:
+            # Record each failure
+            for gate_result in result.gate_results:
+                if gate_result.status == GateStatus.FAIL:
+                    self.evolver.record_failure(
+                        gate_name=gate_result.gate_name,
+                        message=gate_result.message,
+                        code_snippet=code[:500] if code else "",
+                        details=gate_result.evidence
+                    )
+            
+            # Generate proposals if enough failures accumulated
+            proposals = self.evolver.generate_proposals()
+            
+            if proposals:
+                # Log evolution activity
+                import logging
+                logger = logging.getLogger('yolo_weaver')
+                logger.info(f"🧬 DGM Evolution: Generated {len(proposals)} proposals from gate failures")
+                
+        except Exception as e:
+            # Don't let evolution errors break the main flow
+            pass
     
     def _run_gates(
         self,

@@ -42,6 +42,15 @@ from .gates import (
     GATE_REGISTRY,
 )
 
+from .dgm_evolver import (
+    DGMEvolver,
+    get_evolver,
+    evolve_from_failures,
+    EvolutionProposal,
+    FailurePattern,
+    ProposalType,
+)
+
 __all__ = [
     # Risk Detection
     "RiskDetector",
@@ -61,4 +70,11 @@ __all__ = [
     "run_gates",
     "run_all_gates",
     "GATE_REGISTRY",
+    # DGM Evolution
+    "DGMEvolver",
+    "get_evolver",
+    "evolve_from_failures",
+    "EvolutionProposal",
+    "FailurePattern",
+    "ProposalType",
 ]

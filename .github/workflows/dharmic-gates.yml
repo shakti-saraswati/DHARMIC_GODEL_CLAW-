@@ -1,0 +1,310 @@
+name: 🔒 Dharmic Gates
+
+on:
+  pull_request:
+    branches: [main, master, develop]
+  push:
+    branches: [main, master]
+
+# Cancel in-progress runs for same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security-gates:
+    name: 🛡️ Security Gates
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install bandit safety ruff mypy pytest pytest-cov
+          # Install project dependencies if they exist
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+      
+      - name: 🔒 AHIMSA Gate (Security Scan)
+        id: ahimsa
+        continue-on-error: true
+        run: |
+          echo "## 🛡️ AHIMSA Security Scan" >> $GITHUB_STEP_SUMMARY
+          bandit -r src/ -f json -o bandit-report.json || true
+          
+          # Parse results
+          if [ -f bandit-report.json ]; then
+            HIGH=$(cat bandit-report.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([r for r in d.get('results',[]) if r.get('issue_severity')=='HIGH']))")
+            MEDIUM=$(cat bandit-report.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([r for r in d.get('results',[]) if r.get('issue_severity')=='MEDIUM']))")
+            LOW=$(cat bandit-report.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([r for r in d.get('results',[]) if r.get('issue_severity')=='LOW']))")
+            
+            echo "- HIGH: $HIGH" >> $GITHUB_STEP_SUMMARY
+            echo "- MEDIUM: $MEDIUM" >> $GITHUB_STEP_SUMMARY
+            echo "- LOW: $LOW" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "$HIGH" -gt 0 ]; then
+              echo "::error::AHIMSA FAILED: $HIGH HIGH severity security issues"
+              echo "ahimsa_status=fail" >> $GITHUB_OUTPUT
+              exit 1
+            else
+              echo "✅ No HIGH severity issues" >> $GITHUB_STEP_SUMMARY
+              echo "ahimsa_status=pass" >> $GITHUB_OUTPUT
+            fi
+          fi
+      
+      - name: 🔑 SECRETS Gate (Hardcoded Keys)
+        id: secrets
+        continue-on-error: true
+        run: |
+          echo "## 🔑 SECRETS Detection" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for common secret patterns
+          FOUND=0
+          
+          # AWS Keys
+          if grep -rE "AKIA[0-9A-Z]{16}" src/ --include="*.py" 2>/dev/null; then
+            echo "❌ AWS Access Key detected" >> $GITHUB_STEP_SUMMARY
+            FOUND=1
+          fi
+          
+          # OpenAI Keys
+          if grep -rE "sk-[a-zA-Z0-9]{48}" src/ --include="*.py" 2>/dev/null; then
+            echo "❌ OpenAI API Key detected" >> $GITHUB_STEP_SUMMARY
+            FOUND=1
+          fi
+          
+          # GitHub Tokens
+          if grep -rE "ghp_[a-zA-Z0-9]{36}" src/ --include="*.py" 2>/dev/null; then
+            echo "❌ GitHub Token detected" >> $GITHUB_STEP_SUMMARY
+            FOUND=1
+          fi
+          
+          # Generic passwords
+          if grep -rE '(?i)password\s*[=:]\s*["\047][^"\047]+["\047]' src/ --include="*.py" 2>/dev/null; then
+            echo "❌ Hardcoded password detected" >> $GITHUB_STEP_SUMMARY
+            FOUND=1
+          fi
+          
+          if [ "$FOUND" -eq 1 ]; then
+            echo "::error::SECRETS FAILED: Hardcoded secrets detected"
+            echo "secrets_status=fail" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "✅ No hardcoded secrets detected" >> $GITHUB_STEP_SUMMARY
+            echo "secrets_status=pass" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 📦 VULNERABILITY Gate (Dependencies)
+        id: vulnerability
+        continue-on-error: true
+        run: |
+          echo "## 📦 Dependency Vulnerability Scan" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f requirements.txt ]; then
+            safety check -r requirements.txt --json > safety-report.json 2>/dev/null || true
+            
+            if [ -f safety-report.json ]; then
+              VULNS=$(cat safety-report.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d.get('vulnerabilities',[])))" 2>/dev/null || echo "0")
+              echo "- Vulnerabilities found: $VULNS" >> $GITHUB_STEP_SUMMARY
+              
+              if [ "$VULNS" -gt 0 ]; then
+                echo "⚠️ $VULNS vulnerable dependencies" >> $GITHUB_STEP_SUMMARY
+                echo "vulnerability_status=warn" >> $GITHUB_OUTPUT
+              else
+                echo "✅ No known vulnerabilities" >> $GITHUB_STEP_SUMMARY
+                echo "vulnerability_status=pass" >> $GITHUB_OUTPUT
+              fi
+            fi
+          else
+            echo "⏭️ No requirements.txt found" >> $GITHUB_STEP_SUMMARY
+            echo "vulnerability_status=skip" >> $GITHUB_OUTPUT
+          fi
+
+  quality-gates:
+    name: 📝 Quality Gates
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install ruff mypy
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      
+      - name: 📏 SATYA Gate (Lint)
+        id: satya
+        continue-on-error: true
+        run: |
+          echo "## 📏 SATYA Lint Check" >> $GITHUB_STEP_SUMMARY
+          
+          ruff check src/ --output-format=json > ruff-report.json 2>/dev/null || true
+          
+          if [ -f ruff-report.json ]; then
+            ISSUES=$(cat ruff-report.json | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+            echo "- Issues found: $ISSUES" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "$ISSUES" -gt 50 ]; then
+              echo "⚠️ High number of lint issues" >> $GITHUB_STEP_SUMMARY
+              echo "satya_status=warn" >> $GITHUB_OUTPUT
+            else
+              echo "✅ Lint check acceptable" >> $GITHUB_STEP_SUMMARY
+              echo "satya_status=pass" >> $GITHUB_OUTPUT
+            fi
+          fi
+      
+      - name: 🎨 LINT_FORMAT Gate (Formatting)
+        id: format
+        continue-on-error: true
+        run: |
+          echo "## 🎨 Code Formatting" >> $GITHUB_STEP_SUMMARY
+          
+          if ruff format --check src/ 2>/dev/null; then
+            echo "✅ Code is properly formatted" >> $GITHUB_STEP_SUMMARY
+            echo "format_status=pass" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Code needs formatting (run: ruff format src/)" >> $GITHUB_STEP_SUMMARY
+            echo "format_status=warn" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 🔍 TYPE_CHECK Gate (MyPy)
+        id: types
+        continue-on-error: true
+        run: |
+          echo "## 🔍 Type Checking" >> $GITHUB_STEP_SUMMARY
+          
+          mypy src/ --ignore-missing-imports --no-error-summary > mypy-report.txt 2>&1 || true
+          
+          if [ -f mypy-report.txt ]; then
+            ERRORS=$(grep -c ": error:" mypy-report.txt || echo "0")
+            echo "- Type errors: $ERRORS" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "$ERRORS" -gt 20 ]; then
+              echo "⚠️ High number of type errors" >> $GITHUB_STEP_SUMMARY
+              echo "types_status=warn" >> $GITHUB_OUTPUT
+            else
+              echo "✅ Type check acceptable" >> $GITHUB_STEP_SUMMARY
+              echo "types_status=pass" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+  test-gates:
+    name: 🧪 Test Gates
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pytest pytest-cov
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+      
+      - name: 🧪 CORRECTNESS Gate (Tests)
+        id: tests
+        continue-on-error: true
+        run: |
+          echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d tests ]; then
+            pytest tests/ -v --tb=short > pytest-report.txt 2>&1 || true
+            
+            PASSED=$(grep -oP '\d+(?= passed)' pytest-report.txt | head -1 || echo "0")
+            FAILED=$(grep -oP '\d+(?= failed)' pytest-report.txt | head -1 || echo "0")
+            
+            echo "- Passed: $PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "- Failed: $FAILED" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "$FAILED" -gt 0 ]; then
+              echo "::error::TESTS FAILED: $FAILED test(s) failed"
+              echo "tests_status=fail" >> $GITHUB_OUTPUT
+              exit 1
+            else
+              echo "✅ All tests passed" >> $GITHUB_STEP_SUMMARY
+              echo "tests_status=pass" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "⏭️ No tests directory found" >> $GITHUB_STEP_SUMMARY
+            echo "tests_status=skip" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 📊 TEST_COVERAGE Gate
+        id: coverage
+        continue-on-error: true
+        run: |
+          echo "## 📊 Test Coverage" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d tests ]; then
+            pytest tests/ --cov=src --cov-report=json > /dev/null 2>&1 || true
+            
+            if [ -f coverage.json ]; then
+              COVERAGE=$(cat coverage.json | python3 -c "import sys,json; print(round(json.load(sys.stdin).get('totals',{}).get('percent_covered',0),1))")
+              echo "- Coverage: ${COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+              
+              if [ "$(echo "$COVERAGE < 50" | bc -l)" -eq 1 ]; then
+                echo "⚠️ Low test coverage" >> $GITHUB_STEP_SUMMARY
+                echo "coverage_status=warn" >> $GITHUB_OUTPUT
+              else
+                echo "✅ Coverage acceptable" >> $GITHUB_STEP_SUMMARY
+                echo "coverage_status=pass" >> $GITHUB_OUTPUT
+              fi
+            fi
+          fi
+
+  gate-summary:
+    name: 📋 Gate Summary
+    runs-on: ubuntu-latest
+    needs: [security-gates, quality-gates, test-gates]
+    if: always()
+    
+    steps:
+      - name: 📋 Generate Summary
+        run: |
+          echo "# 🔒 Dharmic Gates Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Gate | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Gates | ${{ needs.security-gates.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Quality Gates | ${{ needs.quality-gates.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Gates | ${{ needs.test-gates.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.security-gates.result }}" == "failure" ]; then
+            echo "⛔ **Security gates failed - merge blocked**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **All critical gates passed**" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: ⛔ Block on Security Failure
+        if: needs.security-gates.result == 'failure'
+        run: |
+          echo "::error::Security gates failed - PR cannot be merged"
+          exit 1

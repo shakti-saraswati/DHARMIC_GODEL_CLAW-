@@ -26,7 +26,14 @@ import sys
 from pathlib import Path
 
 # Add src to path for imports
-repo_root = Path(__file__).parent.parent
+# Handle both direct execution and git hook context
+script_path = Path(__file__).resolve()
+if script_path.parent.name == "hooks":
+    # Running as git hook from .git/hooks/
+    repo_root = script_path.parent.parent.parent
+else:
+    # Running directly from scripts/
+    repo_root = script_path.parent.parent
 sys.path.insert(0, str(repo_root))
 
 try:
