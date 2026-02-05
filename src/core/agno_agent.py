@@ -42,6 +42,12 @@ else:
 from telos_layer import TelosLayer
 from strange_loop_memory import StrangeLoopMemory
 
+# Model factory (provider selection)
+try:
+    from model_factory import resolve_model_spec
+except Exception:
+    resolve_model_spec = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -85,7 +91,8 @@ class AgnoDharmicAgent:
     def __init__(
         self,
         name: str = "DHARMIC_CLAW",
-        model: str = "claude-opus-4",
+        model: Optional[str] = None,
+        provider: Optional[str] = None,
         db_path: Optional[str] = None,
         user_id: str = "dhyana",
     ):
@@ -95,7 +102,7 @@ class AgnoDharmicAgent:
             )
 
         self.name = name
-        self.model_id = model
+        self.model_id = model or "claude-opus-4"
         self.user_id = user_id
 
         # Initialize dharmic components
@@ -108,17 +115,56 @@ class AgnoDharmicAgent:
         )
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
-        # Create Agno model pointing to our proxy
-        self.model = ClaudeMaxProxy(
-            id=model,
-            name="ClaudeMaxProxy",
-            api_key="not-needed",
-            base_url="http://localhost:3456/v1",
-        )
+        # Resolve provider/model
+        if resolve_model_spec:
+            spec = resolve_model_spec(provider=provider, model_id=self.model_id)
+            self.provider = spec.provider
+            self.model_id = spec.model_id
+        else:
+            # Fallback to proxy
+            self.provider = provider or "proxy"
 
-        # Initialize Tools
+        # Instantiate model by provider
+        if self.provider == "proxy":
+            base_url = os.getenv("OPENAI_BASE_URL", "http://localhost:3456/v1")
+            self.model = ClaudeMaxProxy(
+                id=self.model_id,
+                name="ClaudeMaxProxy",
+                api_key="not-needed",
+                base_url=base_url,
+            )
+        elif self.provider == "moonshot":
+            from agno.models.moonshot import MoonShot
+            self.model = MoonShot(id=self.model_id)
+        elif self.provider == "anthropic":
+            from agno.models.anthropic import Claude
+            self.model = Claude(id=self.model_id)
+        elif self.provider == "ollama":
+            from agno.models.ollama import Ollama
+            self.model = Ollama(id=self.model_id)
+        elif self.provider == "max":
+            from claude_max_model import ClaudeMax
+            self.model = ClaudeMax(id=self.model_id)
+        else:
+            # Default fallback
+            base_url = os.getenv("OPENAI_BASE_URL", "http://localhost:3456/v1")
+            self.model = ClaudeMaxProxy(
+                id=self.model_id,
+                name="ClaudeMaxProxy",
+                api_key="not-needed",
+                base_url=base_url,
+            )
+
+        # Initialize Tools (optional)
         self.tools = []
-        if TOOLS_AVAILABLE:
+        enable_tools_env = os.getenv("DGC_ENABLE_TOOLS")
+        if enable_tools_env is not None:
+            enable_tools = enable_tools_env == "1"
+        else:
+            # Default: disable tools for moonshot until tool-call reasoning is stable
+            enable_tools = TOOLS_AVAILABLE and self.provider != "moonshot"
+
+        if enable_tools and TOOLS_AVAILABLE:
             try:
                 registry = create_default_registry()
                 # Use "human_operator" permissions for the core agent to give full access
@@ -128,6 +174,8 @@ class AgnoDharmicAgent:
                 logger.info(f"Loaded {len(self.tools)} tools from registry")
             except Exception as e:
                 logger.warning(f"Failed to load tools: {e}")
+        elif not enable_tools:
+            logger.info("Tools disabled for this session")
 
         # Create Agno agent with full features
         self.agent = Agent(
@@ -155,7 +203,7 @@ class AgnoDharmicAgent:
             markdown=True,
         )
 
-        logger.info(f"AgnoDharmicAgent initialized: {name} with model {model}")
+        logger.info(f"AgnoDharmicAgent initialized: {name} with {self.provider}/{self.model_id}")
 
     def _build_instructions(self) -> List[str]:
         """Build agent instructions from telos and strange memory."""

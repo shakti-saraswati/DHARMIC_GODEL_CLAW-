@@ -169,6 +169,15 @@ def render_status_panel() -> Panel:
     # Proxy status
     table.add_row("Proxy", get_proxy_status())
 
+    # Chat backend
+    backend = os.getenv("DGC_TUI_PROVIDER") or os.getenv("DHARMIC_MODEL_PROVIDER") or ("moonshot" if os.getenv("MOONSHOT_API_KEY") else "proxy")
+    model_id = os.getenv("DGC_TUI_MODEL") or os.getenv("DHARMIC_MOONSHOT_MODEL") or ("kimi-k2.5" if backend == "moonshot" else "")
+    table.add_row("Chat", f"{backend}{(' / ' + model_id) if model_id else ''}")
+    tools_flag = os.getenv("DGC_ENABLE_TOOLS")
+    if tools_flag is None:
+        tools_flag = "auto"
+    table.add_row("Tools", tools_flag)
+
     # Memory stats
     mem = get_memory_stats()
     total_entries = sum(m["entries"] for m in mem.values())
@@ -237,7 +246,15 @@ def run_agent(message: str, session_id: str = "tui") -> str:
     """Run message through DGC agent."""
     try:
         from agno_agent import AgnoDharmicAgent
-        agent = AgnoDharmicAgent()
+        # Prefer Moonshot/Kimi when MOONSHOT_API_KEY is set
+        provider = os.getenv("DGC_TUI_PROVIDER") or os.getenv("DHARMIC_MODEL_PROVIDER")
+        model_id = os.getenv("DGC_TUI_MODEL") or os.getenv("DHARMIC_MOONSHOT_MODEL")
+        if not provider and os.getenv("MOONSHOT_API_KEY"):
+            provider = "moonshot"
+        if provider == "moonshot" and not model_id:
+            model_id = "kimi-k2.5"
+
+        agent = AgnoDharmicAgent(model=model_id, provider=provider)
         response = agent.run(message, session_id=session_id)
         return response
     except Exception as e:
