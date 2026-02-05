@@ -1,0 +1,181 @@
+#!/usr/bin/env python3
+"""
+🔒 DHARMIC PRE-COMMIT HOOK — Real Security Gates
+=================================================
+
+Runs core security gates before every commit:
+- AHIMSA: bandit security scan
+- SECRETS: hardcoded key detection
+- VULNERABILITY: dependency audit (if requirements changed)
+
+Blocks commit if HIGH severity issues found.
+Warns but allows commit for MEDIUM/LOW issues.
+
+Install:
+    cp scripts/pre-commit-gates .git/hooks/pre-commit
+    chmod +x .git/hooks/pre-commit
+
+Or use the install script:
+    python scripts/install-pre-commit.py
+
+JSCA! 🔒
+"""
+
+import subprocess
+import sys
+from pathlib import Path
+
+# Add src to path for imports
+repo_root = Path(__file__).parent.parent
+sys.path.insert(0, str(repo_root))
+
+try:
+    from src.core.cosmic_krishna_coder.gates import (
+        check_ahimsa,
+        check_secrets,
+        check_vulnerability,
+        GateStatus,
+    )
+    GATES_AVAILABLE = True
+except ImportError:
+    GATES_AVAILABLE = False
+
+
+def get_staged_python_files():
+    """Get list of staged Python files."""
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--name-only", "--diff-filter=ACM"],
+        capture_output=True,
+        text=True
+    )
+    files = result.stdout.strip().split("\n") if result.stdout.strip() else []
+    return [f for f in files if f.endswith(".py")]
+
+
+def get_staged_content(filepath):
+    """Get staged content of a file."""
+    result = subprocess.run(
+        ["git", "show", f":{filepath}"],
+        capture_output=True,
+        text=True
+    )
+    return result.stdout
+
+
+def run_fallback_checks(files, contents):
+    """Fallback checks if gates module not available."""
+    issues = []
+    
+    # Basic secret patterns
+    import re
+    secret_patterns = [
+        (r'AKIA[0-9A-Z]{16}', 'AWS Access Key'),
+        (r'sk-[a-zA-Z0-9]{48}', 'OpenAI API Key'),
+        (r'ghp_[a-zA-Z0-9]{36}', 'GitHub Token'),
+        (r'(?i)password\s*[=:]\s*["\'][^"\']+["\']', 'Hardcoded Password'),
+        (r'(?i)api[_-]?key\s*[=:]\s*["\'][^"\']{10,}["\']', 'API Key'),
+    ]
+    
+    for filepath, content in zip(files, contents):
+        for pattern, name in secret_patterns:
+            if re.search(pattern, content):
+                issues.append(f"SECRETS: {name} in {filepath}")
+    
+    # Basic dangerous patterns
+    dangerous = ["eval(", "exec(", "os.system(", "__import__"]
+    for filepath, content in zip(files, contents):
+        for d in dangerous:
+            if d in content:
+                issues.append(f"SECURITY: Dangerous pattern '{d}' in {filepath}")
+    
+    return issues
+
+
+def main():
+    print("🔒 DHARMIC PRE-COMMIT — Running Security Gates")
+    print("=" * 50)
+    
+    # Get staged Python files
+    staged_files = get_staged_python_files()
+    
+    if not staged_files:
+        print("✅ No Python files staged, skipping gates")
+        return 0
+    
+    print(f"📁 Checking {len(staged_files)} Python file(s)...")
+    
+    # Get content of staged files
+    staged_contents = [get_staged_content(f) for f in staged_files]
+    combined_code = "\n\n".join(staged_contents)
+    
+    # Track results
+    blocking_issues = []
+    warnings = []
+    
+    if GATES_AVAILABLE:
+        # Run real gates
+        print("\n🛡️ AHIMSA (Security Scan)...")
+        ahimsa_result = check_ahimsa(combined_code, staged_files)
+        if ahimsa_result.status == GateStatus.FAIL:
+            blocking_issues.append(f"AHIMSA: {ahimsa_result.message}")
+            if ahimsa_result.details.get("issues"):
+                for issue in ahimsa_result.details["issues"][:3]:
+                    print(f"   ❌ {issue.get('issue_text', 'Security issue')}")
+        elif ahimsa_result.status == GateStatus.WARN:
+            warnings.append(f"AHIMSA: {ahimsa_result.message}")
+        else:
+            print(f"   ✅ {ahimsa_result.message}")
+        
+        print("\n🔑 SECRETS (Hardcoded Keys)...")
+        secrets_result = check_secrets(combined_code, staged_files)
+        if secrets_result.status == GateStatus.FAIL:
+            blocking_issues.append(f"SECRETS: {secrets_result.message}")
+            if secrets_result.details.get("secrets"):
+                for secret in secrets_result.details["secrets"][:3]:
+                    print(f"   ❌ {secret.get('type', 'Secret')}: {secret.get('redacted', '***')}")
+        elif secrets_result.status == GateStatus.WARN:
+            warnings.append(f"SECRETS: {secrets_result.message}")
+        else:
+            print(f"   ✅ {secrets_result.message}")
+        
+        # Check if requirements files changed
+        req_files = [f for f in staged_files if "requirements" in f.lower()]
+        if req_files:
+            print("\n📦 VULNERABILITY (Dependencies)...")
+            for req_file in req_files:
+                content = get_staged_content(req_file)
+                vuln_result = check_vulnerability(content, [req_file])
+                if vuln_result.status == GateStatus.FAIL:
+                    blocking_issues.append(f"VULNERABILITY: {vuln_result.message}")
+                elif vuln_result.status == GateStatus.WARN:
+                    warnings.append(f"VULNERABILITY: {vuln_result.message}")
+                else:
+                    print(f"   ✅ {vuln_result.message}")
+    else:
+        # Fallback to basic checks
+        print("\n⚠️  Gates module not available, using fallback checks...")
+        fallback_issues = run_fallback_checks(staged_files, staged_contents)
+        blocking_issues.extend(fallback_issues)
+    
+    # Report results
+    print("\n" + "=" * 50)
+    
+    if blocking_issues:
+        print("❌ COMMIT BLOCKED — Security issues found:")
+        for issue in blocking_issues:
+            print(f"   • {issue}")
+        print("\nFix these issues before committing.")
+        print("To bypass (NOT RECOMMENDED): git commit --no-verify")
+        return 1
+    
+    if warnings:
+        print("⚠️  WARNINGS (commit allowed):")
+        for warning in warnings:
+            print(f"   • {warning}")
+    
+    print("✅ All security gates passed!")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

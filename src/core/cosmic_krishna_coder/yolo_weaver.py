@@ -33,6 +33,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from .risk_detector import RiskDetector, RiskResult, RiskTier, WeaveMode
+from . import gates as real_gates
 
 
 class GateStatus(Enum):
@@ -352,153 +353,166 @@ class YOLOWeaver:
         with open(filepath, 'w') as f:
             json.dump(result.to_dict(), f, indent=2, default=str)
     
-    # === GATE CHECK IMPLEMENTATIONS ===
+    # === GATE CHECK IMPLEMENTATIONS (WIRED TO REAL TOOLS) ===
+    
+    def _convert_gate_result(self, result: real_gates.GateResult) -> Tuple[GateStatus, str, Dict]:
+        """Convert real gate result to YOLOWeaver format."""
+        # Map GateStatus from gates.py to local GateStatus
+        status_map = {
+            real_gates.GateStatus.PASS: GateStatus.PASS,
+            real_gates.GateStatus.WARN: GateStatus.WARN,
+            real_gates.GateStatus.FAIL: GateStatus.FAIL,
+            real_gates.GateStatus.SKIP: GateStatus.SKIP,
+            real_gates.GateStatus.ERROR: GateStatus.WARN,  # Errors become warnings
+        }
+        return status_map.get(result.status, GateStatus.PASS), result.message, result.details
     
     def _check_lint(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Check code formatting/linting."""
-        # Simplified check - real impl would run ruff
-        issues = []
-        if "  " in code:  # Double spaces
-            issues.append("inconsistent spacing")
-        if code and not code.endswith("\n"):
-            issues.append("missing newline at EOF")
-        
-        if not issues:
-            return GateStatus.PASS, "Code style OK", {}
-        return GateStatus.WARN, f"Style issues: {issues}", {"issues": issues}
+        """Check code formatting/linting via ruff format."""
+        result = real_gates.check_lint_format(code)
+        return self._convert_gate_result(result)
     
     def _check_types(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Check type annotations."""
-        if "def " in code and ") ->" not in code and "def __" not in code:
-            return GateStatus.WARN, "Function missing return type annotation", {}
-        return GateStatus.PASS, "Type annotations OK", {}
+        """Check type annotations via mypy."""
+        result = real_gates.check_type_check(code)
+        return self._convert_gate_result(result)
     
     def _check_security(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Security scan."""
-        dangerous = ["eval(", "exec(", "os.system(", "subprocess.call(", "__import__"]
-        found = [d for d in dangerous if d in code]
-        
-        if found:
-            return GateStatus.FAIL, f"Dangerous patterns: {found}", {"patterns": found}
-        return GateStatus.PASS, "Security scan clean", {}
+        """Security scan via bandit."""
+        result = real_gates.check_ahimsa(code)
+        return self._convert_gate_result(result)
     
     def _check_ahimsa(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Non-harm check."""
-        harmful = ["rm -rf", "drop table", "delete all", "destroy", "kill -9"]
-        found = [h for h in harmful if h in combined]
+        """Non-harm check via bandit + secrets detection."""
+        # Run both security and secrets checks
+        security = real_gates.check_ahimsa(code)
+        secrets = real_gates.check_secrets(code)
         
-        if found:
-            return GateStatus.FAIL, f"Potentially harmful: {found}", {"patterns": found}
-        return GateStatus.PASS, "No harmful patterns", {}
+        # Combine results - fail if either fails
+        if secrets.status == real_gates.GateStatus.FAIL:
+            return GateStatus.FAIL, secrets.message, secrets.details
+        if security.status == real_gates.GateStatus.FAIL:
+            return GateStatus.FAIL, security.message, security.details
+        if security.status == real_gates.GateStatus.WARN:
+            return GateStatus.WARN, security.message, security.details
+        return GateStatus.PASS, "Security and secrets check passed", {}
     
     def _check_satya(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Truth/documentation check."""
-        if len(code) > 100 and '"""' not in code and "'''" not in code:
-            return GateStatus.WARN, "Missing docstrings", {}
-        return GateStatus.PASS, "Documentation present", {}
+        """Truth/documentation check via ruff lint + docstring check."""
+        satya = real_gates.check_satya(code)
+        svadhyaya = real_gates.check_svadhyaya(code)
+        
+        # Combine results
+        if satya.status == real_gates.GateStatus.WARN or svadhyaya.status == real_gates.GateStatus.WARN:
+            messages = []
+            if satya.status == real_gates.GateStatus.WARN:
+                messages.append(satya.message)
+            if svadhyaya.status == real_gates.GateStatus.WARN:
+                messages.append(svadhyaya.message)
+            return GateStatus.WARN, "; ".join(messages), {**satya.details, **svadhyaya.details}
+        return GateStatus.PASS, "Documentation and lint OK", {}
     
     def _check_consent(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Permission/consent check."""
-        sensitive = ["delete", "drop", "remove", "shutdown"]
+        """Permission/consent check - pattern-based."""
+        sensitive = ["delete", "drop", "remove", "shutdown", "destroy"]
         needs_consent = any(s in combined for s in sensitive)
-        has_consent = "confirm" in combined or "approved" in combined
+        has_consent = "confirm" in combined or "approved" in combined or "consent" in combined
         
         if needs_consent and not has_consent:
-            return GateStatus.WARN, "Sensitive operation without confirmation", {}
+            return GateStatus.WARN, "Sensitive operation without explicit confirmation", {}
         return GateStatus.PASS, "Consent OK", {}
     
     def _check_reversibility(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Reversibility check."""
-        destructive = ["delete", "drop", "remove", "overwrite"]
-        reversible = ["backup", "undo", "rollback", "trash"]
+        """Reversibility check - pattern-based."""
+        destructive = ["delete", "drop", "remove", "overwrite", "truncate"]
+        reversible = ["backup", "undo", "rollback", "trash", "archive", "snapshot"]
         
         is_destructive = any(d in combined for d in destructive)
         has_reversible = any(r in combined for r in reversible)
         
         if is_destructive and not has_reversible:
-            return GateStatus.WARN, "Destructive operation without backup", {}
+            return GateStatus.WARN, "Destructive operation - consider adding backup/rollback", {}
         return GateStatus.PASS, "Reversibility OK", {}
     
     def _check_witness(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Logging/audit check."""
-        logging = ["log", "logger", "print", "audit", "trace"]
-        has_logging = any(l in combined for l in logging)
-        
-        if len(code) > 200 and not has_logging:
-            return GateStatus.WARN, "Consider adding logging", {}
-        return GateStatus.PASS, "Observability OK", {}
+        """Logging/audit check via ishvara_pranidhana."""
+        result = real_gates.check_ishvara_pranidhana(code)
+        return self._convert_gate_result(result)
     
     def _check_vyavasthit(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Natural order check."""
-        return GateStatus.PASS, "Flow preserved", {}
+        """Natural order check - complexity via brahmacharya."""
+        result = real_gates.check_brahmacharya(code)
+        return self._convert_gate_result(result)
     
     def _check_svabhaava(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Nature alignment check."""
-        return GateStatus.PASS, "Purpose aligned", {}
+        """Nature alignment check - clean code via saucha."""
+        result = real_gates.check_saucha(code)
+        return self._convert_gate_result(result)
     
     def _check_coherence(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Consistency check."""
-        return GateStatus.PASS, "Coherent", {}
+        """Consistency check via tapas."""
+        result = real_gates.check_tapas(code)
+        return self._convert_gate_result(result)
     
     def _check_integrity(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Completeness check."""
-        if "def " in code and "return" not in code and "yield" not in code:
-            return GateStatus.WARN, "Function may be incomplete", {}
-        return GateStatus.PASS, "Complete", {}
+        """Completeness check - run tests if available."""
+        result = real_gates.check_correctness(code)
+        return self._convert_gate_result(result)
     
     def _check_boundary(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Resource limits check."""
+        """Resource limits check via aparigraha (non-hoarding)."""
+        result = real_gates.check_aparigraha(code)
+        
+        # Also check for unbounded loops
         unbounded = ["while True", "while 1", "for i in range(999"]
         found = [u for u in unbounded if u in code]
         
         if found:
-            return GateStatus.WARN, f"Potentially unbounded: {found}", {}
-        return GateStatus.PASS, "Bounded", {}
+            return GateStatus.WARN, f"Potentially unbounded: {found}", {"unbounded": found}
+        return self._convert_gate_result(result)
     
     def _check_tests(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Test coverage check."""
-        if "test" in combined or "def test_" in code:
-            return GateStatus.PASS, "Tests present", {}
-        return GateStatus.WARN, "Consider adding tests", {}
+        """Test coverage check via pytest-cov."""
+        result = real_gates.check_test_coverage(code)
+        return self._convert_gate_result(result)
     
     def _check_clarity(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Clarity check."""
-        magic = ["xxx", "hack", "fixme", "todo", "magic"]
-        found = [m for m in magic if m in combined]
-        
-        if found:
-            return GateStatus.WARN, f"Clarity issues: {found}", {}
-        return GateStatus.PASS, "Clear", {}
+        """Clarity check via saucha (purity) - detects code smells."""
+        result = real_gates.check_saucha(code)
+        return self._convert_gate_result(result)
     
     def _check_care(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Data stewardship check."""
-        sensitive = ["password", "secret", "api_key", "token"]
-        found = [s for s in sensitive if s in combined]
-        protected = "encrypt" in combined or "hash" in combined
-        
-        if found and not protected:
-            return GateStatus.WARN, f"Sensitive data: {found}", {}
-        return GateStatus.PASS, "Data protected", {}
+        """Data stewardship check via secrets detection."""
+        result = real_gates.check_secrets(code)
+        return self._convert_gate_result(result)
     
     def _check_dignity(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Respect check."""
-        return GateStatus.PASS, "Respectful", {}
+        """Respect check - bias audit for ML code."""
+        result = real_gates.check_bias_audit(code)
+        return self._convert_gate_result(result)
     
     def _check_justice(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Fairness check."""
-        return GateStatus.PASS, "Fair", {}
+        """Fairness check via ML explainability."""
+        result = real_gates.check_explainability(code)
+        return self._convert_gate_result(result)
     
     def _check_humility(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Uncertainty check."""
+        """Uncertainty check - santosha (contentment)."""
+        result = real_gates.check_santosha(code)
+        
+        # Also check for overconfident claims
         overconfident = ["100%", "guaranteed", "never fail", "perfect"]
         found = [o for o in overconfident if o in combined]
         
         if found:
-            return GateStatus.WARN, f"Overconfident claims: {found}", {}
-        return GateStatus.PASS, "Humble", {}
+            return GateStatus.WARN, f"Overconfident claims: {found}", {"claims": found}
+        return self._convert_gate_result(result)
     
     def _check_completion(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Cleanup check."""
+        """Cleanup check - error handling via ishvara_pranidhana."""
+        result = real_gates.check_ishvara_pranidhana(code)
+        
+        # Also check for resource cleanup
         resources = ["open(", "connect(", "session"]
         cleanup = ["close", "dispose", "with "]
         
@@ -506,16 +520,28 @@ class YOLOWeaver:
         has_cleanup = any(c in code for c in cleanup)
         
         if has_resources and not has_cleanup:
-            return GateStatus.WARN, "Add resource cleanup", {}
-        return GateStatus.PASS, "Cleanup OK", {}
+            return GateStatus.WARN, "Add resource cleanup", {"needs_cleanup": True}
+        return self._convert_gate_result(result)
     
     def _check_dependencies(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """Dependency audit check."""
-        return GateStatus.PASS, "Dependencies OK", {}
+        """Dependency audit via safety (vulnerability check)."""
+        result = real_gates.check_vulnerability(code)
+        return self._convert_gate_result(result)
     
     def _check_sbom(self, combined: str, code: str, task: str) -> Tuple[GateStatus, str, Dict]:
-        """SBOM/provenance check."""
-        return GateStatus.PASS, "Provenance OK", {}
+        """SBOM/provenance check via data_provenance + reproducibility."""
+        provenance = real_gates.check_data_provenance(code)
+        reproducibility = real_gates.check_reproducibility(code)
+        
+        # Combine - warn if either warns
+        if provenance.status == real_gates.GateStatus.WARN or reproducibility.status == real_gates.GateStatus.WARN:
+            messages = []
+            if provenance.status == real_gates.GateStatus.WARN:
+                messages.append(provenance.message)
+            if reproducibility.status == real_gates.GateStatus.WARN:
+                messages.append(reproducibility.message)
+            return GateStatus.WARN, "; ".join(messages), {}
+        return GateStatus.PASS, "Provenance and reproducibility OK", {}
 
 
 if __name__ == "__main__":

@@ -34,6 +34,14 @@ from .yolo_weaver import (
     GateStatus,
 )
 
+from . import gates
+from .gates import (
+    run_gate,
+    run_gates,
+    run_all_gates,
+    GATE_REGISTRY,
+)
+
 __all__ = [
     # Risk Detection
     "RiskDetector",
@@ -47,4 +55,10 @@ __all__ = [
     "WeaveResult",
     "GateResult",
     "GateStatus",
+    # Real Gates
+    "gates",
+    "run_gate",
+    "run_gates",
+    "run_all_gates",
+    "GATE_REGISTRY",
 ]
