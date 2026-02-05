@@ -1,74 +1,13 @@
 #!/bin/bash
-# DGC - Dharmic Gödel Claw launcher
-# Usage: ./dgc [command]
-#
-# Commands:
-#   (none)    - Launch TUI
-#   chat      - Quick chat mode
-#   status    - Show status
-#   swarm     - Run DGM swarm cycle
-#   moltbook  - Run Moltbook heartbeat
+# DGC - Terminal Entry Point
+# Usage: ./DGC TUI
 
-cd "$(dirname "$0")"
-source .venv/bin/activate 2>/dev/null || true
+COMMAND=$(echo "$1" | tr '[:lower:]' '[:upper:]')
 
-case "${1:-tui}" in
-    tui|"")
-        python3 src/core/dgc_tui.py
-        ;;
-    chat)
-        python3 -c "
-from src.core.agno_agent import AgnoDharmicAgent
-agent = AgnoDharmicAgent()
-print('DGC Chat (Ctrl+C to exit)')
-print()
-while True:
-    try:
-        msg = input('You: ')
-        if msg.strip():
-            print()
-            print('DGC:', agent.run(msg))
-            print()
-    except (KeyboardInterrupt, EOFError):
-        print()
-        break
-"
-        ;;
-    status)
-        python3 -c "
-from src.core.dgc_tui import get_memory_stats, get_swarm_status, get_moltbook_status, get_proxy_status
-print('DGC Status')
-print('=' * 40)
-print(f'Proxy: {get_proxy_status()}')
-mem = get_memory_stats()
-total = sum(m['entries'] for m in mem.values())
-print(f'Memory: {total} entries')
-swarm = get_swarm_status()
-print(f'Swarm: fitness {swarm[\"fitness\"]:.2f} ({swarm[\"cycles\"]} cycles)')
-molt = get_moltbook_status()
-print(f'Moltbook: {molt[\"our_comments\"]} comments')
-"
-        ;;
-    swarm)
-        shift
-        mode=""
-        if [[ "${1:-}" == "--live" || "${1:-}" == "--dry-run" ]]; then
-            mode="$1"
-            shift
-        else
-            if [[ "${DGC_ALLOW_LIVE:-}" == "1" ]]; then
-                mode="--live"
-            else
-                mode="--dry-run"
-            fi
-        fi
-        python3 -m swarm.run_swarm --cycles 1 "$mode" "$@"
-        ;;
-    moltbook)
-        python3 src/core/moltbook_heartbeat.py --once
-        ;;
-    *)
-        echo "Usage: dgc [tui|chat|status|swarm|moltbook]"
-        exit 1
-        ;;
-esac
+if [ "$COMMAND" == "TUI" ]; then
+    export DGC_GOD_MODE=1
+    export PYTHONPATH="/Users/dhyana/DHARMIC_GODEL_CLAW"
+    python3 /Users/dhyana/DHARMIC_GODEL_CLAW/src/core/dgc_tui.py
+else
+    echo "Usage: ./DGC TUI"
+fi

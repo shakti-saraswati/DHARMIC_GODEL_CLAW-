@@ -182,6 +182,8 @@ def render_status_panel() -> Panel:
     if tools_flag is None:
         tools_flag = "auto"
     table.add_row("Tools", tools_flag)
+    live_flag = "ON" if os.getenv("DGC_ALLOW_LIVE") == "1" else "OFF"
+    table.add_row("Live", live_flag)
 
     # Memory stats
     mem = get_memory_stats()
@@ -231,7 +233,7 @@ def render_help_panel() -> Panel:
     """Render help panel."""
     help_text = """[bold]Commands:[/bold]
   [cyan]/status[/cyan]    - Show detailed status
-  [cyan]/swarm[/cyan]     - Run swarm cycle (default: live if DGC_ALLOW_LIVE=1)
+  [cyan]/swarm[/cyan]     - Run swarm cycle (default: live if DGC_ALLOW_LIVE=1; use /swarm --live)
   [cyan]/gates[/cyan]     - Run 17-gate protocol (dry-run default)
   [cyan]/skills[/cyan]    - Verify skill registry
   [cyan]/openclaw[/cyan]  - Show OpenClaw config summary

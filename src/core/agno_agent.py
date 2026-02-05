@@ -176,6 +176,11 @@ class AgnoDharmicAgent:
             # CRITICAL: Disabling tools breaks core functionality
             enable_tools = TOOLS_AVAILABLE
 
+        # Moonshot tool calls are opt-in to avoid reasoning/tool-call schema failures.
+        if self.provider == "moonshot" and enable_tools and os.getenv("DGC_MOONSHOT_TOOL_CALLS") != "1":
+            logger.warning("Moonshot tools disabled (set DGC_MOONSHOT_TOOL_CALLS=1 to enable)")
+            enable_tools = False
+
         if enable_tools:
             try:
                 # Try PSMV registry first
