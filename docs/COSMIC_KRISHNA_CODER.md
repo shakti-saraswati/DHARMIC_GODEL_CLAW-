@@ -28,8 +28,8 @@ memorable, visible, and non‑bypassable.
 
 ## Shared skill install (team setup)
 
-Shared skill root (local):
-`/Users/dhyana/skills-shared`
+Shared skill root (team-wide):
+`/Users/Shared/skills-shared`
 
 Install symlinks for any user:
 ```bash

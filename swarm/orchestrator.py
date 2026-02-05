@@ -28,6 +28,7 @@ import asyncio
 import json
 import logging
 import time
+import os
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Any
 from enum import Enum
@@ -70,6 +71,13 @@ try:
     FILE_LOCK_AVAILABLE = True
 except ImportError:
     FILE_LOCK_AVAILABLE = False
+
+# Gate runner (Cosmic Krishna Coder)
+try:
+    from .run_gates import GateRunner
+    GATE_RUNNER_AVAILABLE = True
+except ImportError:
+    GATE_RUNNER_AVAILABLE = False
 
 
 class WorkflowState(Enum):
@@ -154,6 +162,18 @@ class SwarmOrchestrator:
                 self.logger.info(f"Enforcement enabled - {status['daily_proposals']}/{status['daily_limit']} proposals today, ${status['daily_cost_usd']:.2f} spent")
             except Exception as e:
                 self.logger.warning(f"Enforcement init failed: {e}")
+
+    def _run_cosmic_gates(self, proposal_id: str, dry_run: bool = False):
+        """Run the Cosmic Krishna Coder gate runner."""
+        if not GATE_RUNNER_AVAILABLE:
+            self.logger.warning("Gate runner unavailable; skipping Cosmic Krishna Coder gates")
+            return None
+        try:
+            runner = GateRunner()
+            return runner.run_all_gates(proposal_id=proposal_id, dry_run=dry_run)
+        except Exception as e:
+            self.logger.error(f"Gate runner failed: {e}")
+            return None
 
     def get_research_context(self) -> str:
         """Get mech-interp research context for proposals."""
@@ -613,6 +633,41 @@ class SwarmOrchestrator:
                 },
             )
 
+            # Phase 6: Cosmic Krishna Coder gates (non-bypassable for live runs)
+            gate_result = None
+            live_allowed = os.getenv("DGC_ALLOW_LIVE") == "1"
+            force_gates = os.getenv("DGC_FORCE_GATES") == "1"
+            if test_result.passed and (live_allowed or force_gates):
+                self.logger.info("Starting Cosmic Krishna Coder gate runner")
+                gate_result = self._run_cosmic_gates(
+                    proposal_id=proposal_id,
+                    dry_run=not live_allowed
+                )
+                if gate_result is None:
+                    if self.enforcer:
+                        self.enforcer.record_proposal(proposal_id, success=False)
+                    return WorkflowResult(
+                        state=WorkflowState.FAILED,
+                        files_changed=implementation.files_changed,
+                        tests_passed=test_result.passed,
+                        error_message="Gate runner failed or unavailable",
+                    )
+                if gate_result.overall_result == "FAIL":
+                    if self.enforcer:
+                        self.enforcer.record_proposal(proposal_id, success=False)
+                    return WorkflowResult(
+                        state=WorkflowState.FAILED,
+                        files_changed=implementation.files_changed,
+                        tests_passed=test_result.passed,
+                        error_message="Gate runner reported FAIL",
+                        metrics={
+                            "gate_overall": gate_result.overall_result,
+                            "gate_evidence_hash": gate_result.evidence_bundle_hash,
+                            "gates_failed": gate_result.gates_failed,
+                            "gates_warned": gate_result.gates_warned,
+                        }
+                    )
+
             result = WorkflowResult(
                 state=WorkflowState.COMPLETED if test_result.passed else WorkflowState.FAILED,
                 files_changed=implementation.files_changed,
@@ -623,7 +678,11 @@ class SwarmOrchestrator:
                     "proposals_approved": len(approved_proposals),
                     "files_modified": len(implementation.files_changed),
                     "tests_run": test_result.tests_run,
-                    "evaluation_score": evaluation.overall_score
+                    "evaluation_score": evaluation.overall_score,
+                    "gate_overall": gate_result.overall_result if gate_result else "skipped",
+                    "gate_evidence_hash": gate_result.evidence_bundle_hash if gate_result else "",
+                    "gates_failed": gate_result.gates_failed if gate_result else 0,
+                    "gates_warned": gate_result.gates_warned if gate_result else 0,
                 }
             )
             

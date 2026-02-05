@@ -20,6 +20,36 @@ skills:
     last_verified: "2026-02-05"
     owner: "shakti"
 
+  - id: dgc-tui
+    path: ~/.claude/skills/dgc-tui/SKILL.md
+    sha256: "b23663a15166b363f0194e3fd488a5afc1ab158dad7cb312fb0cf4c69412dc8b"
+    purpose: "Unified DGC terminal UI operations"
+    iteration_triggers:
+      - "TUI command surface changed"
+      - "New status panels added"
+    last_verified: "2026-02-05"
+    owner: "shakti"
+
+  - id: dgc-bridge
+    path: ~/.claude/skills/dgc-bridge/SKILL.md
+    sha256: "4b4c43b28e36a45cd1267f6f85b6137e788442903654dffbfb9c6c2e9617ba1c"
+    purpose: "Queue tasks for Codex CLI via DGC bridge"
+    iteration_triggers:
+      - "Bridge queue format changes"
+      - "Codex CLI integration updated"
+    last_verified: "2026-02-05"
+    owner: "shakti"
+
+  - id: dgc
+    path: ~/.claude/skills/dgc/SKILL.md
+    sha256: "c85c9b6ea4908bb1a2c0078fd4aea7bf96c72c2a062bcd4789e2b536dc59aaab"
+    purpose: "Operate DHARMIC_GODEL_CLAW core systems and swarm"
+    iteration_triggers:
+      - "Core architecture changes"
+      - "Swarm workflow changes"
+    last_verified: "2026-02-05"
+    owner: "shakti"
+
   - id: dharmic-coding-protocol
     path: ~/.claude/skills/dharmic-coding-protocol/SKILL.md
     sha256: "d4369c73fb3e8a988b31c4ac5d72b4a43ac8c57173b1a0aeda6e6c60c19592ad"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SHARED_ROOT="/Users/dhyana/skills-shared"
+SHARED_ROOT="/Users/Shared/skills-shared"
 SKILLS=("cosmic-krishna-coder" "dgc-tui" "dgc-bridge" "dgc")
 
 if [[ ! -d "$SHARED_ROOT" ]]; then
