@@ -79,6 +79,13 @@ try:
 except ImportError:
     GATE_RUNNER_AVAILABLE = False
 
+# YOLO-Gate Weaver integration
+try:
+    from .yolo_gate_integration import YOLOGateIntegration
+    YOLO_GATE_AVAILABLE = True
+except ImportError:
+    YOLO_GATE_AVAILABLE = False
+
 
 class WorkflowState(Enum):
     """Workflow execution states."""
@@ -162,6 +169,15 @@ class SwarmOrchestrator:
                 self.logger.info(f"Enforcement enabled - {status['daily_proposals']}/{status['daily_limit']} proposals today, ${status['daily_cost_usd']:.2f} spent")
             except Exception as e:
                 self.logger.warning(f"Enforcement init failed: {e}")
+        
+        # Initialize YOLO-Gate Weaver for intelligent routing
+        self.yolo_gate = None
+        if YOLO_GATE_AVAILABLE:
+            try:
+                self.yolo_gate = YOLOGateIntegration(dry_run=True)  # Safe default
+                self.logger.info("YOLO-Gate Weaver initialized - intelligent routing available")
+            except Exception as e:
+                self.logger.warning(f"YOLO-Gate Weaver init failed: {e}")
 
     def _run_cosmic_gates(self, proposal_id: str, dry_run: bool = False):
         """Run the Cosmic Krishna Coder gate runner."""
@@ -790,6 +806,119 @@ class SwarmOrchestrator:
             "max_cycles": self.max_cycles,
             **self.get_workflow_status()
         }
+
+    async def execute_with_cosmic_weaver(
+        self,
+        target_area: Optional[str] = None,
+        task_description: Optional[str] = None,
+        use_yolo_weaver: bool = True
+    ) -> WorkflowResult:
+        """
+        Execute improvement cycle with Cosmic Krishna Coder (YOLO-Gate Weaver).
+        
+        This method routes through the YOLO-Gate Weaver for intelligent
+        security enforcement. It replaces the standard execute_improvement_cycle
+        when use_yolo_weaver=True.
+        
+        Args:
+            target_area: Directory or file to improve
+            task_description: Human-readable description of the task
+            use_yolo_weaver: If True, use YOLO-Gate Weaver routing
+            
+        Returns:
+            WorkflowResult with execution status
+        """
+        if not use_yolo_weaver or not self.yolo_gate:
+            # Fall back to standard execution
+            return await self.execute_improvement_cycle(target_area)
+        
+        self.logger.info("🔥 Executing with Cosmic Krishna Coder (YOLO-Gate Weaver)")
+        
+        # Get files that would be modified
+        files = self._get_target_files(target_area)
+        
+        # Execute with YOLO-Gate Weaver
+        weaver_result = await self.yolo_gate.execute_with_weaver(
+            task=task_description or f"Improve {target_area}",
+            files=files,
+            target_area=target_area
+        )
+        
+        # Convert WeaverResult to WorkflowResult
+        state_map = {
+            "committed": WorkflowState.COMPLETED,
+            "escalated": WorkflowState.FAILED,
+            "needs_revision": WorkflowState.FAILED,
+            "pending_approval": WorkflowState.EVALUATING,
+            "failed": WorkflowState.FAILED
+        }
+        
+        # Create archive entry if successful
+        evolution_id = None
+        if weaver_result.status == "committed" and self.archive:
+            try:
+                from src.dgm.archive import EvolutionEntry, FitnessScore
+                
+                fitness = FitnessScore(
+                    correctness=1.0 if weaver_result.overseer_approved else 0.5,
+                    dharmic_alignment=0.8,
+                    elegance=0.7,
+                    efficiency=0.7,
+                    safety=0.9 if not weaver_result.gate_violations else 0.5
+                )
+                
+                entry = EvolutionEntry(
+                    id="",
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                    parent_id=self._last_evolution_id,
+                    component=target_area or "unknown",
+                    change_type="weaver_improvement",
+                    description=task_description or f"YOLO-Gate Weaver improvement",
+                    diff="",  # Could capture actual diff
+                    fitness=fitness,
+                    test_results={
+                        "passed": weaver_result.overseer_approved,
+                        "files_changed": weaver_result.files_changed
+                    },
+                    gates_passed=[],  # Could extract from evidence bundle
+                    gates_failed=weaver_result.gate_violations,
+                    agent_id="cosmic_weaver",
+                    model=self.model,
+                    status="applied" if weaver_result.status == "committed" else "proposed"
+                )
+                
+                evolution_id = self.archive.add_entry(entry)
+                self._last_evolution_id = evolution_id
+                
+            except Exception as e:
+                self.logger.error(f"Failed to create evolution entry: {e}")
+        
+        return WorkflowResult(
+            state=state_map.get(weaver_result.status, WorkflowState.FAILED),
+            files_changed=weaver_result.files_changed,
+            tests_passed=(weaver_result.status == "committed"),
+            error_message=weaver_result.error_message,
+            metrics={
+                "risk_score": weaver_result.risk_score,
+                "yolo_confidence": weaver_result.yolo_confidence,
+                "overseer_approved": weaver_result.overseer_approved,
+                "gate_violations": weaver_result.gate_violations,
+                "mode": weaver_result.evidence_bundle.get("mode", "unknown")
+            },
+            evolution_id=evolution_id
+        )
+    
+    def _get_target_files(self, target_area: Optional[str]) -> List[str]:
+        """Get list of files in target area."""
+        if not target_area:
+            return []
+        
+        target_path = Path(target_area)
+        if target_path.is_file():
+            return [str(target_path)]
+        elif target_path.is_dir():
+            return [str(f) for f in target_path.rglob("*.py")][:20]  # Limit to 20 files
+        return []
 
     async def run_cycles(
         self,
