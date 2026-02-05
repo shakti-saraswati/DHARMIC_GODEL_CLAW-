@@ -633,11 +633,11 @@ class SwarmOrchestrator:
                 },
             )
 
-            # Phase 6: Cosmic Krishna Coder gates (non-bypassable for live runs)
+            # Phase 6: Cosmic Krishna Coder gates (run even if tests fail)
             gate_result = None
             live_allowed = os.getenv("DGC_ALLOW_LIVE") == "1"
             force_gates = os.getenv("DGC_FORCE_GATES") == "1"
-            if test_result.passed and (live_allowed or force_gates):
+            if live_allowed or force_gates:
                 self.logger.info("Starting Cosmic Krishna Coder gate runner")
                 gate_result = self._run_cosmic_gates(
                     proposal_id=proposal_id,
@@ -661,6 +661,7 @@ class SwarmOrchestrator:
                         tests_passed=test_result.passed,
                         error_message="Gate runner reported FAIL",
                         metrics={
+                            "tests_failed_pre_gate": not test_result.passed,
                             "gate_overall": gate_result.overall_result,
                             "gate_evidence_hash": gate_result.evidence_bundle_hash,
                             "gates_failed": gate_result.gates_failed,
@@ -679,6 +680,7 @@ class SwarmOrchestrator:
                     "files_modified": len(implementation.files_changed),
                     "tests_run": test_result.tests_run,
                     "evaluation_score": evaluation.overall_score,
+                    "tests_failed_pre_gate": not test_result.passed,
                     "gate_overall": gate_result.overall_result if gate_result else "skipped",
                     "gate_evidence_hash": gate_result.evidence_bundle_hash if gate_result else "",
                     "gates_failed": gate_result.gates_failed if gate_result else 0,
