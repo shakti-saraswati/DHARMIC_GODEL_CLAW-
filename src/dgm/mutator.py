@@ -9,6 +9,7 @@ can then be voted on by the dharmic gates before application.
 Safety: Never proposes changes to secrets, credentials, or .env files.
 """
 import subprocess
+import sys
 import json
 import re
 from pathlib import Path
@@ -16,6 +17,18 @@ from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
 
 from .archive import EvolutionEntry, FitnessScore
+
+# Security integration for subprocess calls
+SRC_CORE = Path(__file__).parent.parent / "core"
+if str(SRC_CORE) not in sys.path:
+    sys.path.insert(0, str(SRC_CORE))
+try:
+    from dharmic_security import ExecGuard
+    EXEC_GUARD = ExecGuard(allowed_bins=["clawdbot"])
+    SECURITY_AVAILABLE = True
+except Exception:
+    EXEC_GUARD = None
+    SECURITY_AVAILABLE = False
 
 # Import logging with fallback for test compatibility
 try:
@@ -333,18 +346,27 @@ Remember: Smaller, safer changes are better than ambitious rewrites.
         """
         try:
             # Use clawdbot CLI to call Claude
-            result = subprocess.run(
-                [
-                    self.clawdbot_path,
-                    "ask",
-                    "--model", self.model,
-                    "--no-stream",
-                    prompt,
-                ],
-                capture_output=True,
-                text=True,
-                timeout=self.timeout,
-            )
+            cmd = [
+                self.clawdbot_path,
+                "ask",
+                "--model", self.model,
+                "--no-stream",
+                prompt,
+            ]
+            if SECURITY_AVAILABLE and EXEC_GUARD:
+                result = EXEC_GUARD.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout,
+                )
+            else:
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout,
+                )
             
             if result.returncode != 0:
                 logger.error("Claude call failed", context={

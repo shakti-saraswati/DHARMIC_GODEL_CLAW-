@@ -50,7 +50,19 @@ print(f'Moltbook: {molt[\"our_comments\"]} comments')
 "
         ;;
     swarm)
-        python3 swarm/run_swarm.py --cycles 1 ${2:---dry-run}
+        shift
+        mode=""
+        if [[ "${1:-}" == "--live" || "${1:-}" == "--dry-run" ]]; then
+            mode="$1"
+            shift
+        else
+            if [[ "${DGC_ALLOW_LIVE:-}" == "1" ]]; then
+                mode="--live"
+            else
+                mode="--dry-run"
+            fi
+        fi
+        python3 -m swarm.run_swarm --cycles 1 "$mode" "$@"
         ;;
     moltbook)
         python3 src/core/moltbook_heartbeat.py --once

@@ -22,6 +22,7 @@ Usage:
 import os
 import subprocess
 import hashlib
+import sys
 from pathlib import Path
 from datetime import datetime, timezone
 from dataclasses import dataclass, field
@@ -31,6 +32,18 @@ from .archive import Archive, EvolutionEntry, FitnessScore, get_archive
 
 # Dharmic structured logging
 from src.core.dharmic_logging import get_logger
+
+# Security integration for subprocess calls
+SRC_CORE = Path(__file__).parent.parent / "core"
+if str(SRC_CORE) not in sys.path:
+    sys.path.insert(0, str(SRC_CORE))
+try:
+    from dharmic_security import ExecGuard
+    EXEC_GUARD = ExecGuard(allowed_bins=["git", "python3", "pytest"])
+    SECURITY_AVAILABLE = True
+except Exception:
+    EXEC_GUARD = None
+    SECURITY_AVAILABLE = False
 
 logger = get_logger("dgm_auto_push")
 
@@ -499,13 +512,23 @@ Dharmic-gates: {gates_list}
             return True
         
         try:
-            result = subprocess.run(
-                ["python3", "-m", "pytest", "tests/", "-x", "-q"],
-                cwd=self.project_root,
-                capture_output=True,
-                text=True,
-                timeout=300,  # 5 minute timeout
-            )
+            cmd = ["python3", "-m", "pytest", "tests/", "-x", "-q"]
+            if SECURITY_AVAILABLE and EXEC_GUARD:
+                result = EXEC_GUARD.run(
+                    cmd,
+                    cwd=self.project_root,
+                    capture_output=True,
+                    text=True,
+                    timeout=300,  # 5 minute timeout
+                )
+            else:
+                result = subprocess.run(
+                    cmd,
+                    cwd=self.project_root,
+                    capture_output=True,
+                    text=True,
+                    timeout=300,  # 5 minute timeout
+                )
             passed = result.returncode == 0
             
             if not passed:
@@ -534,12 +557,21 @@ Dharmic-gates: {gates_list}
             return True
         
         try:
-            result = subprocess.run(
-                ["git", "status", "--porcelain"],
-                cwd=self.project_root,
-                capture_output=True,
-                text=True,
-            )
+            cmd = ["git", "status", "--porcelain"]
+            if SECURITY_AVAILABLE and EXEC_GUARD:
+                result = EXEC_GUARD.run(
+                    cmd,
+                    cwd=self.project_root,
+                    capture_output=True,
+                    text=True,
+                )
+            else:
+                result = subprocess.run(
+                    cmd,
+                    cwd=self.project_root,
+                    capture_output=True,
+                    text=True,
+                )
             
             if not result.stdout.strip():
                 return True  # No changes at all
@@ -618,44 +650,84 @@ Dharmic-gates: {gates_list}
     
     def _git_add(self, files: List[str]) -> None:
         """Stage files for commit."""
-        subprocess.run(
-            ["git", "add"] + files,
-            cwd=self.project_root,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+        cmd = ["git", "add"] + files
+        if SECURITY_AVAILABLE and EXEC_GUARD:
+            EXEC_GUARD.run(
+                cmd,
+                cwd=self.project_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        else:
+            subprocess.run(
+                cmd,
+                cwd=self.project_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
     
     def _git_commit(self, message: str) -> str:
         """Create git commit and return SHA."""
-        subprocess.run(
-            ["git", "commit", "-m", message],
-            cwd=self.project_root,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+        cmd = ["git", "commit", "-m", message]
+        if SECURITY_AVAILABLE and EXEC_GUARD:
+            EXEC_GUARD.run(
+                cmd,
+                cwd=self.project_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        else:
+            subprocess.run(
+                cmd,
+                cwd=self.project_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
         
         # Get commit SHA
-        result = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=self.project_root,
-            capture_output=True,
-            text=True,
-            check=True,
-        )
+        cmd = ["git", "rev-parse", "HEAD"]
+        if SECURITY_AVAILABLE and EXEC_GUARD:
+            result = EXEC_GUARD.run(
+                cmd,
+                cwd=self.project_root,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+        else:
+            result = subprocess.run(
+                cmd,
+                cwd=self.project_root,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
         
         return result.stdout.strip()
     
     def _git_push(self, branch: str) -> None:
         """Push to remote."""
-        subprocess.run(
-            ["git", "push", self.remote, branch],
-            cwd=self.project_root,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+        cmd = ["git", "push", self.remote, branch]
+        if SECURITY_AVAILABLE and EXEC_GUARD:
+            EXEC_GUARD.run(
+                cmd,
+                cwd=self.project_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        else:
+            subprocess.run(
+                cmd,
+                cwd=self.project_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
 
 
 # -----------------------------------------------------------------------------

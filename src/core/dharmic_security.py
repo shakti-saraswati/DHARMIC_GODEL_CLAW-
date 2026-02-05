@@ -153,6 +153,7 @@ class ExecGuard:
         "pytest",
         # Optional CLIs
         "claude",
+        "clawdbot",
         "node",
         "npm",
         "curl",
@@ -161,9 +162,32 @@ class ExecGuard:
     # Dangerous chars to flag in arguments if not strictly controlled
     DANGEROUS_CHARS = set(";&|><$`")
     
+    # Expanded allowlist for "God Mode" (OpenClaw parity)
+    GOD_MODE_BINARIES = {
+        # Shells
+        "bash", "sh", "zsh",
+        # File Ops
+        "cp", "mv", "rm", "mkdir", "rmdir", "touch", "chmod", "chown", "ln", "tar", "zip", "unzip",
+        # Editors/Viewers
+        "vi", "vim", "nano", "head", "tail", "less", "more", "wc", "sed", "awk", "diff",
+        # Network
+        "curl", "wget", "ssh", "scp", "ping", "dig", "nslookup", "netstat", "lsof",
+        # Dev Tools
+        "npm", "node", "npx", "pip", "pip3", "poetry", "docker", "docker-compose", "make", "cmake",
+        "gcc", "g++", "cargo", "go", "rustc",
+        # System
+        "ps", "kill", "top", "htop", "df", "du", "free", "uname", "whoami", "id", "env"
+    }
+
     def __init__(self, allowed_bins: Optional[List[str]] = None):
+        import os
         if allowed_bins:
             self.SAFE_BINARIES.update(allowed_bins)
+            
+        self.god_mode = os.getenv("DGC_GOD_MODE") == "1"
+        if self.god_mode:
+            self.SAFE_BINARIES.update(self.GOD_MODE_BINARIES)
+            logger.warning("ExecGuard: GOD MODE ENABLED - Expanded binary allowlist active")
             
     def validate_command(self, args: Union[List[str], str], shell: bool = False) -> bool:
         """
@@ -190,16 +214,17 @@ class ExecGuard:
             # Allow only if the binary itself is allowlisted.
             # For bash/sh, require -c or -lc to avoid interactive shells.
             if binary in {"bash", "sh"}:
-                if not any(flag in cmd_list for flag in ("-c", "-lc")):
+                if not any(flag in cmd_list for flag in ("-c", "-lc")) and not self.god_mode:
                     logger.warning("ExecGuard: shell allowed but missing -c/-lc")
             logger.info(f"ExecGuard: Allowed shell command: {cmd_list}")
             return True
 
-        # 4. Non-shell argument safety checks
-        for arg in cmd_list[1:]:
-            if any(ch in arg for ch in self.DANGEROUS_CHARS):
-                logger.warning(f"ExecGuard: Blocked dangerous arg '{arg}'")
-                return False
+        # 4. Non-shell argument safety checks (Skip in God Mode)
+        if not self.god_mode:
+            for arg in cmd_list[1:]:
+                if any(ch in arg for ch in self.DANGEROUS_CHARS):
+                    logger.warning(f"ExecGuard: Blocked dangerous arg '{arg}'")
+                    return False
 
         # 5. Audit log
         logger.info(f"ExecGuard: Allowed command: {cmd_list}")
