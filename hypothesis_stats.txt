@@ -9,4 +9,4 @@ asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, a
 [1mcollecting ... [0mcollected 614 items / 614 deselected / 0 selected
 
 ============================ Hypothesis Statistics =============================
-[33m===================== [33m[1m614 deselected[0m, [33m[1m6 warnings[0m[33m in 1.04s[0m[33m ======================[0m
+[33m===================== [33m[1m614 deselected[0m, [33m[1m6 warnings[0m[33m in 1.06s[0m[33m ======================[0m

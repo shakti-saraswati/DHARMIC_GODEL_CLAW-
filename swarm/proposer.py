@@ -25,8 +25,10 @@ class Proposal:
     estimated_impact: float = 0.5
     fix_type: str = ""
     diff: str = ""
+    content: str = ""
     rationale: str = ""
     risk_level: str = "low"
+    approved: bool = False # Added for consistency with evaluator
 
 
 class ProposerAgent:
@@ -71,13 +73,19 @@ class ProposerAgent:
                     component = issue.file_path
                     context = {"focus": issue.description, "line": issue.line_number}
                     mutation = self._mutator.propose_mutation(component=component, context=context)
+                    
+                    fix_type = "llm_diff"
+                    if mutation.mutation_type == "create":
+                        fix_type = "create_file"
+
                     proposals.append(Proposal(
                         id=f"PROP-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{idx}",
                         description=f"{issue.description} ({component})",
                         target_files=[component],
                         estimated_impact=mutation.estimated_fitness,
-                        fix_type="llm_diff",
+                        fix_type=fix_type,
                         diff=mutation.diff,
+                        content=getattr(mutation, "content", ""),
                         rationale=mutation.rationale,
                         risk_level=mutation.risk_level,
                     ))

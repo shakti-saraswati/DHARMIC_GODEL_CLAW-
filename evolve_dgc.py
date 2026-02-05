@@ -22,6 +22,7 @@ os.environ["DGC_SWARM_USE_LLM"] = "1"
 os.environ["DGC_YOLO_MODE"] = "1"
 os.environ["DGC_GOD_MODE"] = "1" # Maximum permissions
 os.environ["DGC_MOCK_LLM"] = "1" # Use mock LLM for demonstration
+os.environ["DGC_ALLOW_LIVE"] = "1" # ALLOW WRITING TO FILES
 
 # Import Orchestrator
 try:

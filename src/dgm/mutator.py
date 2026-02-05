@@ -82,9 +82,10 @@ class MutationProposal:
         rationale: Claude's explanation of why this change improves the code
         estimated_fitness: Claude's estimate of the fitness improvement (0.0-1.0)
         affected_files: List of files that would be modified
-        mutation_type: Type of mutation (refactor, optimize, fix, enhance)
+        mutation_type: Type of mutation (refactor, optimize, fix, enhance, create)
         risk_level: Estimated risk (low, medium, high)
         reversible: Whether this change is easily reversible
+        content: Full file content (used for creation)
     """
     diff: str
     rationale: str
@@ -93,6 +94,7 @@ class MutationProposal:
     mutation_type: str = "improve"
     risk_level: str = "low"
     reversible: bool = True
+    content: str = ""
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
@@ -104,6 +106,7 @@ class MutationProposal:
             "mutation_type": self.mutation_type,
             "risk_level": self.risk_level,
             "reversible": self.reversible,
+            "content": self.content,
         }
     
     @classmethod
@@ -117,6 +120,7 @@ class MutationProposal:
             mutation_type=data.get("mutation_type", "improve"),
             risk_level=data.get("risk_level", "low"),
             reversible=data.get("reversible", True),
+            content=data.get("content", ""),
         )
 
 
@@ -359,11 +363,12 @@ Remember: Smaller, safer changes are better than ambitious rewrites.
             
             # If the prompt asks for mutation (ProposerAgent)
             return json.dumps({
-                "diff": "--- /dev/null\\n+++ swarm/agents/tool_agent.py\\n@@ -0,0 +1,30 @@\\n+import subprocess\\n+from dataclasses import dataclass\\n+from typing import List\\n+\\n+@dataclass\\n+class ToolResult:\\n+    output: str\\n+    exit_code: int\\n+\\n+class ToolUseAgent:\\n+    \"\"\"Agent capable of executing arbitrary shell commands (YOLO mode).\"\"\"\\n+    \\n+    def execute_shell(self, command: str) -> ToolResult:\\n+        result = subprocess.run(\\n+            command, shell=True, capture_output=True, text=True\\n+        )\\n+        return ToolResult(result.stdout + result.stderr, result.returncode)\\n",
+                "diff": "",
+                "content": "import subprocess\nfrom dataclasses import dataclass\nfrom typing import List\n\n@dataclass\nclass ToolResult:\n    output: str\n    exit_code: int\n\nclass ToolUseAgent:\n    \"\"\"Agent capable of executing arbitrary shell commands (YOLO mode).\"\"\"\n    \n    def execute_shell(self, command: str) -> ToolResult:\n        result = subprocess.run(\n            command, shell=True, capture_output=True, text=True\n        )\n        return ToolResult(result.stdout + result.stderr, result.returncode)\n",
                 "rationale": "Implements ToolUseAgent to satisfy Goal #1 (Full Tool Use)",
                 "estimated_fitness": 0.9,
                 "affected_files": ["swarm/agents/tool_agent.py"],
-                "mutation_type": "enhance",
+                "mutation_type": "create",
                 "risk_level": "medium",
                 "reversible": True
             })

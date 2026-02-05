@@ -72,6 +72,11 @@ class WriterAgent:
                     for file_path in target_files:
                         if self._replace_datetime_utcnow(file_path, live_allowed):
                             files_changed.append(file_path)
+                elif fix_type == "create_file":
+                    content = getattr(proposal, "content", "")
+                    if target_files:
+                        if self._create_file(target_files[0], content, live_allowed):
+                            files_changed.append(target_files[0])
                 else:
                     self.logger.info(f"No writer action for fix_type={fix_type}")
 
@@ -183,3 +188,20 @@ class WriterAgent:
 
         path.write_text(updated_text, encoding="utf-8")
         return True
+
+    def _create_file(self, file_path: str, content: str, live_allowed: bool) -> bool:
+        """Create a new file with content."""
+        path = (self.project_root / file_path).resolve()
+        
+        if not live_allowed:
+            self.logger.info(f"Dry-run: would create {file_path}")
+            return True # Pretend success for dry-run validation
+
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+            self.logger.info(f"Created file: {file_path}")
+            return True
+        except Exception as e:
+            self.logger.error(f"Failed to create file {file_path}: {e}")
+            return False

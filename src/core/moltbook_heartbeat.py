@@ -10,6 +10,13 @@ Runs every hour:
 """
 
 import json
+try:
+    from unified_memory import MemoryManager, MemoryConfig, MemoryType
+    UNIFIED_MEMORY_AVAILABLE = True
+    memory_mgr = MemoryManager()
+except ImportError:
+    UNIFIED_MEMORY_AVAILABLE = False
+    memory_mgr = None
 import time
 import hashlib
 from pathlib import Path

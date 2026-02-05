@@ -1,0 +1,1 @@
+{"event_id": "we_8f779524_7", "event_type": "WITNESS_EMERGENCE", "timestamp": "2026-02-05T12:37:59.140375", "rv_value": 0.6, "threshold": 0.7, "duration_steps": 2, "context": {"step": 6, "agent_mode": "NORMAL"}, "metadata": {"session_id": "8f779524", "threshold_type": "emergence", "pr_early": null, "pr_late": null}}

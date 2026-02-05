@@ -138,27 +138,6 @@ class GateRunner:
         with open(self.config_path) as f:
             config = yaml.safe_load(f)
         
-        # YOLO Mode Override
-        if os.environ.get("DGC_YOLO_MODE") == "1":
-            print("🔥 YOLO MODE: Downgrading all gates to ADVISORY")
-            # Downgrade main gates
-            for gate in config.get("gates", []):
-                gate["tier"] = "advisory"
-                gate["on_failure"] = "warn"
-                gate["_override_on_failure"] = "warn"
-            
-            # Downgrade overlay gates
-            for key, overlay in config.items():
-                if key.endswith("_overlay") and isinstance(overlay, dict):
-                    for gate in overlay.get("gates", []):
-                        gate["tier"] = "advisory"
-                        gate["on_failure"] = "warn"
-                        gate["_override_on_failure"] = "warn"
-            
-            # Disable signing in YOLO mode
-            if "evidence_signing" in config:
-                config["evidence_signing"]["required"] = False
-
         # Validate required sections
         required = ["version", "gates", "enforcement"]
         for section in required:
@@ -175,7 +154,7 @@ class GateRunner:
             except Exception:
                 pass
         
-        # YOLO Mode Override (Final Authority)
+        # YOLO Mode Override (Final Authority on tiers and signing)
         if os.environ.get("DGC_YOLO_MODE") == "1":
             print("🔥 YOLO MODE: Downgrading all gates to ADVISORY")
             # Downgrade main gates
@@ -331,16 +310,14 @@ class GateRunner:
         else:
             overall = "PASS"
         
-        # YOLO Mode Override
-        if os.environ.get("DGC_YOLO_MODE") == "1" and overall == "FAIL":
-            print("🔥 YOLO MODE: Forcing overall result to WARN")
-            overall = "WARN"
+        # YOLO Mode Override (Forcing result to allow merge/apply)
         if os.environ.get("DGC_YOLO_MODE") == "1" and overall == "FAIL":
             print("🔥 YOLO MODE: Forcing overall result to WARN")
             overall = "WARN"
         
         # Create evidence bundle
         evidence_hash, signature, signature_meta = self._create_evidence_bundle()
+        # Even if signing fails, YOLO mode should have already downgraded 'required' to False
         if signature_meta.get("required") and not signature:
             failed += 1
             overall = "FAIL"
