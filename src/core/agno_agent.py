@@ -173,7 +173,7 @@ class AgnoDharmicAgent:
             enable_tools = enable_tools_env == "1"
         else:
             # DEFAULT: ENABLE TOOLS - DGC requires filesystem/tool access to evolve
-            # This was disabled for moonshot but breaks core functionality
+            # CRITICAL: Disabling tools breaks core functionality
             enable_tools = TOOLS_AVAILABLE
 
         if enable_tools:
