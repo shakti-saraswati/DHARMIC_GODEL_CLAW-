@@ -29,6 +29,15 @@ import time
 import json
 import logging
 from pathlib import Path
+
+# MCP Client for Cursor integration
+try:
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.stdio import stdio_client
+    MCP_AVAILABLE = True
+except ImportError:
+    MCP_AVAILABLE = False
+
 from datetime import datetime
 from typing import Optional, Dict, List
 from email.mime.text import MIMEText
@@ -1004,3 +1013,32 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    async def capture_to_mcp(self, build_data: dict):
+        """Send build data to MCP server for DGC capture."""
+        if not MCP_AVAILABLE:
+            return None
+        
+        try:
+            server_params = StdioServerParameters(
+                command="python3",
+                args=["-m", "src.core.mcp_server"],
+                cwd=str(Path(__file__).parent.parent)
+            )
+            
+            async with stdio_client(server_params) as (read, write):
+                async with ClientSession(read, write) as session:
+                    await session.initialize()
+                    result = await session.call_tool(
+                        "capture_build",
+                        {
+                            "files": build_data.get("files", []),
+                            "description": build_data.get("description", ""),
+                            "code_snippet": build_data.get("code", "")[:1000]
+                        }
+                    )
+                    return result
+        except Exception as e:
+            self.logger.warning(f"MCP capture failed: {e}")
+            return None
+
