@@ -5464,10 +5464,44 @@
   },
   {
     "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 59,
+      "row": 14
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/moltbook_heartbeat.py",
+    "fix": null,
+    "location": {
+      "column": 47,
+      "row": 14
+    },
+    "message": "`unified_memory.MemoryConfig` imported but unused; consider using `importlib.util.find_spec` to test for availability",
+    "noqa_row": 14,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 71,
+      "row": 14
+    },
+    "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/moltbook_heartbeat.py",
+    "fix": null,
+    "location": {
+      "column": 61,
+      "row": 14
+    },
+    "message": "`unified_memory.MemoryType` imported but unused; consider using `importlib.util.find_spec` to test for availability",
+    "noqa_row": 14,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
     "code": "F841",
     "end_location": {
       "column": 12,
-      "row": 94
+      "row": 101
     },
     "filename": "/Users/dhyana/DHARMIC_GODEL_CLAW/src/core/moltbook_heartbeat.py",
     "fix": {
@@ -5477,11 +5511,11 @@
           "content": "",
           "end_location": {
             "column": 15,
-            "row": 94
+            "row": 101
           },
           "location": {
             "column": 5,
-            "row": 94
+            "row": 101
           }
         }
       ],
@@ -5489,10 +5523,10 @@
     },
     "location": {
       "column": 5,
-      "row": 94
+      "row": 101
     },
     "message": "Local variable `preview` is assigned to but never used",
-    "noqa_row": 94,
+    "noqa_row": 101,
     "url": "https://docs.astral.sh/ruff/rules/unused-variable"
   },
   {

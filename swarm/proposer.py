@@ -69,14 +69,19 @@ class ProposerAgent:
         # Prefer LLM-based diffs if enabled
         if self._mutator:
             for idx, issue in enumerate(issues[:3], start=1):
+                self.logger.info(f"Processing issue with LLM: {issue.description} (fix_type: {issue.fix_type})")
                 try:
                     component = issue.file_path
-                    context = {"focus": issue.description, "line": issue.line_number}
+                    context = {"focus": issue.description, "line": issue.line_number, "fix_type": issue.fix_type}
                     mutation = self._mutator.propose_mutation(component=component, context=context)
+                    
+                    self.logger.info(f"Mutation type: {mutation.mutation_type}, Content length: {len(getattr(mutation, 'content', ''))}")
                     
                     fix_type = "llm_diff"
                     if mutation.mutation_type == "create":
                         fix_type = "create_file"
+
+                    self.logger.info(f"Generated proposal with fix_type: {fix_type}")
 
                     proposals.append(Proposal(
                         id=f"PROP-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{idx}",

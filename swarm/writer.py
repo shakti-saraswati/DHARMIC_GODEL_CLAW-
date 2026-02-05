@@ -75,6 +75,7 @@ class WriterAgent:
                 elif fix_type == "create_file":
                     content = getattr(proposal, "content", "")
                     if target_files:
+                        self.logger.info(f"Triggering create_file for {target_files[0]}")
                         if self._create_file(target_files[0], content, live_allowed):
                             files_changed.append(target_files[0])
                 else:

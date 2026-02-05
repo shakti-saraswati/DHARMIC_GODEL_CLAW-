@@ -102,6 +102,7 @@ class EvaluatorAgent:
             # Determine approval based on gate results
             # In emergency mode, WARN is accepted
             approved = gate_result.overall_result in ["PASS", "WARN"]
+            self.logger.info(f"Proposals approved status set to: {approved} (Overall: {gate_result.overall_result})")
             
             # Calculate score based on gates passed
             total_gates = gate_result.gates_passed + gate_result.gates_failed + gate_result.gates_warned

@@ -169,11 +169,12 @@ Return valid JSON only:
             json_match = re.search(r'\{.*\}', response, re.DOTALL)
             if json_match:
                 data = json.loads(json_match.group(0))
+                self.logger.info(f"LLM found gap: {data.get('file_path')} - {data.get('description')}")
                 return [Issue(
                     file_path=data.get("file_path", "unknown.py"),
                     description=data.get("description", "LLM suggested improvement"),
                     severity=data.get("severity", "medium"),
-                    fix_type=data.get("fix_type", "llm_feature")
+                    fix_type=data.get("fix_type", "architectural_feature")
                 )]
         except Exception as e:
             self.logger.error(f"LLM analysis failed: {e}")
