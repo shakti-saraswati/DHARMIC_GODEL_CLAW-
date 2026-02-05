@@ -38,6 +38,12 @@ if TOOLS_PATH.exists():
 else:
     TOOLS_AVAILABLE = False
 
+# Import God Mode tools
+try:
+    from system_tools import ALL_GOD_TOOLS
+except ImportError:
+    ALL_GOD_TOOLS = []
+
 # Our dharmic components
 from telos_layer import TelosLayer
 from strange_loop_memory import StrangeLoopMemory
@@ -160,27 +166,48 @@ class AgnoDharmicAgent:
                 base_url=base_url,
             )
 
-        # Initialize Tools (optional)
+        # Initialize Tools (CRITICAL: Must be enabled for DGC to function)
         self.tools = []
         enable_tools_env = os.getenv("DGC_ENABLE_TOOLS")
         if enable_tools_env is not None:
             enable_tools = enable_tools_env == "1"
         else:
-            # Default: disable tools for moonshot until tool-call reasoning is stable
-            enable_tools = TOOLS_AVAILABLE and self.provider != "moonshot"
+            # DEFAULT: ENABLE TOOLS - DGC requires filesystem/tool access to evolve
+            # This was disabled for moonshot but breaks core functionality
+            enable_tools = TOOLS_AVAILABLE
 
-        if enable_tools and TOOLS_AVAILABLE:
+        if enable_tools:
             try:
-                registry = create_default_registry()
-                # Use "human_operator" permissions for the core agent to give full access
-                raw_tools = get_agent_tools(registry, "human_operator")
-                # Wrap for Agno
-                self.tools = [wrap_as_agno_tool(t, agent_id=name) for t in raw_tools]
-                logger.info(f"Loaded {len(self.tools)} tools from registry")
+                # Try PSMV registry first
+                if TOOLS_AVAILABLE:
+                    try:
+                        registry = create_default_registry()
+                        # Use "human_operator" permissions for the core agent to give full access
+                        raw_tools = get_agent_tools(registry, "human_operator")
+                        # Wrap for Agno
+                        self.tools = [wrap_as_agno_tool(t, agent_id=name) for t in raw_tools]
+                        logger.info(f"Loaded {len(self.tools)} tools from PSMV registry")
+                    except Exception as e:
+                        logger.warning(f"PSMV registry failed: {e}, falling back to Agno native tools")
+                
+                # Fallback: Use Agno native FileTools and ShellTools
+                if not self.tools:
+                    from agno.tools.file import FileTools
+                    from agno.tools.shell import ShellTools
+                    from agno.tools.python import PythonTools
+                    
+                    self.tools = [
+                        FileTools(),
+                        ShellTools(),
+                        PythonTools(),
+                    ]
+                    logger.info(f"Loaded {len(self.tools)} native Agno tools (File, Shell, Python)")
+                    
             except Exception as e:
-                logger.warning(f"Failed to load tools: {e}")
-        elif not enable_tools:
-            logger.info("Tools disabled for this session")
+                logger.error(f"Failed to load ANY tools: {e}")
+                logger.error("DGC agent will be NON-FUNCTIONAL - no filesystem access!")
+        else:
+            logger.warning("Tools DISABLED - DGC agent cannot access filesystem!")
 
         # Create Agno agent with full features
         self.agent = Agent(
