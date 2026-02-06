@@ -23,9 +23,13 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional
 from enum import Enum
 
-# Import our own components
-from .moltbook_observer import MoltbookClient, ObservationRecorder, MOLTBOOK_API_BASE
-from .gates import GateProtocol
+# Import our own components (support both package and direct execution)
+try:
+    from .moltbook_observer import MoltbookClient, ObservationRecorder, MOLTBOOK_API_BASE
+    from .gates import GateProtocol
+except ImportError:
+    from moltbook_observer import MoltbookClient, ObservationRecorder, MOLTBOOK_API_BASE
+    from gates import GateProtocol
 
 
 # =============================================================================
