@@ -19,15 +19,12 @@ Usage:
 Requires: Clawdbot gateway running
 """
 
-import os
-import sys
 import json
 import subprocess
 import asyncio
 from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Optional
-from dataclasses import dataclass, asdict
+from typing import Dict, Optional
 
 # Paths
 SCRIPT_DIR = Path(__file__).resolve().parent

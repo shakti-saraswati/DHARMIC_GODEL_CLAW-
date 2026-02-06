@@ -3,9 +3,8 @@ TELOS LAYER: 7 Dharmic Gates + Moksha Orientation
 Tier A (Absolute): AHIMSA | Tier B (Strong): SATYA, CONSENT | Tier C: rest
 """
 from dataclasses import dataclass
-from typing import Dict, List, Any
+from typing import Dict, List
 from enum import Enum
-import json
 
 class GateResult(Enum):
     PASS = "pass"

@@ -14,21 +14,12 @@ import pytest
 import tempfile
 import json
 from pathlib import Path
-from datetime import datetime, timezone
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from audit import (
     AuditLog,
-    AuditEvent,
-    log_registration,
-    log_authentication,
-    log_challenge,
-    log_token_issued,
-    log_account_deleted,
-    log_consent,
-    log_error,
 )
 
 
@@ -174,7 +165,6 @@ class TestConvenienceFunctions:
 
     def test_log_registration(self, monkeypatch, temp_log):
         """log_registration convenience function works."""
-        from audit import audit_log
         monkeypatch.setattr("audit.audit_log", AuditLog(temp_log))
 
         # Import again to use patched version
@@ -186,7 +176,6 @@ class TestConvenienceFunctions:
 
     def test_log_authentication(self, monkeypatch, temp_log):
         """log_authentication convenience function works."""
-        from audit import audit_log
         audit = AuditLog(temp_log)
         monkeypatch.setattr("audit.audit_log", audit)
 

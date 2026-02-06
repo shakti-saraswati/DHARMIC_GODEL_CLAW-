@@ -10,7 +10,7 @@ from dataclasses import dataclass, asdict, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Set
+from typing import Dict, List, Optional, Any
 
 
 class MemoryType(Enum):
@@ -218,7 +218,7 @@ class CanonicalStore:
                 (memory.content_hash,)
             )
             if cursor.fetchone():
-                raise ValueError(f"Duplicate memory: similar content exists")
+                raise ValueError("Duplicate memory: similar content exists")
             
             # Insert memory
             data = memory.to_db_dict()

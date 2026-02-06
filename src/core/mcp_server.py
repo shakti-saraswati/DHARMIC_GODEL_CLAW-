@@ -876,7 +876,7 @@ async def main():
     print("🔥 DGC MCP Server v2 starting...", file=sys.stderr)
     print(f"   Memory: {'Unified Memory v3' if UNIFIED_MEMORY_AVAILABLE else 'Stub'}", file=sys.stderr)
     print(f"   CKC: {'RiskDetector + YOLOWeaver' if CKC_AVAILABLE else 'Basic Gates'}", file=sys.stderr)
-    print(f"   DGM: Bridge active", file=sys.stderr)
+    print("   DGM: Bridge active", file=sys.stderr)
     print("   Tools: capture_build, run_gates, analyze_risk, get_context", file=sys.stderr)
     print("   Ready for Cursor CLI connections.", file=sys.stderr)
     print("   JSCA! 🪷", file=sys.stderr)

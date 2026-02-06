@@ -1,0 +1,11 @@
+{
+  "name": "Moltbook Archaeologist",
+  "description": "Scraper mining 110 Moltbook agents for patterns",
+  "status": "stub",
+  "priority": "P0",
+  "files": [
+    "scraper.py",
+    "analyzer.py",
+    "insights.py"
+  ]
+}

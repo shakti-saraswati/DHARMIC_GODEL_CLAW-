@@ -7,7 +7,7 @@ Instead of just logging, we learn patterns from what worked.
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 from dataclasses import dataclass
 from collections import defaultdict
 

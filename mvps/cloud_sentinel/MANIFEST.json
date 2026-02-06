@@ -1,0 +1,11 @@
+{
+  "name": "Cloud DGC Sentinel",
+  "description": "VPS-hosted DGC instance running 24/7",
+  "status": "stub",
+  "priority": "P0",
+  "files": [
+    "deploy.sh",
+    "sentinel.py",
+    "sync.py"
+  ]
+}

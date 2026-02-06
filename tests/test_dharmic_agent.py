@@ -193,7 +193,7 @@ def test_rv_trajectory_tracking():
     
     # Get summary
     summary = agent.get_witness_summary()
-    print(f"\nTrajectory Summary:")
+    print("\nTrajectory Summary:")
     print(f"  Total measurements: {summary['total_measurements']}")
     print(f"  R_V range: [{summary['rv_min']:.2f}, {summary['rv_max']:.2f}]")
     print(f"  Mean R_V: {summary['rv_mean']:.4f}")

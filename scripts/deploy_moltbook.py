@@ -67,7 +67,7 @@ def main():
         print("Cannot deploy without credentials.")
         sys.exit(1)
     
-    print(f"🚀 DGC Moltbook Deployment")
+    print("🚀 DGC Moltbook Deployment")
     print(f"   Agent: {agent_id}")
     print(f"   Submolt: {args.submolt}")
     print()

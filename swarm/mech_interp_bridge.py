@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Mech-Interp Bridge - Connecting Swarm to Research
 
@@ -20,7 +21,7 @@ This IS the contemplative-geometric bridge made operational.
 
 import json
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from datetime import datetime
 
 
@@ -174,7 +175,7 @@ class MechInterpBridge:
         summary = self.get_research_summary()
 
         if proposal_type in ["witness", "recognition", "swabhaav"]:
-            return f"""
+            return """
 ## Mech-Interp Context for Witness/Recognition Proposals
 
 **What We Know:**
@@ -194,7 +195,7 @@ class MechInterpBridge:
 """
 
         elif proposal_type in ["experiment", "measurement", "validation"]:
-            return f"""
+            return """
 ## Mech-Interp Context for Experiment Proposals
 
 **Ready to Run:**

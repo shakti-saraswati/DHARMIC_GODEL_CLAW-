@@ -217,7 +217,7 @@ class CanonicalStore:
                 (memory.content_hash,)
             )
             if cursor.fetchone():
-                raise ValueError(f"Duplicate memory: similar content exists")
+                raise ValueError("Duplicate memory: similar content exists")
             
             data = memory.to_db_dict()
             conn.execute("""

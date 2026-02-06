@@ -1,9 +1,9 @@
+from __future__ import annotations
 """Shared types for the DHARMIC GODEL CLAW swarm."""
 
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional, Any
-from enum import Enum
 
 
 @dataclass

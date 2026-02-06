@@ -4,8 +4,7 @@ Tests for DharmicRuntime - heartbeat, specialist spawning, swarm integration.
 import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, AsyncMock
-import asyncio
+from unittest.mock import Mock, patch
 import json
 
 # Add src to path

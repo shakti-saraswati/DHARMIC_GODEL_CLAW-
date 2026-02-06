@@ -1,0 +1,9 @@
+# Agora Federation Node - docker-compose.yml
+# Status: STUB
+
+version: "3.8"
+services:
+  # TODO: Define services
+  stub:
+    image: alpine
+    command: echo "STUB - implement me"

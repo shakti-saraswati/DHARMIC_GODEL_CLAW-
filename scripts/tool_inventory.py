@@ -10,10 +10,7 @@ Usage:
     python3 tool_inventory.py --full
 """
 
-import json
 import subprocess
-import sys
-from pathlib import Path
 
 def run_cmd(cmd, timeout=5):
     """Run shell command and return output."""
@@ -93,7 +90,7 @@ def main():
     )
     status = "✅" if result["available"] else "⚠️"
     print(f"{status} sessions_spawn (via OpenClaw)")
-    print(f"   → Use: sessions_spawn(task='...', label='worker')")
+    print("   → Use: sessions_spawn(task='...', label='worker')")
     
     # Show recent subagents
     print()

@@ -208,7 +208,7 @@ async def call_with_full_fallback(
             continue
     
     # All tiers exhausted
-    raise RuntimeError(f"All models failed:\n" + "\n".join(errors))
+    raise RuntimeError("All models failed:\n" + "\n".join(errors))
 
 
 async def call_with_fallback(
@@ -332,7 +332,7 @@ async def test_all_tiers():
         except Exception as e:
             print(f"✗ Tier 3 (Ollama Cloud Direct): {e}")
     else:
-        print(f"⚠ Tier 3 (Ollama Cloud Direct): No API key")
+        print("⚠ Tier 3 (Ollama Cloud Direct): No API key")
     
     # Test Tier 4
     try:

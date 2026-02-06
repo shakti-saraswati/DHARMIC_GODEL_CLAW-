@@ -36,7 +36,6 @@ import email
 import imaplib
 import smtplib
 import os
-import time
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
@@ -47,7 +46,7 @@ load_dotenv(env_path)
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from typing import Optional, List, Dict
+from typing import List, Dict
 
 # Import the Dharmic Agent (via singleton to avoid duplication)
 import sys
@@ -257,7 +256,7 @@ Respond thoughtfully and authentically from your telos.
     
     async def run(self):
         """Main daemon loop."""
-        self._log(f"Starting email daemon")
+        self._log("Starting email daemon")
         self._log(f"Config: {self.config}")
         self._log(f"Poll interval: {self.poll_interval}s")
         if self.allowed_senders:

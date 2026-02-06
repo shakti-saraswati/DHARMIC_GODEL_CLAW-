@@ -320,13 +320,18 @@ class ProxyBackend(ModelBackend):
     def __init__(
         self,
         model: str = "claude-opus-4",
-        base_url: str = "http://localhost:3456/v1",
-        api_key: str = "not-needed",
+        base_url: str = None,
+        api_key: str = None,
     ):
+        import os
         try:
             from openai import OpenAI
         except ImportError:
             raise RuntimeError("openai package not installed: pip install openai")
+
+        # Support environment variables for OpenRouter/external APIs
+        base_url = base_url or os.environ.get("DHARMIC_PROXY_BASE_URL", "http://localhost:3456/v1")
+        api_key = api_key or os.environ.get("DHARMIC_PROXY_API_KEY", "not-needed")
 
         self.client = OpenAI(base_url=base_url, api_key=api_key)
         self.model = model

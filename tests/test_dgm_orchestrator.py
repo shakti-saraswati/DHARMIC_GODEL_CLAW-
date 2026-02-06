@@ -14,13 +14,10 @@ Comprehensive test suite covering:
 - CLI interface
 """
 
-import asyncio
-import json
 import pytest
 import tempfile
-from datetime import datetime
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 
 # Import all components
 from src.dgm.dgm_orchestrator import (
@@ -42,7 +39,7 @@ from src.dgm.dgm_orchestrator import (
     AutoPusher,
     DGMOrchestrator,
 )
-from src.dgm.archive import Archive, EvolutionEntry, FitnessScore
+from src.dgm.archive import Archive, FitnessScore
 
 
 # =============================================================================

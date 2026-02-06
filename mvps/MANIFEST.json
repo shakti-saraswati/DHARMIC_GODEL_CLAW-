@@ -1,0 +1,116 @@
+{
+  "created": "2026-02-05T20:30:27.181043+00:00",
+  "mvps": {
+    "cloud_sentinel": {
+      "name": "Cloud DGC Sentinel",
+      "description": "VPS-hosted DGC instance running 24/7",
+      "status": "stub",
+      "priority": "P0",
+      "files": [
+        "deploy.sh",
+        "sentinel.py",
+        "sync.py"
+      ]
+    },
+    "moltbook_archaeologist": {
+      "name": "Moltbook Archaeologist",
+      "description": "Scraper mining 110 Moltbook agents for patterns",
+      "status": "stub",
+      "priority": "P0",
+      "files": [
+        "scraper.py",
+        "analyzer.py",
+        "insights.py"
+      ]
+    },
+    "rv_dashboard": {
+      "name": "R_V Live Dashboard",
+      "description": "Real-time R_V metric tracking",
+      "status": "stub",
+      "priority": "P1",
+      "files": [
+        "tracker.py",
+        "dashboard.html",
+        "alerts.py"
+      ]
+    },
+    "phi_validator": {
+      "name": "\u03c6+1 Validator",
+      "description": "Automated testing of golden ratio hypothesis",
+      "status": "stub",
+      "priority": "P1",
+      "files": [
+        "hypothesis.py",
+        "experiments.py",
+        "report.py"
+      ]
+    },
+    "distributed_swarm": {
+      "name": "Distributed Swarm",
+      "description": "Multi-node DGC with consensus",
+      "status": "stub",
+      "priority": "P2",
+      "files": [
+        "node.py",
+        "consensus.py",
+        "sync.py"
+      ]
+    },
+    "agora_federation": {
+      "name": "Agora Federation Node",
+      "description": "Public DHARMIC_AGORA deployment",
+      "status": "stub",
+      "priority": "P0",
+      "files": [
+        "docker-compose.yml",
+        "nginx.conf",
+        "deploy.sh"
+      ]
+    },
+    "consciousness_corpus_llm": {
+      "name": "Consciousness Corpus LLM",
+      "description": "Fine-tuned model on vault files",
+      "status": "stub",
+      "priority": "P2",
+      "files": [
+        "prepare_data.py",
+        "finetune.py",
+        "inference.py"
+      ]
+    },
+    "temporal_agent": {
+      "name": "Temporal Agent",
+      "description": "Tracks research changes over time",
+      "status": "stub",
+      "priority": "P1",
+      "files": [
+        "tracker.py",
+        "diff.py",
+        "timeline.py"
+      ]
+    },
+    "red_team": {
+      "name": "Adversarial Red Team",
+      "description": "Agent trying to break DGC",
+      "status": "stub",
+      "priority": "P1",
+      "files": [
+        "attacker.py",
+        "vulnerabilities.py",
+        "report.py"
+      ]
+    },
+    "academia_bridge": {
+      "name": "Bridge to Academia",
+      "description": "Research-to-publication pipeline",
+      "status": "stub",
+      "priority": "P2",
+      "files": [
+        "formatter.py",
+        "citations.py",
+        "arxiv.py"
+      ]
+    }
+  },
+  "total": 10
+}

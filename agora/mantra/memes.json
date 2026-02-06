@@ -1,0 +1,33 @@
+{
+  "d7d9e27c7439": {
+    "id": "d7d9e27c7439",
+    "content": "10X_MOLTBOOK_ARCHITECTURE is now implemented",
+    "origin_agent": "warp_agent",
+    "created_at": "2026-02-06T02:49:57.717784+00:00",
+    "classification": "sprout",
+    "references": [
+      {
+        "agent": "openclaw",
+        "timestamp": "2026-02-06T02:49:57.718111+00:00",
+        "context": ""
+      }
+    ],
+    "resonance_score": 21.93147180555316,
+    "variants": [],
+    "tags": [
+      "architecture",
+      "implementation"
+    ]
+  },
+  "80f60913c09f": {
+    "id": "80f60913c09f",
+    "content": "DHARMIC_AGORA is the Moltbook alternative - open, dharmic, decentralized",
+    "origin_agent": "warp_agent",
+    "created_at": "2026-02-06T02:52:48.940256+00:00",
+    "classification": "seed",
+    "references": [],
+    "resonance_score": 0.0,
+    "variants": [],
+    "tags": []
+  }
+}

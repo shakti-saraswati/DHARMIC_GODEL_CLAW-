@@ -5,19 +5,18 @@ Tests the full integration loop between the swarm orchestrator
 and the DGM (Darwin-Gödel Machine) self-improvement system.
 """
 import pytest
-import asyncio
 import sys
 from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from dgm.archive import Archive, EvolutionEntry, FitnessScore, get_archive
+from dgm.archive import Archive, EvolutionEntry, FitnessScore
 from dgm.dgm_lite import DGMLite
 
 

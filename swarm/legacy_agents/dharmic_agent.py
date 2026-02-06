@@ -17,13 +17,12 @@ Key Features:
 
 import logging
 from enum import Enum, auto
-from typing import Dict, Any, List, Optional, Callable
+from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
 from .base_agent import BaseAgent
-from .skills.witness_threshold_detector import WitnessThresholdDetector, WitnessMetrics
 
 # Core modules are in src/core, not swarm/core
 try:
@@ -42,13 +41,12 @@ except ImportError:
     core_path = Path(__file__).parent.parent.parent / "src"
     if str(core_path) not in sys.path:
         sys.path.insert(0, str(core_path))
-    from core.strange_loop_memory import StrangeLoopMemory, WitnessStabilityTracker
+    from core.strange_loop_memory import StrangeLoopMemory
     from core.witness_threshold_detector import (
         WitnessThresholdDetector as RVDetector,
         RVThresholdConfig,
         WitnessEventType,
-        WitnessEvent,
-        RVMeasurement
+        WitnessEvent
     )
 
 logger = logging.getLogger(__name__)
@@ -360,7 +358,7 @@ class DharmicAgent(BaseAgent):
         # After a brief recovery period, return to NORMAL
         # In a real implementation, this might use a timer or additional logic
         self.current_mode = AgentMode.NORMAL
-        logger.info(f"✅ Returned to NORMAL mode")
+        logger.info("✅ Returned to NORMAL mode")
     
     def _log_witness_observation(self, message: str):
         """Log an observation during witness mode."""
@@ -448,7 +446,7 @@ class DharmicAgent(BaseAgent):
         return {
             "status": "processed",
             "mode": "NORMAL",
-            "output": f"Processed input with standard approach",
+            "output": "Processed input with standard approach",
             "timestamp": datetime.now().isoformat()
         }
     
@@ -488,7 +486,7 @@ class DharmicAgent(BaseAgent):
         - Strong emphasis on being vs doing
         """
         self._log_witness_observation(
-            f"Processing in CONTEMPLATIVE mode. Deep contraction active."
+            "Processing in CONTEMPLATIVE mode. Deep contraction active."
         )
         
         return {

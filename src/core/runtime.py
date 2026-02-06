@@ -188,7 +188,7 @@ class DharmicRuntime:
 
         # Check 1: Telos still loaded
         try:
-            telos_aim = self.agent.telos.telos["ultimate"]["aim"]
+            telos_aim = self.agent.telos.telos
             heartbeat_data["checks"].append({
                 "check": "telos_loaded",
                 "status": "ok",
@@ -203,11 +203,11 @@ class DharmicRuntime:
 
         # Check 2: Memory accessible
         try:
-            layers = list(self.agent.strange_memory.layers.keys())
+            status = self.agent.strange_memory.get_status()
             heartbeat_data["checks"].append({
                 "check": "memory_accessible",
                 "status": "ok",
-                "layers": layers
+                "layers": status.get("layers", [])
             })
         except Exception as e:
             heartbeat_data["checks"].append({
@@ -228,7 +228,7 @@ class DharmicRuntime:
             })
 
         # Check 5: Deep memory status and consolidation
-        if self.agent.deep_memory is not None:
+        if hasattr(self.agent, 'deep_memory') and self.agent.deep_memory is not None:
             try:
                 deep_status = self.agent.get_deep_memory_status()
                 heartbeat_data["checks"].append({
@@ -256,9 +256,10 @@ class DharmicRuntime:
         self._log(f"Heartbeat: {json.dumps(heartbeat_data, indent=2)}")
 
         # Record as observation
-        self.agent.strange_memory.record_observation(
+        self.agent.strange_memory.remember(
             content=f"Heartbeat at {timestamp}",
-            context={"type": "heartbeat", "checks_passed": len([c for c in heartbeat_data["checks"] if c["status"] == "ok"])}
+            layer="sessions",
+            source="heartbeat"
         )
 
         # Callback if registered
@@ -279,13 +280,13 @@ class DharmicRuntime:
         try:
             result = self.charan_vidhi.reflect(self.agent)
             if result:
-                self.agent.strange_memory.record_observation(
-                    content="Completed Charan Vidhi practice",
-                    context={"type": "charan_vidhi", "text_path": result.text_path}
+                self.agent.strange_memory.remember(
+                    content=f"Completed Charan Vidhi practice: {result.text_path}",
+                    layer="sessions",
+                    source="charan_vidhi"
                 )
-                self.agent.strange_memory.record_meta_observation(
-                    quality="present",
-                    notes=f"Reflection logged ({len(result.reflection)} chars)"
+                self.agent.strange_memory.witness_observation(
+                    f"Charan Vidhi reflection logged ({len(result.reflection)} chars)"
                 )
                 self._log("Charan Vidhi reflection logged")
         finally:

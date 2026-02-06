@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 DHARMIC GODEL CLAW - Configuration
 Self-improving agent swarm with dharmic alignment constraints.
@@ -6,7 +7,7 @@ Self-improving agent swarm with dharmic alignment constraints.
 import os
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List
 from enum import Enum
 
 class SwarmState(Enum):

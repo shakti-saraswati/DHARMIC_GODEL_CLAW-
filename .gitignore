@@ -53,3 +53,4 @@ archive/evolved_agents/
 
 # === DOCKER ===
 .docker/
+integrations/dharmic-agora

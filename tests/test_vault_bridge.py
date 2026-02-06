@@ -1,11 +1,9 @@
 """
 Tests for VaultBridge - search, read, and write operations.
 """
-import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime
+from unittest.mock import Mock, patch
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "core"))

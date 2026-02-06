@@ -9,9 +9,9 @@ from datetime import datetime
 # Add to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from dgm.archive import Archive, EvolutionEntry, FitnessScore, get_archive
-from dgm.fitness import FitnessEvaluator, evaluate_component
-from dgm.selector import Selector, select_parent
+from dgm.archive import Archive, EvolutionEntry, FitnessScore
+from dgm.fitness import FitnessEvaluator
+from dgm.selector import Selector
 
 
 class TestArchive:

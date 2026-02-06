@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Proposer Agent - Generates improvement proposals."""
 
 from dataclasses import dataclass

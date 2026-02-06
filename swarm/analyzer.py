@@ -1,13 +1,13 @@
+from __future__ import annotations
 """Analyzer Agent - Analyzes codebase for improvement opportunities."""
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Iterable, Dict, Any
+from typing import List, Optional, Iterable
 from pathlib import Path
 import logging
 import re
 import os
 import json
-import asyncio
 
 try:
     from src.dgm.mutator import Mutator
@@ -56,7 +56,7 @@ class AnalyzerAgent:
             {
                 "id": "datetime_utcnow",
                 "regex": re.compile(r"datetime\.utcnow\("),
-                "description": "Deprecated datetime.utcnow() (use timezone-aware now)",
+                "description": "Deprecated datetime.datetime.now(datetime.timezone.utc) (use timezone-aware now)",
                 "severity": "low",
                 "fix_type": "replace_datetime_utcnow",
             },

@@ -12,7 +12,6 @@ Usage:
 """
 
 import argparse
-import asyncio
 import json
 import subprocess
 import sys
@@ -213,7 +212,7 @@ def run_comparison(prompt: str, model_keys: List[str]) -> Dict[str, Any]:
     }
 
     print(f"\n{'='*60}")
-    print(f"MULTI-MODEL COMPARISON")
+    print("MULTI-MODEL COMPARISON")
     print(f"{'='*60}")
     print(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
     print(f"Models: {', '.join(model_keys)}")

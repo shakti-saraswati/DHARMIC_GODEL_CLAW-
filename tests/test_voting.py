@@ -9,17 +9,14 @@ Tests cover:
 - Consensus thresholds
 - Edge cases
 """
-import asyncio
 import pytest
 from collections import Counter
-from unittest.mock import AsyncMock, patch
 
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from dgm.voting import (
-    MutationProposal,
     Vote,
     VoteResult,
     ReviewerType,

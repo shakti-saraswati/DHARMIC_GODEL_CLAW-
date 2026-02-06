@@ -3,15 +3,12 @@ Tests for strange_memory.py (StrangeLoopMemory)
 ================================================
 Verifies multi-layer memory with development tracking.
 """
-import pytest
-import json
 from pathlib import Path
-from datetime import datetime
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "core"))
 
-from strange_memory import StrangeLoopMemory, MemoryEntry
+from strange_memory import StrangeLoopMemory
 
 
 class TestStrangeLoopMemory:

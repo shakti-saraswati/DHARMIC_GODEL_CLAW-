@@ -19,8 +19,8 @@ Usage:
 """
 
 import logging
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Callable
+from dataclasses import dataclass
+from typing import Optional, Dict, Any, List
 from enum import Enum
 import os
 
@@ -207,7 +207,7 @@ class MultiModelAdapter:
         # Check available models
         self.available_models = self._check_available_models()
 
-        logger.info(f"MultiModelAdapter initialized")
+        logger.info("MultiModelAdapter initialized")
         logger.info(f"  Budget per call: ${budget_per_call}")
         logger.info(f"  Require witness: {require_witness}")
         logger.info(f"  Available models: {list(self.available_models.keys())}")

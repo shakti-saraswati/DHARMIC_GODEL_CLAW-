@@ -17,11 +17,11 @@ import argparse
 import sys
 from pathlib import Path
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from dgm.dgm_orchestrator import DGMOrchestrator, ImprovementStatus
+from dgm.dgm_orchestrator import DGMOrchestrator
 
 # Priority components for evolution (in order)
 EVOLUTION_TARGETS = [
@@ -106,7 +106,7 @@ class EvolutionOrchestrator:
         print("🚀 DGC CONTINUOUS EVOLUTION")
         print("=" * 60)
         print(f"Mode: {'DRY RUN' if self.dgm.dry_run else 'LIVE'}")
-        print(f"17 Gates: ENFORCING")
+        print("17 Gates: ENFORCING")
         print(f"Targets: {len(EVOLUTION_TARGETS)} components")
         print()
         

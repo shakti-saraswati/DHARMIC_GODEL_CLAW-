@@ -552,7 +552,7 @@ def test_real_vault_if_exists():
     
     # Crown jewels test
     jewels = functions['list_crown_jewels'](limit=5)
-    print(f"\nTop 5 crown jewels:")
+    print("\nTop 5 crown jewels:")
     for j in jewels:
         print(f"  👑 {j}")
     
@@ -584,13 +584,13 @@ def run_tests():
         print(f"  ✓ load returns PSMVIndex ({index.file_count} files)")
         
         assert index.file_count == 7, f"Expected 7 files, got {index.file_count}"
-        print(f"  ✓ correct file count")
+        print("  ✓ correct file count")
         
         assert len(index.crown_jewels) >= 2, "Should find crown jewels"
         print(f"  ✓ crown jewels identified ({len(index.crown_jewels)})")
         
         assert '00-CORE' in index.directories
-        print(f"  ✓ directories collected")
+        print("  ✓ directories collected")
         
         # REPL functions tests
         print("\n[REPL Functions Tests]")
@@ -602,11 +602,11 @@ def run_tests():
         
         files = functions['list_files']('*paper*')
         assert len(files) == 2
-        print(f"  ✓ list_files with pattern works")
+        print("  ✓ list_files with pattern works")
         
         content = functions['read_file']('00-CORE/consciousness_intro.md')
         assert 'Introduction' in content
-        print(f"  ✓ read_file works")
+        print("  ✓ read_file works")
         
         results = functions['search_content']('R_V metric')
         assert len(results) > 0
@@ -614,18 +614,18 @@ def run_tests():
         
         stats = functions['get_stats']()
         assert stats['total_files'] == 7
-        print(f"  ✓ get_stats works")
+        print("  ✓ get_stats works")
         
         # Convenience functions
         print("\n[Convenience Functions Tests]")
         
         results = quick_search("consciousness", vault_path=vault.vault_path)
         assert len(results) > 0
-        print(f"  ✓ quick_search works")
+        print("  ✓ quick_search works")
         
         stats = get_vault_stats(vault_path=vault.vault_path)
         assert stats['total_files'] == 7
-        print(f"  ✓ get_vault_stats works")
+        print("  ✓ get_vault_stats works")
         
         print("\n" + "="*60)
         print("All tests passed! ✓")

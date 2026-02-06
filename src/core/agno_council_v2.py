@@ -50,9 +50,8 @@ import logging
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from enum import Enum, auto
-from typing import Dict, List, Optional, Any, Callable, Union, AsyncIterator
+from typing import Dict, List, Optional, Any, Callable, AsyncIterator
 from collections import deque
-from concurrent.futures import ThreadPoolExecutor
 import traceback
 
 # Configure logging
@@ -436,8 +435,6 @@ class ToolRouter:
         Run all 17 dharmic gates validation with evidence bundle storage.
         Each gate validates a specific ethical/security principle.
         """
-        import os
-        import time
         from datetime import datetime
         
         evidence_bundle = {
@@ -743,7 +740,6 @@ class ToolRouter:
     async def _store_evidence_bundle(self, bundle: Dict[str, Any]):
         """Store evidence bundle for audit and forensic purposes."""
         import os
-        import json
         from datetime import datetime
         
         # Create evidence directory
@@ -916,7 +912,7 @@ class DGMProposalGenerator:
         return DGMProposal(
             proposal_type=ProposalType.SECURITY_ENHANCEMENT,
             title=f"SECURITY: {key}",
-            description=f"Security enhancement based on gate validation failures",
+            description="Security enhancement based on gate validation failures",
             motivation=motivation,
             implementation_plan=plan,
             estimated_impact="Improved dharmic compliance",
@@ -936,7 +932,7 @@ class DGMProposalGenerator:
         return DGMProposal(
             proposal_type=ProposalType.NEW_CAPABILITY,
             title=f"CAPABILITY: {key}",
-            description=f"New capability to address confidence gaps",
+            description="New capability to address confidence gaps",
             motivation=motivation,
             implementation_plan=plan,
             estimated_impact="+15-25% confidence improvement",
@@ -956,7 +952,7 @@ class DGMProposalGenerator:
         return DGMProposal(
             proposal_type=ProposalType.BUG_FIX,
             title=f"BUGFIX: {key}",
-            description=f"Reliability fix for tool execution",
+            description="Reliability fix for tool execution",
             motivation=motivation,
             implementation_plan=plan,
             estimated_impact="95%+ tool success rate",
@@ -976,7 +972,7 @@ class DGMProposalGenerator:
         return DGMProposal(
             proposal_type=ProposalType.MEMORY_UPGRADE,
             title=f"MEMORY: {key}",
-            description=f"Memory system enhancement for query patterns",
+            description="Memory system enhancement for query patterns",
             motivation=motivation,
             implementation_plan=plan,
             estimated_impact="60% reduction in repeated computation",
@@ -1292,8 +1288,8 @@ class AgnoCouncilV2:
         responses = {
             "Gnata": f"Perceived patterns in '{query[:30]}...' — detected {len(tool_calls)} relevant data sources.",
             "Gneya": f"Retrieved knowledge from {len(tool_calls)} sources. Key context identified.",
-            "Gnan": f"Synthesized findings: logical coherence confirmed. Recommendation ready.",
-            "Shakti": f"Execution path prepared. Ready to act with dharmic alignment."
+            "Gnan": "Synthesized findings: logical coherence confirmed. Recommendation ready.",
+            "Shakti": "Execution path prepared. Ready to act with dharmic alignment."
         }
         
         return responses.get(member.name, "Analysis complete.")

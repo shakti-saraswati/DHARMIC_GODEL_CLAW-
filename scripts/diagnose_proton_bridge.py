@@ -8,8 +8,6 @@ Run this after GUI setup to verify everything works.
 """
 
 import os
-import sys
-import json
 import ssl
 import imaplib
 import smtplib

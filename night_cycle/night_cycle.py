@@ -23,11 +23,10 @@ import os
 import sys
 import json
 import asyncio
-import subprocess
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Tuple, Optional
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from enum import Enum
 
 # Backend selection: OpenRouter (default) or direct Anthropic
@@ -501,7 +500,7 @@ def phase6_synthesis(results: List[Dict]) -> Path:
         status = "PASS" if r.get("committed") else "FAIL"
         synthesis += f"- [{status}] {r.get('action')}: {r.get('reason', 'N/A')}\n"
 
-    synthesis += f"""
+    synthesis += """
 ### Next Cycle
 - Priorities will be re-evaluated by V7 agents
 - Builds will iterate based on feedback

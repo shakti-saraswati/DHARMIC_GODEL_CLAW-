@@ -218,7 +218,7 @@ class UnifiedDaemon:
                     "agent": {
                         "name": self.agent.name,
                         "model": f"{self.agent.model_provider}/{self.agent.model_id}",
-                        "telos": self.agent.telos.telos["ultimate"]["aim"],
+                        "telos": self.agent.telos.telos,
                     },
                     "state": self.state,
                 }
@@ -522,7 +522,7 @@ class UnifiedDaemon:
         self._log("=" * 60)
         self._log(f"Agent: {self.agent.name}")
         self._log(f"Model: {self.agent.model_provider}/{self.agent.model_id}")
-        self._log(f"Telos: {self.agent.telos.telos['ultimate']['aim']}")
+        self._log(f"Telos: {self.agent.telos.telos}")
         self._log(f"Email: {'enabled' if self.config.email_enabled else 'disabled'}")
         self._log(f"Heartbeat: {self.config.heartbeat_interval}s")
         self._log(f"Sync: {self.config.sync_interval}s")

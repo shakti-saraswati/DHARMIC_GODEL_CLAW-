@@ -1,0 +1,11 @@
+{
+  "name": "Bridge to Academia",
+  "description": "Research-to-publication pipeline",
+  "status": "stub",
+  "priority": "P2",
+  "files": [
+    "formatter.py",
+    "citations.py",
+    "arxiv.py"
+  ]
+}

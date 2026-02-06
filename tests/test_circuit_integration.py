@@ -4,7 +4,6 @@ Integration Test - DGM Circuit 5-Phase Pipeline
 Tests the full circuit flow with various scenarios.
 """
 import pytest
-import asyncio
 import sys
 from pathlib import Path
 from unittest.mock import patch, MagicMock, AsyncMock
@@ -16,13 +15,11 @@ from dgm.circuit import (
     MutationCircuit,
     MutationProposal,
     CircuitResult,
-    PhaseResult,
     PhaseStatus,
     run_circuit
 )
 from dgm.voting import VotingSwarm, VoteResult
-from dgm.elegance import EleganceEvaluator, EleganceScore
-from dgm.archive import FitnessScore
+from dgm.elegance import EleganceEvaluator
 
 
 class TestMutationProposal:
@@ -65,8 +62,7 @@ class TestMutationProposal:
             description="Test conversion",
             target_file="src/convert.py",
             new_code="# code",
-            diff="+ # code",
-            rationale="Testing conversion"
+            diff="+ # code"
         )
         
         voting_proposal = proposal.to_voting_proposal()
@@ -157,7 +153,7 @@ class TestCircuitPhases:
     @pytest.fixture
     def circuit(self, tmp_path):
         """Create a circuit with temp project root."""
-        return MutationCircuit(project_root=tmp_path, quick_vote=True, min_votes=3)
+        return MutationCircuit(project_root=tmp_path, required_votes=3)
     
     def test_phase_2_valid_syntax(self, circuit):
         """Test Phase 2 with valid Python syntax."""

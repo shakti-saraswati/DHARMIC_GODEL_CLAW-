@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Orchestrator for the self-improving agent swarm workflow.
 
 This module coordinates the 5-phase improvement cycle:
@@ -876,7 +877,7 @@ class SwarmOrchestrator:
                     parent_id=self._last_evolution_id,
                     component=target_area or "unknown",
                     change_type="weaver_improvement",
-                    description=task_description or f"YOLO-Gate Weaver improvement",
+                    description=task_description or "YOLO-Gate Weaver improvement",
                     diff="",  # Could capture actual diff
                     fitness=fitness,
                     test_results={

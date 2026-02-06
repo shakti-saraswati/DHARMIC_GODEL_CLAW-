@@ -1,13 +1,14 @@
+from __future__ import annotations
 """Core evaluation system for the DHARMIC GODEL CLAW swarm."""
 
 import asyncio
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from enum import Enum
 
-from .types import Proposal, EvaluationResult, Agent
+from .types import Proposal, EvaluationResult
 
 
 class EvaluationStatus(Enum):

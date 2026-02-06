@@ -3,7 +3,6 @@ Strange Loop Memory — Self-referential memory with emergent pattern detection.
 Uses NetworkX for graph operations. Optional feature (can be disabled).
 """
 
-import json
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime

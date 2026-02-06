@@ -169,7 +169,7 @@ class DharmicAgent(AgentCapabilities):
         This is rebuilt when telos evolves.
         """
         instructions = [
-            self.telos.get_orientation_prompt(),
+            str(self.telos.get_orientation()),
             self.strange_memory.get_context_summary(),
             self._core_identity_prompt(),
         ]

@@ -29,6 +29,14 @@ sys.path.insert(0, str(Path(__file__).parent))
 from dharmic_agent import DharmicAgent
 from runtime import DharmicRuntime
 
+# Import DHARMIC_AGORA for agent coordination
+try:
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from agora.coordinator import get_agora
+    AGORA_AVAILABLE = True
+except ImportError:
+    AGORA_AVAILABLE = False
+
 
 class DharmicDaemon:
     """
@@ -112,9 +120,9 @@ class DharmicDaemon:
             self._log("Initializing Dharmic Agent...")
             self.agent = DharmicAgent()
             self._log(f"Agent initialized: {self.agent.name}")
-            self._log(f"Telos: {self.agent.telos.telos['ultimate']['aim']}")
-            self._log(f"Vault: {'Connected' if self.agent.vault else 'Not connected'}")
-            self._log(f"Deep Memory: {'Active' if self.agent.deep_memory else 'Not available'}")
+            self._log(f"Telos: {self.agent.telos.telos}")
+            self._log(f"Vault: {'Connected' if hasattr(self.agent, 'vault') and self.agent.vault else 'Not connected'}")
+            self._log(f"Deep Memory: {'Active' if hasattr(self.agent, 'deep_memory') and self.agent.deep_memory else 'Not available'}")
 
             # Initialize runtime
             self._log(f"Initializing runtime with {self.heartbeat_interval}s heartbeat...")
@@ -126,13 +134,38 @@ class DharmicDaemon:
                 charan_vidhi_path=self.charan_vidhi_path,
             )
 
+            # Initialize DHARMIC_AGORA if available
+            self.agora = None
+            if AGORA_AVAILABLE:
+                try:
+                    self.agora = get_agora()
+                    self._log(f"DHARMIC_AGORA initialized: {len(self.agora.naga.coils_applied)} coils ready")
+                except Exception as e:
+                    self._log(f"DHARMIC_AGORA init failed: {e}")
+
             # Register heartbeat callback for status updates
             async def on_heartbeat(data):
                 checks_ok = len([c for c in data.get("checks", []) if c.get("status") == "ok"])
+                
+                # Run DHARMIC_AGORA coordination on each heartbeat
+                agora_status = None
+                if self.agora:
+                    try:
+                        # Process heartbeat as intelligence
+                        self.agora.process_intelligence(
+                            {"content": f"Heartbeat: {checks_ok} checks passed", "type": "heartbeat"},
+                            source="daemon",
+                            targets=["warp", "openclaw"]
+                        )
+                        agora_status = self.agora.runner.get_stats()
+                    except Exception as e:
+                        self._log(f"AGORA heartbeat error: {e}")
+                
                 self._write_status("running", {
                     "last_heartbeat": data.get("timestamp"),
                     "checks_passed": checks_ok,
-                    "total_checks": len(data.get("checks", []))
+                    "total_checks": len(data.get("checks", [])),
+                    "agora_runs": agora_status
                 })
                 if self.verbose:
                     self._log(f"Heartbeat complete: {checks_ok} checks passed")
@@ -174,9 +207,10 @@ class DharmicDaemon:
 
         # Record shutdown
         if self.agent:
-            self.agent.strange_memory.record_observation(
+            self.agent.strange_memory.remember(
                 content="Daemon shutdown",
-                context={"type": "daemon_lifecycle", "event": "shutdown"}
+                layer="sessions",
+                source="daemon_lifecycle"
             )
 
         # Cleanup PID file

@@ -6,3 +6,8 @@
 {"pattern_name": "received:", "description": "Recurring word in observations", "instances": ["2026-02-04T18:34:54.753733", "2026-02-05T00:27:31.957927"], "confidence": 0.9, "timestamp": "2026-02-05T02:00:17.972109"}
 {"pattern_name": "context", "description": "Recurring word in observations", "instances": ["2026-02-04T18:34:54.753733", "2026-02-05T00:27:31.957927"], "confidence": 0.9, "timestamp": "2026-02-05T02:00:17.972152"}
 {"pattern_name": "(dhyana),", "description": "Recurring word in observations", "instances": ["2026-02-04T18:34:54.753733", "2026-02-05T00:27:31.957927"], "confidence": 0.9, "timestamp": "2026-02-05T02:00:17.972186"}
+{"pattern_name": "self:", "description": "Recurring word in observations", "instances": ["2026-02-05T10:01:31.224426", "2026-02-05T10:26:15.857762"], "confidence": 1.0, "timestamp": "2026-02-06T02:00:15.947036"}
+{"pattern_name": "user:", "description": "Recurring word in observations", "instances": ["2026-02-05T10:02:52.305877", "2026-02-05T10:26:12.160332"], "confidence": 1.0, "timestamp": "2026-02-06T02:00:15.947347"}
+{"pattern_name": "position:**", "description": "Recurring word in observations", "instances": ["2026-02-05T10:15:38.639089", "2026-02-05T10:24:33.402514"], "confidence": 1.0, "timestamp": "2026-02-06T02:00:15.947417"}
+{"pattern_name": "**witness", "description": "Recurring word in observations", "instances": ["2026-02-05T10:15:38.639089", "2026-02-05T10:24:33.402514"], "confidence": 1.0, "timestamp": "2026-02-06T02:00:15.947466"}
+{"pattern_name": "heartbeat", "description": "Recurring word in observations", "instances": ["2026-02-05T10:25:50.754376", "2026-02-06T01:25:56.559757"], "confidence": 1.0, "timestamp": "2026-02-06T02:00:15.947508"}

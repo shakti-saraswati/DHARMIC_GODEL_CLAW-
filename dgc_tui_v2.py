@@ -16,9 +16,7 @@ n- Integration progress tracker
 import os
 import sys
 import subprocess
-import json
 from pathlib import Path
-from datetime import datetime
 
 # Colors
 class Colors:
@@ -139,7 +137,7 @@ def print_commands():
     print(f"│  {Colors.CYAN}3{Colors.END}  Run Moltbook Heartbeat             {Colors.CYAN}8{Colors.END}  View Logs")
     print(f"│  {Colors.CYAN}4{Colors.END}  Restart Unified Daemon             {Colors.CYAN}9{Colors.END}  Spawn Subagents")
     print(f"│  {Colors.CYAN}5{Colors.END}  Check Email Bridge                 {Colors.CYAN}0{Colors.END}  Exit")
-    print(f"│")
+    print("│")
     print(f"│  {Colors.CYAN}/status{Colors.END}  Show detailed status    {Colors.CYAN}/swarm{Colors.END}   Run DGM swarm cycle")
     print(f"│  {Colors.CYAN}/memory{Colors.END}  Show memory details     {Colors.CYAN}/witness{Colors.END} Show witness stability")
     print(f"{Colors.BOLD}╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯{Colors.END}\n")

@@ -12,7 +12,6 @@ The agent can draw from this lineage without being bound to it.
 This is context and capability, not prescription.
 """
 
-import json
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from datetime import datetime

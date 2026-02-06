@@ -1,0 +1,11 @@
+{
+  "name": "Agora Federation Node",
+  "description": "Public DHARMIC_AGORA deployment",
+  "status": "stub",
+  "priority": "P0",
+  "files": [
+    "docker-compose.yml",
+    "nginx.conf",
+    "deploy.sh"
+  ]
+}

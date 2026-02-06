@@ -1,0 +1,11 @@
+{
+  "name": "R_V Live Dashboard",
+  "description": "Real-time R_V metric tracking",
+  "status": "stub",
+  "priority": "P1",
+  "files": [
+    "tracker.py",
+    "dashboard.html",
+    "alerts.py"
+  ]
+}

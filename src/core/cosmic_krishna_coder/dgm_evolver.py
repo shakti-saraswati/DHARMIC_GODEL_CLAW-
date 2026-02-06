@@ -22,12 +22,12 @@ from __future__ import annotations
 
 import json
 import re
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 
 class ProposalType(Enum):
@@ -365,7 +365,7 @@ def check_{pattern.gate_name.lower()}(code: str, files: List[str] = None, **kwar
             priority=ProposalPriority.MEDIUM,
             title=f"Expand {pattern.gate_name} Pattern Library",
             motivation=f"{pattern.gate_name} catching {pattern.failure_count} failures with patterns: {pattern.common_code_patterns}",
-            analysis=f"These patterns are correctly identified but could be more specific. Adding to pattern library improves detection quality.",
+            analysis="These patterns are correctly identified but could be more specific. Adding to pattern library improves detection quality.",
             implementation_plan=f"""
 1. Document detected patterns: {pattern.common_code_patterns}
 2. Add pattern variants to gates.py
@@ -528,7 +528,6 @@ def evolve_from_failures(
 # =============================================================================
 
 if __name__ == "__main__":
-    import sys
     
     print("=" * 60)
     print("🧬 DGM EVOLVER — Self-Improvement Engine")

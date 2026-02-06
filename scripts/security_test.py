@@ -10,7 +10,6 @@ Usage:
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add parent to path
@@ -286,7 +285,7 @@ class SecurityTestSuite:
         if long_timeouts:
             for filename, line_num, timeout in long_timeouts:
                 print(f"  ⚠ WARNING: {filename}:{line_num} - timeout={timeout}s")
-                print(f"            Consider shorter timeout for external input")
+                print("            Consider shorter timeout for external input")
                 self.warnings += 1
         else:
             print("  ✓ PASS: All timeouts are reasonable (≤60s)")

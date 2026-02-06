@@ -21,7 +21,6 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Optional
 
 from bridge_queue import claim_task, respond_task, _report_path, init_dirs
 

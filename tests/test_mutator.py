@@ -5,7 +5,7 @@ Tests for DGM Mutator - Claude-Powered Mutation Proposer
 import pytest
 import json
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 import subprocess
 import sys
 
@@ -18,7 +18,6 @@ from dgm.mutator import (
     MutationProposal,
     MutationError,
     SafetyViolationError,
-    FORBIDDEN_PATTERNS,
     propose_mutation,
 )
 from dgm.archive import EvolutionEntry, FitnessScore

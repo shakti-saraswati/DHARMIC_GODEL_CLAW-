@@ -4,7 +4,6 @@ DHARMIC TRIAD STRESS TEST - 10 Agent Swarm
 Break it, improve it, find the synthesis.
 """
 
-import os
 import sys
 from pathlib import Path
 from datetime import datetime

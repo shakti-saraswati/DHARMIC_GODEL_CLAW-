@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+"""
+Temporal Agent - diff.py
+Status: STUB - Needs implementation
+
+Tracks research changes over time
+"""
+
+# TODO: Implement diff functionality
+
+def main():
+    """Entry point."""
+    print("[STUB] Temporal Agent - diff.py")
+    raise NotImplementedError("This MVP needs implementation")
+
+if __name__ == "__main__":
+    main()

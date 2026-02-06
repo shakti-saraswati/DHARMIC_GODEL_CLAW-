@@ -8,7 +8,6 @@ import os
 sys.path.insert(0, os.path.expanduser('~/DHARMIC_GODEL_CLAW/src'))
 
 from dgm.elegance import (
-    EleganceEvaluator, 
     EleganceScore, 
     evaluate_elegance,
     create_diff,

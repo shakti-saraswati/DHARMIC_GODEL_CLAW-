@@ -8,7 +8,6 @@ Fixed for STARTTLS (not direct SSL).
 """
 
 import os
-import sys
 import ssl
 import imaplib
 import smtplib
@@ -54,7 +53,7 @@ def test_imap():
         status, messages = mail.search(None, 'ALL')
         total = len(messages[0].split()) if status == 'OK' and messages[0] else 0
         
-        print(f"   ✅ Connected to IMAP")
+        print("   ✅ Connected to IMAP")
         print(f"   📧 Total emails: {total}")
         print(f"   📧 Unread: {unread}")
         
@@ -86,7 +85,7 @@ def test_smtp():
         # Login
         server.login(os.getenv('EMAIL_ADDRESS'), os.getenv('EMAIL_PASSWORD'))
         
-        print(f"   ✅ Connected to SMTP")
+        print("   ✅ Connected to SMTP")
         server.quit()
         return True
         
@@ -96,7 +95,7 @@ def test_smtp():
 
 def send_test_email(to_address=None):
     """Send a test email."""
-    print(f"\n📤 Sending test email...")
+    print("\n📤 Sending test email...")
     
     from_addr = os.getenv('EMAIL_ADDRESS')
     to_addr = to_address or from_addr  # Default to self

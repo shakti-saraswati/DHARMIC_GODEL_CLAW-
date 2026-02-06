@@ -1,0 +1,11 @@
+{
+  "name": "Adversarial Red Team",
+  "description": "Agent trying to break DGC",
+  "status": "stub",
+  "priority": "P1",
+  "files": [
+    "attacker.py",
+    "vulnerabilities.py",
+    "report.py"
+  ]
+}

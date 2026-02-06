@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 DHARMIC_CLAW Protocol v3 - Multi-Agent File Locking
 
@@ -162,7 +163,7 @@ class FileLock:
                 self._write_lock_info()
                 return self
                 
-            except (IOError, OSError) as e:
+            except (IOError, OSError):
                 if self._lock_fd is not None:
                     os.close(self._lock_fd)
                     self._lock_fd = None

@@ -4,9 +4,7 @@ Tests for Email Daemon - IMAP polling and SMTP responses.
 import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-import json
-import email
+from unittest.mock import Mock, patch
 from email.mime.text import MIMEText
 
 # Add src to path

@@ -1,10 +1,10 @@
+from __future__ import annotations
 """Evaluator Agent - Evaluates proposals using the 17-gate protocol.
 
 This agent is the CODE_GUARDIAN role - it runs all gates and produces
 signed evidence bundles. It cannot write code or modify gates.
 """
 
-import asyncio
 import os
 from dataclasses import dataclass, field
 from typing import List, Any, Optional
@@ -14,7 +14,7 @@ import sys
 
 # Import the gate runner
 sys.path.insert(0, str(Path(__file__).parent))
-from run_gates import GateRunner, GateResult, EVIDENCE_DIR
+from run_gates import GateRunner, EVIDENCE_DIR
 
 
 @dataclass

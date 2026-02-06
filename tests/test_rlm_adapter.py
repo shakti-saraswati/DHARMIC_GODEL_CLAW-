@@ -13,11 +13,9 @@ Tests cover:
 """
 
 import json
-import os
 import sys
-import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -28,11 +26,8 @@ from rlm.rlm_adapter import (
     RLMAdapter,
     RLMConfig,
     RLMResult,
-    RLMError,
-    MaxIterationsError,
     MaxDepthError,
     REPLEnvironment,
-    SAFE_BUILTINS,
 )
 
 

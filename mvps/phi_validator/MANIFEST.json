@@ -1,0 +1,11 @@
+{
+  "name": "\u03c6+1 Validator",
+  "description": "Automated testing of golden ratio hypothesis",
+  "status": "stub",
+  "priority": "P1",
+  "files": [
+    "hypothesis.py",
+    "experiments.py",
+    "report.py"
+  ]
+}

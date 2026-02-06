@@ -12,10 +12,9 @@ Safety: Never executes without human approval for HIGH/CRITICAL.
 """
 
 import subprocess
-import json
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 class DGMExecutor:
     """
@@ -103,7 +102,7 @@ class DGMExecutor:
     
     def _get_human_approval(self, proposal: Dict) -> bool:
         """Request human approval for HIGH/CRITICAL changes."""
-        print(f"\n⏸️  HUMAN APPROVAL REQUIRED")
+        print("\n⏸️  HUMAN APPROVAL REQUIRED")
         print(f"   Proposal: {proposal.get('description', 'Unknown')}")
         print(f"   Risk: {proposal.get('risk_level', 'UNKNOWN')}")
         print(f"   Files: {len(proposal.get('changes', []))}")
@@ -201,7 +200,7 @@ class DGMExecutor:
         }
         
         archive.add_entry(entry)
-        print(f"   ✓ Archived to DGM")
+        print("   ✓ Archived to DGM")
 
 
 if __name__ == "__main__":

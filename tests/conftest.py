@@ -4,7 +4,6 @@ DGC Test Configuration
 Pytest fixtures and configuration for DHARMIC_GODEL_CLAW tests.
 """
 import sys
-import os
 import pytest
 import yaml
 from pathlib import Path

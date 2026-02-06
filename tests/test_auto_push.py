@@ -6,8 +6,7 @@ Uses mocking for git operations to enable safe testing.
 import pytest
 import sys
 from pathlib import Path
-from datetime import datetime, timezone
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 import subprocess
 
 # Add to path
@@ -19,10 +18,9 @@ from dgm.auto_push import (
     CircuitResult,
     VoteRecord,
     CommitResult,
-    PushResult,
     commit_and_push,
 )
-from dgm.archive import Archive, EvolutionEntry
+from dgm.archive import Archive
 
 
 # -----------------------------------------------------------------------------

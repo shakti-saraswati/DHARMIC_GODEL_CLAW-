@@ -5,12 +5,11 @@ Main interface for unified memory system.
 
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
 
 from .canonical_memory import CanonicalMemory, CanonicalStore, MemoryType, MemorySource
-from .mem0_layer import Mem0Layer, SearchResult, MiniLMEmbedder
+from .mem0_layer import Mem0Layer, MiniLMEmbedder
 from .strange_loop_memory import StrangeLoopLayer, ReferenceType
 
 

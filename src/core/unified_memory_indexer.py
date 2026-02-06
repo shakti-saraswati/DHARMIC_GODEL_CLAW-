@@ -4,15 +4,11 @@ Unified Memory Indexer — PSMV + Conversations + Code
 Builds SQLite database with vector embeddings for unified search.
 """
 
-import os
-import sys
-import json
 import sqlite3
 import hashlib
 from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Optional, Tuple
-import numpy as np
+from typing import List, Dict, Optional
 
 # Configuration
 HOME = Path.home()
@@ -182,7 +178,7 @@ class UnifiedMemoryIndexer:
                         count += 1
                         if count % 100 == 0:
                             print(f"  Indexed {count} files...")
-                except Exception as e:
+                except Exception:
                     continue
                     
         self.conn.commit()
@@ -203,7 +199,7 @@ class UnifiedMemoryIndexer:
                 content = file_path.read_text(errors='ignore')
                 if self.index_file(file_path, 'conversation', content):
                     count += 1
-            except Exception as e:
+            except Exception:
                 continue
                 
         self.conn.commit()
@@ -236,7 +232,7 @@ class UnifiedMemoryIndexer:
                             count += 1
                             if count % 100 == 0:
                                 print(f"  Indexed {count} files...")
-                except Exception as e:
+                except Exception:
                     continue
                     
         self.conn.commit()

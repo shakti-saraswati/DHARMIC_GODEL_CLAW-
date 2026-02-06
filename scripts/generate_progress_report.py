@@ -4,7 +4,6 @@ Generate Daily Progress Report
 Runs at 6 AM to summarize what was built overnight.
 """
 
-import json
 from pathlib import Path
 from datetime import datetime, timedelta
 

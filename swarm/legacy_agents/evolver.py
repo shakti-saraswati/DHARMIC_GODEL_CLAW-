@@ -8,7 +8,6 @@ from typing import Dict, Any, List
 from datetime import datetime
 from .base_agent import BaseAgent, AgentResponse
 from ..config import EVOLVER_CONFIG, SwarmConfig
-from ..residual_stream import FitnessScore
 
 class EvolverAgent(BaseAgent):
     """Agent that archives successful changes and evolves swarm capabilities."""

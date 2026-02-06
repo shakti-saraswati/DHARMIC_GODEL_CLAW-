@@ -1,0 +1,11 @@
+{
+  "name": "Temporal Agent",
+  "description": "Tracks research changes over time",
+  "status": "stub",
+  "priority": "P1",
+  "files": [
+    "tracker.py",
+    "diff.py",
+    "timeline.py"
+  ]
+}

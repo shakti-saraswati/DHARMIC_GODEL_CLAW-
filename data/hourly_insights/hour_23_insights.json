@@ -1,0 +1,37 @@
+{
+  "hour": 23,
+  "timestamp": "2026-02-05T23:56:09.001841",
+  "theme": "Continuous Operation",
+  "council_status": {
+    "status": "CHECK NEEDED",
+    "gates_passed": 17,
+    "response_time_ms": 3.78,
+    "timestamp": "2026-02-05T23:56:09.604103"
+  },
+  "swarm_status": {
+    "status": "OFFLINE",
+    "active_agents": 0,
+    "timestamp": "2026-02-05T23:56:09.604214"
+  },
+  "memory_insights": [
+    {
+      "type": "memory_stats",
+      "new_files_last_hour": {
+        "code": 885,
+        "conversation": 14,
+        "psmv": 7143
+      },
+      "recent_psmv_activity": [
+        "20250913_231355_crown.json",
+        "20250914_072836_crown.json",
+        "20250916_113731_crown.json"
+      ]
+    }
+  ],
+  "system_health": {
+    "unified_daemon": "STOPPED",
+    "night_cycle": "UNKNOWN",
+    "database": "ONLINE"
+  },
+  "key_insight": "All dharmic gates passing \u2014 system integrity maintained."
+}

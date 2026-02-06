@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 DHARMIC_CLAW Autonomous Coding Protocol v3 - Gate Runner
 
@@ -216,7 +217,7 @@ class GateRunner:
         skipped = 0
         
         print(f"\n{'='*60}")
-        print(f"DHARMIC_CLAW Gate Runner v3")
+        print("DHARMIC_CLAW Gate Runner v3")
         print(f"Proposal: {proposal_id}")
         print(f"Timestamp: {timestamp}")
         print(f"Mode: {'DRY-RUN' if dry_run else 'EMERGENCY' if emergency else 'STANDARD'}")
@@ -933,10 +934,10 @@ class GateRunner:
         with open(EMERGENCY_LOG, "a") as f:
             f.write(json.dumps(entry) + "\n")
         
-        print(f"\n⚠️  EMERGENCY BYPASS LOGGED")
+        print("\n⚠️  EMERGENCY BYPASS LOGGED")
         print(f"   Reason: {reason}")
         print(f"   Approver: {approver}")
-        print(f"   POST-MORTEM REQUIRED\n")
+        print("   POST-MORTEM REQUIRED\n")
 
 
 # =============================================================================

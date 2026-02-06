@@ -12,10 +12,8 @@ Tests cover:
 
 import pytest
 import json
-import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime
+from unittest.mock import Mock, patch
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))

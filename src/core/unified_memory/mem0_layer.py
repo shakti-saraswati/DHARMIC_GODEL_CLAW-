@@ -2,14 +2,12 @@
 Mem0 Layer — Vector embeddings for semantic memory search.
 """
 
-import json
 import numpy as np
 import sqlite3
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Tuple, Any
+from typing import List, Optional
 
 
 @dataclass

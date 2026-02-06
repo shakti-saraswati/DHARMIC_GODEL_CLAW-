@@ -22,7 +22,6 @@ Usage:
 import logging
 from dataclasses import dataclass
 from typing import Optional, Dict, Any, Tuple, List
-from pathlib import Path
 
 import torch
 import numpy as np

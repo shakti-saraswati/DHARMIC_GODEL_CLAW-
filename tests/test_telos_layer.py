@@ -3,14 +3,13 @@ Tests for telos_layer.py
 ========================
 Verifies TelosLayer with 7 Dharmic Gates, action checking, and witness functionality.
 """
-import pytest
 from pathlib import Path
 
 # Import from core (the lean implementation)
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "core"))
 
-from telos_layer import TelosLayer, GateResult, GateCheck, TelosCheck, RollbackMechanism
+from telos_layer import TelosLayer, GateResult, TelosCheck, RollbackMechanism
 
 
 class TestTelosLayer:

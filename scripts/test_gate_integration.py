@@ -21,7 +21,7 @@ async def test_gate_integration():
     
     # Check gate status
     status = evaluator.get_gate_status()
-    print(f"\nGate Configuration:")
+    print("\nGate Configuration:")
     print(f"  Total gates: {status['total_gates']}")
     print(f"  Version: {status['version']}")
     print(f"  Enforcement: {status['enforcement_mode']}")
@@ -39,7 +39,7 @@ async def test_gate_integration():
         dry_run=True  # Use dry-run to avoid actual execution
     )
     
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Overall score: {result.overall_score:.2f}")
     print(f"  Gates passed: {result.gates_passed}")
     print(f"  Gates failed: {result.gates_failed}")

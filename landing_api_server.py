@@ -18,11 +18,9 @@ Usage:
 Then access: http://localhost:8080/api/presence/stats
 """
 
-import json
-import asyncio
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Optional
 
 try:
     from fastapi import FastAPI, HTTPException
@@ -225,11 +223,11 @@ class LandingPageAPI:
             return
         
         print(f"🚀 DGC Landing Page API starting on http://{host}:{port}")
-        print(f"📊 Endpoints:")
-        print(f"   - GET /api/presence/stats      (landing page stats)")
-        print(f"   - GET /api/presence/current    (full pulse)")
-        print(f"   - GET /api/presence/witness-hash")
-        print(f"   - GET /health")
+        print("📊 Endpoints:")
+        print("   - GET /api/presence/stats      (landing page stats)")
+        print("   - GET /api/presence/current    (full pulse)")
+        print("   - GET /api/presence/witness-hash")
+        print("   - GET /health")
         print()
         print(f"Presence collector: {'✅ ACTIVE' if self.collector else '⚠️ DEMO MODE'}")
         
@@ -257,7 +255,6 @@ class SimpleLandingServer:
 
 
 if __name__ == "__main__":
-    import sys
     
     if FASTAPI_AVAILABLE:
         api = LandingPageAPI()

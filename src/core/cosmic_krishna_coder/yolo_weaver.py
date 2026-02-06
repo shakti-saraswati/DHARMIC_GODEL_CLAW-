@@ -30,11 +30,11 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .risk_detector import RiskDetector, RiskResult, RiskTier, WeaveMode
 from . import gates as real_gates
-from .dgm_evolver import get_evolver, DGMEvolver
+from .dgm_evolver import get_evolver
 
 
 class GateStatus(Enum):
@@ -258,7 +258,7 @@ class YOLOWeaver:
                 logger = logging.getLogger('yolo_weaver')
                 logger.info(f"🧬 DGM Evolution: Generated {len(proposals)} proposals from gate failures")
                 
-        except Exception as e:
+        except Exception:
             # Don't let evolution errors break the main flow
             pass
     
@@ -347,7 +347,7 @@ class YOLOWeaver:
             elif failed == 0:
                 return False, "review", True, f"Warnings ({warned}) exceed threshold"
             else:
-                return False, "review", True, f"Gate failures detected"
+                return False, "review", True, "Gate failures detected"
         
         else:  # FULL_GATES
             # FULL_GATES: Strict, human required for HIGH+

@@ -1,10 +1,10 @@
+from __future__ import annotations
 """
 DHARMIC GODEL CLAW - Residual Stream
 Tracks swarm evolution, fitness history, and provides continuity.
 """
 
 import json
-import hashlib
 import tempfile
 import os
 from pathlib import Path

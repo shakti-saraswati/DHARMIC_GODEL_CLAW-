@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Benchmark Harness - Real Evaluation for Self-Improvement
 
@@ -20,10 +21,9 @@ import tempfile
 import shutil
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
-import traceback
 
 
 @dataclass

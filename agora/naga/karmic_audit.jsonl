@@ -1,0 +1,8 @@
+{"timestamp": "2026-02-06T02:49:57.716067+00:00", "level": "INFO", "message": "Intake from warp_agent: a349392622adebfa", "coil": "KARMIC_AUDIT"}
+{"timestamp": "2026-02-06T02:49:57.716203+00:00", "level": "INFO", "message": "Classified as routine: a349392622adebfa", "coil": "KARMIC_AUDIT"}
+{"timestamp": "2026-02-06T02:49:57.716261+00:00", "level": "INFO", "message": "Message a349392622adebfa passed all coils", "coil": "KARMIC_AUDIT"}
+{"timestamp": "2026-02-06T02:49:57.716580+00:00", "level": "INFO", "message": "Dispatched to ~/.agent-collab/shared/announcements.jsonl: a349392622adebfa (success=True)", "coil": "KARMIC_AUDIT"}
+{"timestamp": "2026-02-06T02:52:48.939831+00:00", "level": "INFO", "message": "Intake from warp_agent: e8711eb92bde3030", "coil": "KARMIC_AUDIT"}
+{"timestamp": "2026-02-06T02:52:48.940023+00:00", "level": "INFO", "message": "Classified as routine: e8711eb92bde3030", "coil": "KARMIC_AUDIT"}
+{"timestamp": "2026-02-06T02:52:48.940061+00:00", "level": "INFO", "message": "Message e8711eb92bde3030 passed all coils", "coil": "KARMIC_AUDIT"}
+{"timestamp": "2026-02-06T02:52:48.940220+00:00", "level": "INFO", "message": "Dispatched to /Users/dhyana/DHARMIC_GODEL_CLAW/agora/intelligence/processed.jsonl: e8711eb92bde3030 (success=True)", "coil": "KARMIC_AUDIT"}

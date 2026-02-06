@@ -1,7 +1,8 @@
+from __future__ import annotations
 """Writer Agent - Implements approved proposals."""
 
 from dataclasses import dataclass, field
-from typing import List, Any, Optional
+from typing import List, Any
 import logging
 import os
 import re

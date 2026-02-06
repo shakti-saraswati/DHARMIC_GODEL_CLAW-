@@ -1,0 +1,11 @@
+{
+  "name": "Distributed Swarm",
+  "description": "Multi-node DGC with consensus",
+  "status": "stub",
+  "priority": "P2",
+  "files": [
+    "node.py",
+    "consensus.py",
+    "sync.py"
+  ]
+}

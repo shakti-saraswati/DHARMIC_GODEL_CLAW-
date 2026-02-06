@@ -16,10 +16,9 @@ import sys
 import time
 import json
 import argparse
-import subprocess
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict
 
 # Add src/core to path
 sys.path.insert(0, str(Path(__file__).parent / "src" / "core"))
@@ -77,7 +76,7 @@ class PerformanceBenchmark:
             "times_ms": [t * 1000 for t in times]
         }
 
-        print(f"\nResults:")
+        print("\nResults:")
         print(f"  Average: {result['avg_ms']:.2f}ms")
         print(f"  Min: {result['min_ms']:.2f}ms")
         print(f"  Max: {result['max_ms']:.2f}ms")
@@ -374,7 +373,7 @@ def main():
 
         if not baseline_files or not optimized_files:
             print("Error: Need both baseline and optimized results to compare")
-            print(f"Run with --baseline first, then apply optimizations, then run with --optimized")
+            print("Run with --baseline first, then apply optimizations, then run with --optimized")
             return
 
         compare_results(baseline_files[-1], optimized_files[-1])

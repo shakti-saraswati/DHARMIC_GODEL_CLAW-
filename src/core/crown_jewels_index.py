@@ -4,9 +4,6 @@ Crown Jewels Fast Access System
 Indexes and caches PSMV crown jewels for instant retrieval.
 """
 
-import os
-import json
-import sqlite3
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional

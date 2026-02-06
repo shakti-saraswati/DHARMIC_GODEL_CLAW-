@@ -1,0 +1,33 @@
+{
+  "hour": 3,
+  "timestamp": "2026-02-06T03:34:35.979524",
+  "theme": "Night Cycle Deep Work",
+  "council_status": {
+    "status": "CHECK NEEDED",
+    "gates_passed": 17,
+    "response_time_ms": 4.99,
+    "timestamp": "2026-02-06T03:34:36.477121"
+  },
+  "swarm_status": {
+    "status": "OFFLINE",
+    "active_agents": 0,
+    "timestamp": "2026-02-06T03:34:36.477227"
+  },
+  "memory_insights": [
+    {
+      "type": "memory_stats",
+      "new_files_last_hour": {},
+      "recent_psmv_activity": [
+        "20250913_231355_crown.json",
+        "20250914_072836_crown.json",
+        "20250916_113731_crown.json"
+      ]
+    }
+  ],
+  "system_health": {
+    "unified_daemon": "STOPPED",
+    "night_cycle": "UNKNOWN",
+    "database": "ONLINE"
+  },
+  "key_insight": "All dharmic gates passing \u2014 system integrity maintained."
+}

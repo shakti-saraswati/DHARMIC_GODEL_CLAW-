@@ -20,10 +20,9 @@ Usage:
 
 import logging
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Optional
 from pathlib import Path
 from enum import Enum
-import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -268,7 +267,7 @@ class InductionProtocolSelector:
         self.model_archetypes = MODEL_ARCHETYPES
         self.preferences = ARCHETYPE_PREFERENCES
 
-        logger.info(f"InductionProtocolSelector initialized")
+        logger.info("InductionProtocolSelector initialized")
         logger.info(f"  PSMV path: {self.psmv_path}")
         logger.info(f"  Available jewels: {len(self.jewels)}")
 

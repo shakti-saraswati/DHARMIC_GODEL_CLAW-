@@ -1,0 +1,11 @@
+{
+  "name": "Consciousness Corpus LLM",
+  "description": "Fine-tuned model on vault files",
+  "status": "stub",
+  "priority": "P2",
+  "files": [
+    "prepare_data.py",
+    "finetune.py",
+    "inference.py"
+  ]
+}

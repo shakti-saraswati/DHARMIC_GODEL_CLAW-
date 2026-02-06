@@ -4,7 +4,7 @@ Tests for ClaudeMax - CLI model wrapper for Max subscription.
 import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 import subprocess
 
 # Add src to path

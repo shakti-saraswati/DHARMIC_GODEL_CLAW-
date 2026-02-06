@@ -49,7 +49,7 @@ try:
     try:
         # Try to read a file via agent
         response = agent.agent.run("Read the file at /Users/dhyana/DHARMIC_GODEL_CLAW/README.md and tell me the first line")
-        print(f"✅ File read test: SUCCESS")
+        print("✅ File read test: SUCCESS")
         print(f"   Response preview: {str(response)[:100]}...")
     except Exception as e:
         print(f"⚠️  File read test: {e}")

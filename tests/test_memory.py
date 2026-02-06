@@ -1,10 +1,8 @@
 """
 Tests for StrangeLoopMemory - all 5 layers and persistence.
 """
-import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch
 import json
 from datetime import datetime
 

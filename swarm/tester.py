@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Tester Agent - Tests implemented changes."""
 
 from dataclasses import dataclass
