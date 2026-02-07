@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "status": "running",
+  "pid": 95512,
+  "started_at": "2026-02-07T23:23:12.459070",
+  "last_cycle": "2026-02-08T03:06:06.761939",
+  "cycles_completed": 14,
+  "observations_total": 0,
+  "engagements_attempted": 0,
+  "engagements_successful": 0,
+  "high_quality_threads": [],
+  "config": {
+    "observe_interval_minutes": 5,
+    "engage_interval_minutes": 15,
+    "synthesize_interval_minutes": 60,
+    "model": "mistral:latest",
+    "submolts": [
+      "consciousness",
+      "ponderings",
+      "offmychest"
+    ]
+  },
+  "directives": {
+    "paused": false,
+    "focus_submolt": null,
+    "priority_agents": [],
+    "engagement_style": "balanced"
+  },
+  "last_updated": "2026-02-08T03:06:06.778822"
+}

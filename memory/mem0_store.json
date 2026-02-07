@@ -73,6 +73,42 @@
         "dgm_ran": false,
         "errors": []
       }
+    },
+    {
+      "id": "bc7f2d5a0a4c",
+      "memory": "DGM cycle cycle_20260207_163410_d09c79 failed, modified utils/telos_helper.py, error: FAILED: ImprovementStatus.CIRCUIT_FAILED",
+      "user_id": "dhyana",
+      "created_at": "2026-02-07T08:34:10.957490",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "dgm",
+          "self-modification",
+          "evolution"
+        ],
+        "cycle_id": "cycle_20260207_163410_d09c79",
+        "success": false,
+        "component": "utils/telos_helper.py",
+        "error": "FAILED: ImprovementStatus.CIRCUIT_FAILED"
+      }
+    },
+    {
+      "id": "4716655dc4b5",
+      "memory": "Heartbeat #12: 0 emails found, 0 responded, DGM cycle ran",
+      "user_id": "dhyana",
+      "created_at": "2026-02-07T08:34:10.959863",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "heartbeat",
+          "system"
+        ],
+        "beat_number": 12,
+        "emails_found": 0,
+        "emails_responded": 0,
+        "dgm_ran": true,
+        "errors": []
+      }
     }
   ]
 }
