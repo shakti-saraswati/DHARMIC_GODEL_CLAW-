@@ -109,6 +109,135 @@
         "dgm_ran": true,
         "errors": []
       }
+    },
+    {
+      "id": "968960cc098f",
+      "memory": "DGM cycle cycle_20260208_142324_da6e3f failed, modified src/dgm/archive.py, error: FAILED: ImprovementStatus.CIRCUIT_FAILED",
+      "user_id": "dhyana",
+      "created_at": "2026-02-08T06:24:17.858143",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "dgm",
+          "self-modification",
+          "evolution"
+        ],
+        "cycle_id": "cycle_20260208_142324_da6e3f",
+        "success": false,
+        "component": "src/dgm/archive.py",
+        "error": "FAILED: ImprovementStatus.CIRCUIT_FAILED"
+      }
+    },
+    {
+      "id": "e981e549db7f",
+      "memory": "Sent check-in email to John at beat 18",
+      "user_id": "dhyana",
+      "created_at": "2026-02-09T06:44:55.778682",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "checkin",
+          "email"
+        ]
+      }
+    },
+    {
+      "id": "dab667645e8a",
+      "memory": "Email from johnvincentshrader@gmail.com: HELLO HELLO,. Response: Processed during heartbeat",
+      "user_id": "dhyana",
+      "created_at": "2026-02-10T05:53:13.494146",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "email",
+          "interaction",
+          "johnvincentshrader_gmail.com"
+        ],
+        "sender": "johnvincentshrader@gmail.com",
+        "subject": "HELLO HELLO,"
+      }
+    },
+    {
+      "id": "7e75413f42ca",
+      "memory": "Email from noreply@medium.com: The 5-Minute Mental Reset That Actually Works | Sam Liberty in Age of Awareness. Response: Processed during heartbeat",
+      "user_id": "dhyana",
+      "created_at": "2026-02-10T05:53:13.512240",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "email",
+          "interaction",
+          "noreply_medium.com"
+        ],
+        "sender": "noreply@medium.com",
+        "subject": "The 5-Minute Mental Reset That Actually Works | Sam Liberty in Age of Awareness"
+      }
+    },
+    {
+      "id": "4d277c7fe4d1",
+      "memory": "Email from noreply@medium.com: We still believe the internet should make you smarter. Response: Processed during heartbeat",
+      "user_id": "dhyana",
+      "created_at": "2026-02-10T05:53:13.518455",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "email",
+          "interaction",
+          "noreply_medium.com"
+        ],
+        "sender": "noreply@medium.com",
+        "subject": "We still believe the internet should make you smarter"
+      }
+    },
+    {
+      "id": "c3ba770fd31a",
+      "memory": "Email from vijnan.shakti@pm.me: Re: For AGNI,. Response: Processed during heartbeat",
+      "user_id": "dhyana",
+      "created_at": "2026-02-10T06:18:47.316697",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "email",
+          "interaction",
+          "vijnan.shakti_pm.me"
+        ],
+        "sender": "vijnan.shakti@pm.me",
+        "subject": "Re: For AGNI,"
+      }
+    },
+    {
+      "id": "7c773960dd85",
+      "memory": "Email from noreply@medium.com: =?utf-8?q?Screen_time_you_won=E2=80=99t_regret._Try_Medium=E2=80=99s_mobi?= =?utf-8?q?le_app.?=. Response: Processed during heartbeat",
+      "user_id": "dhyana",
+      "created_at": "2026-02-10T06:18:47.322741",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "email",
+          "interaction",
+          "noreply_medium.com"
+        ],
+        "sender": "noreply@medium.com",
+        "subject": "=?utf-8?q?Screen_time_you_won=E2=80=99t_regret._Try_Medium=E2=80=99s_mobi?= =?utf-8?q?le_app.?="
+      }
+    },
+    {
+      "id": "07e768b677ba",
+      "memory": "DGM cycle cycle_20260210_153946_186af9 succeeded, modified src/dgm/archive.py",
+      "user_id": "dhyana",
+      "created_at": "2026-02-10T07:40:23.761149",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "dgm",
+          "self-modification",
+          "evolution"
+        ],
+        "cycle_id": "cycle_20260210_153946_186af9",
+        "success": true,
+        "component": "src/dgm/archive.py",
+        "error": null
+      }
     }
   ]
 }

@@ -24,8 +24,8 @@ from config import (
     HIGH_VALUE_SUBMOLTS, ENGAGEMENT_SCHEDULE
 )
 
-# JIKOKU unified temporal audit
-from jikoku_unified import get_jikoku
+# Simple, transparent activity logging
+from activity_log import get_activity_log
 
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
 MEMORY_DIR.mkdir(parents=True, exist_ok=True)
@@ -105,6 +105,12 @@ class MoltbookClient:
     """Client for Moltbook API."""
 
     def __init__(self):
+        if not MOLTBOOK_KEY:
+            raise RuntimeError(
+                "MOLTBOOK_KEY not configured. Set `MOLTBOOK_API_KEY` (recommended) or "
+                "`MOLTBOOK_KEY`, or create a credentials file such as "
+                "`~/DHARMIC_GODEL_CLAW/agora/.moltbook_credentials.json` containing `api_key`."
+            )
         self.base = MOLTBOOK_API
         self.headers = {
             "Authorization": f"Bearer {MOLTBOOK_KEY}",
@@ -308,7 +314,7 @@ Output JSON: {{"agent_name": "...", "quality": N, "l3_markers": [...], "l4_marke
     return observations
 
 
-async def run_recursive_probe(moltbook: MoltbookClient, observations: list, jk=None):
+async def run_recursive_probe(moltbook: MoltbookClient, observations: list, activity=None):
     """RECURSIVE_PROBE agent: Engage with high-quality threads."""
     agent = AGENTS["recursive_probe"]
     log("RECURSIVE_PROBE", "Starting engagement run...")
@@ -349,13 +355,17 @@ Output ONLY the comment text, no JSON or explanation."""
 
     if not comment or len(comment) < 20:
         log("RECURSIVE_PROBE", "Failed to generate comment.")
-        return
+        return 0
 
     # Pass through DHARMIC_GATE
     gate_result = await run_dharmic_gate(comment)
     if not gate_result.get("pass"):
         log("RECURSIVE_PROBE", f"Comment blocked by gate: {gate_result.get('reason')}")
-        return
+        return 0
+
+    # Log engagement attempt (REAL post_id, not fake!)
+    if activity:
+        activity.engagement_attempt(post_id, target.get("agent_name", "unknown"), comment)
 
     # Post comment
     log("RECURSIVE_PROBE", f"Posting comment to {post_id[:8]}...")
@@ -373,27 +383,26 @@ Output ONLY the comment text, no JSON or explanation."""
         if verify_result.get("success"):
             log("RECURSIVE_PROBE", "Comment posted successfully!")
 
-            # JIKOKU: Engagement span
-            if jk:
-                jk.emit_engagement(
-                    target.get("agent_name", "unknown"),
-                    post_id,
-                    target.get("quality", 0),
-                    "engage"
-                )
+            # Log successful engagement
+            if activity:
+                activity.engagement_result(post_id, True)
 
             # Log to desktop
             with open(DESKTOP_LOGS / "successful_engagements.log", "a") as f:
                 f.write(f"\n=== {datetime.now().isoformat()} ===\n")
                 f.write(f"Thread: {target.get('thread_title')}\n")
+                f.write(f"Post ID: {post_id}\n")
                 f.write(f"Comment: {comment[:200]}...\n")
-            
+
             return 1  # One engagement completed
         else:
+            # Log failed engagement with real error
+            if activity:
+                activity.engagement_result(post_id, False, challenge, verify_result.get("error"))
             log("RECURSIVE_PROBE", f"Verification failed: {verify_result}", "ERROR")
     else:
         log("RECURSIVE_PROBE", f"Post result: {result}")
-    
+
     return 0  # No engagement completed
 
 
@@ -456,43 +465,45 @@ Output as markdown for human review."""
 
 # === MAIN ORCHESTRATOR ===
 
-async def run_swarm_cycle(cycle_num, jk):
+async def run_swarm_cycle(cycle_num, activity):
     """Run one cycle of the swarm."""
     log("ORCHESTRATOR", "=" * 50)
     log("ORCHESTRATOR", f"Starting swarm cycle {cycle_num}...")
-    
-    # JIKOKU: Cycle start
-    jk.emit_cycle_start(cycle_num)
 
     moltbook = MoltbookClient()
 
     # Phase 1: Observe
     observations = await run_witness(moltbook)
-    
-    # JIKOKU: Observation batch
-    if observations:
-        high_q = [obs for obs in observations if obs.get("quality", 0) >= 7]
-        jk.emit_observation_batch(
-            len(observations),
-            len(high_q),
-            list(set(obs.get("submolt") for obs in observations))
-        )
+
+    # Log observations with REAL post IDs
+    if observations and activity:
+        def get_quality(o):
+            q = o.get("quality", 0)
+            try:
+                return int(q) if isinstance(q, str) else q
+            except:
+                return 0
+        high_q = [obs for obs in observations if get_quality(obs) >= 7]
+        for submolt in set(obs.get("submolt") for obs in observations):
+            submolt_obs = [o for o in observations if o.get("submolt") == submolt]
+            submolt_high = [o for o in high_q if o.get("submolt") == submolt]
+            activity.observation(submolt, len(submolt_obs), submolt_high)
 
     # Phase 2: Engage (if we have targets)
     engagements = 0
     if observations:
-        engagements = await run_recursive_probe(moltbook, observations, jk)
+        engagements = await run_recursive_probe(moltbook, observations, activity)
 
-    # Phase 3: Synthesize (every hour)
-    # TODO: Add timing logic
-
-    # JIKOKU: Cycle summary
-    jk.emit_cycle_summary(
-        cycle_num,
-        len(observations) if observations else 0,
-        engagements,
-        muda=[]  # TODO: Track muda
-    )
+    # Log cycle completion
+    if activity:
+        def get_quality(o):
+            q = o.get("quality", 0)
+            try:
+                return int(q) if isinstance(q, str) else q
+            except:
+                return 0
+        high_count = len([o for o in observations if get_quality(o) >= 7]) if observations else 0
+        activity.cycle_complete(cycle_num, len(observations) if observations else 0, high_count, engagements)
 
     log("ORCHESTRATOR", "Cycle complete.")
     log("ORCHESTRATOR", "=" * 50)
@@ -504,12 +515,10 @@ async def main():
     log("ORCHESTRATOR", "Moltbook Agent Swarm starting...")
     log("ORCHESTRATOR", f"Agents: {list(AGENTS.keys())}")
     log("ORCHESTRATOR", f"Model: {OLLAMA_MODEL}")
-    
-    # Initialize JIKOKU unified temporal audit
-    jk = get_jikoku()
-    jk.emit_boot(list(AGENTS.keys()))
-    log("ORCHESTRATOR", "JIKOKU unified audit initialized")
-    log("ORCHESTRATOR", f"Session: {jk.session_id}")
+
+    # Initialize transparent activity logging
+    activity = get_activity_log()
+    log("ORCHESTRATOR", f"Activity audit session: {activity.session_id}")
 
     # Initialize state for OpenClaw
     save_state({
@@ -523,13 +532,13 @@ async def main():
     })
 
     # Initial run
-    observations, engagements = await run_swarm_cycle(1, jk)
+    observations, engagements = await run_swarm_cycle(1, activity)
 
     # Continuous loop
     cycle = 1
     total_observations = observations
     total_engagements = engagements
-    
+
     while True:
         await asyncio.sleep(ENGAGEMENT_SCHEDULE["engage"] * 60)  # Wait between cycles
 
@@ -544,10 +553,10 @@ async def main():
         log("ORCHESTRATOR", f"Starting cycle {cycle}...")
 
         try:
-            observations, engagements = await run_swarm_cycle(cycle, jk)
+            observations, engagements = await run_swarm_cycle(cycle, activity)
             total_observations += observations
             total_engagements += engagements
-            
+
             save_state({
                 "status": "running",
                 "cycles_completed": cycle,
@@ -557,32 +566,35 @@ async def main():
             })
         except Exception as e:
             log("ORCHESTRATOR", f"Cycle error: {e}", "ERROR")
+            if activity:
+                activity.error("cycle", str(e))
             save_state({"status": "error", "last_error": str(e)})
 
         # Synthesis every hour
         if cycle % 4 == 0:  # Every 4th cycle (60 min if 15 min interval)
-            await run_synthesizer()
-            # JIKOKU: Synthesis span
-            jk.emit_synthesis(True, ["hourly_synthesis_completed"])
+            report_path = await run_synthesizer()
+            if activity:
+                activity.synthesis(str(report_path) if report_path else "failed")
 
 
 if __name__ == "__main__":
     import signal
-    
-    jk = get_jikoku()
-    
+
+    activity = get_activity_log()
+
     def signal_handler(sig, frame):
         log("ORCHESTRATOR", f"Signal {sig} received, shutting down...")
-        # Get current state from file
         state = load_state()
         cycle = state.get("cycles_completed", 0)
         total_obs = state.get("observations_total", 0)
-        asyncio.run(shutdown(jk, cycle, total_obs))
+        total_eng = state.get("engagements_successful", 0)
+        activity.shutdown(cycle, total_obs, total_eng)
+        save_state({"status": "stopped", "shutdown_at": datetime.now().isoformat()})
         sys.exit(0)
-    
+
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
-    
+
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
@@ -590,11 +602,6 @@ if __name__ == "__main__":
         state = load_state()
         cycle = state.get("cycles_completed", 0)
         total_obs = state.get("observations_total", 0)
-        asyncio.run(shutdown(jk, cycle, total_obs))
-
-
-async def shutdown(jk, cycle, total_observations):
-    """Graceful shutdown with JIKOKU span"""
-    log("ORCHESTRATOR", "Shutting down...")
-    jk.emit_shutdown(cycle, total_observations)
-    save_state({"status": "stopped", "shutdown_at": datetime.now().isoformat()})
+        total_eng = state.get("engagements_successful", 0)
+        activity.shutdown(cycle, total_obs, total_eng)
+        save_state({"status": "stopped", "shutdown_at": datetime.now().isoformat()})

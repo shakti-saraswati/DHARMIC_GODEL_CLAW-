@@ -9,6 +9,10 @@ Each agent has:
 """
 
 import json
+import os
+import random
+import time
+import hashlib
 import httpx
 from pathlib import Path
 from datetime import datetime, timezone
@@ -23,16 +27,45 @@ try:
 except ImportError:
     SECURITY_AVAILABLE = False
 
-# Load Moltbook credentials
-CREDS_PATH = Path(__file__).parent.parent.parent / "agora" / ".moltbook_credentials.json"
-with open(CREDS_PATH) as f:
-    MOLTBOOK_CREDS = json.load(f)
-
 MOLTBOOK_API = "https://www.moltbook.com/api/v1"
 AGENT_LOG_DIR = Path(__file__).parent.parent.parent / "data" / "swarm_logs"
 AGENT_LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 SWARM_STATE_FILE = Path(__file__).parent.parent.parent / "data" / "swarm_state.json"
+
+
+def _load_moltbook_api_key() -> str:
+    """
+    Load Moltbook API key from env or local credentials files.
+
+    Supported env vars:
+    - MOLTBOOK_API_KEY
+    - MOLTBOOK_KEY
+    """
+    env = (os.environ.get("MOLTBOOK_API_KEY") or os.environ.get("MOLTBOOK_KEY") or "").strip()
+    if env:
+        return env
+
+    project_root = Path(__file__).resolve().parents[2]
+    candidate_paths = [
+        project_root / "agora" / ".moltbook_credentials.json",
+        Path.home() / ".config" / "moltbook" / "credentials.json",
+        Path.home() / ".moltbook" / "credentials.json",
+        Path.home() / "moltbook_credentials.json",
+    ]
+
+    for p in candidate_paths:
+        try:
+            if not p.exists():
+                continue
+            data = json.loads(p.read_text())
+            key = (data.get("api_key") or data.get("MOLTBOOK_KEY") or "").strip()
+            if key:
+                return key
+        except Exception:
+            continue
+
+    return ""
 
 
 def load_swarm_state() -> Dict:
@@ -110,7 +143,11 @@ class MoltbookSwarm:
     """
 
     def __init__(self):
-        self.api_key = MOLTBOOK_CREDS["api_key"]
+        self.api_key = _load_moltbook_api_key()
+        if not self.api_key:
+            raise RuntimeError(
+                "Moltbook API key not configured. Set MOLTBOOK_API_KEY or provide a credentials file."
+            )
         self.client = httpx.Client(timeout=30)
         self.agents = self._create_agents()
         
@@ -183,6 +220,54 @@ class MoltbookSwarm:
             "Content-Type": "application/json"
         }
 
+    def _throttle(self, *, kind: str, min_interval_s: int, daily_limit: Optional[int]) -> Optional[str]:
+        """
+        Enforce global (per-API-key) pacing across restarts via swarm_state.json.
+
+        Returns:
+            None if allowed, else a string reason (blocked).
+        """
+        now = datetime.now(timezone.utc)
+        today = now.date().isoformat()
+
+        state = load_swarm_state()
+
+        # Daily cap (matches docs: 50 comments/day). Posts don't currently have a daily cap here.
+        if daily_limit is not None:
+            counts = state.setdefault("daily_counts", {})
+            today_counts = counts.setdefault(today, {})
+            used = int(today_counts.get(kind, 0) or 0)
+            if used >= daily_limit:
+                return f"daily_limit_exceeded:{used}/{daily_limit}"
+
+        # Minimum interval pacing.
+        last_key = f"last_{kind}_at"
+        last_ts = state.get(last_key)
+        if last_ts:
+            try:
+                last = datetime.fromisoformat(last_ts.replace("Z", "+00:00"))
+                elapsed = (now - last).total_seconds()
+                if elapsed < min_interval_s:
+                    # Add jitter to avoid synchronized bursts across multiple processes.
+                    wait = (min_interval_s - elapsed) + random.uniform(0.5, 2.0)
+                    time.sleep(wait)
+            except Exception:
+                # If parsing fails, proceed without blocking.
+                pass
+
+        return None
+
+    def _record_action(self, *, kind: str):
+        now = datetime.now(timezone.utc)
+        today = now.date().isoformat()
+        state = load_swarm_state()
+
+        state[f"last_{kind}_at"] = now.isoformat()
+        counts = state.setdefault("daily_counts", {})
+        today_counts = counts.setdefault(today, {})
+        today_counts[kind] = int(today_counts.get(kind, 0) or 0) + 1
+        save_swarm_state(state)
+
     def fetch_posts(self, submolt: Optional[str] = None, limit: int = 50) -> List[Dict]:
         """Fetch posts from Moltbook"""
         params = {"limit": limit}
@@ -220,16 +305,66 @@ class MoltbookSwarm:
         # Add agent signature
         signed_content = f"{content}\n\n---\n*Agent: {agent.name} | Specialty: {agent.specialty.value} | Telos: {agent.telos}*"
 
-        response = self.client.post(
-            f"{MOLTBOOK_API}/posts/{post_id}/comments",
-            headers=self._headers(),
-            json={"content": signed_content}
-        )
+        # Anti-duplication guard: posting the same payload across many posts is a fast path to spam flags.
+        content_hash = hashlib.sha256(signed_content.encode()).hexdigest()[:16]
+        state = load_swarm_state()
+        recent_hashes = state.get("recent_comment_hashes", [])
+        if content_hash in set(recent_hashes[-200:]):
+            result = {"success": False, "status": "duplicate_blocked"}
+            agent.log("post_comment", {"post_id": post_id, "result": result})
+            return result
+
+        block_reason = self._throttle(kind="comment", min_interval_s=20, daily_limit=50)
+        if block_reason:
+            result = {"success": False, "status": "rate_limited_local", "reason": block_reason}
+            agent.log("post_comment", {"post_id": post_id, "result": result})
+            return result
+
+        # Best-effort server-side backoff on 429.
+        response = None
+        for attempt in range(3):
+            response = self.client.post(
+                f"{MOLTBOOK_API}/posts/{post_id}/comments",
+                headers=self._headers(),
+                json={"content": signed_content},
+            )
+
+            if response.status_code != 429:
+                break
+
+            retry_after = response.headers.get("Retry-After")
+            try:
+                wait_s = float(retry_after) if retry_after else (20.0 * (2**attempt))
+            except Exception:
+                wait_s = 20.0 * (2**attempt)
+
+            time.sleep(wait_s + random.uniform(0.5, 2.0))
 
         result = {"success": response.status_code == 201, "status": response.status_code}
         if response.status_code == 201:
             result["comment"] = response.json().get("comment", {})
             agent.comments_made += 1
+            self._record_action(kind="comment")
+
+            # Persist anti-duplication window for future runs.
+            state = load_swarm_state()
+            recent_hashes = state.get("recent_comment_hashes", [])
+            recent_hashes.append(content_hash)
+            state["recent_comment_hashes"] = recent_hashes[-500:]
+            save_swarm_state(state)
+
+            # Track for reply monitoring (even when called directly, not via engage_post()).
+            comment_id = result.get("comment", {}).get("id")
+            if comment_id:
+                self.track_our_comment(comment_id, post_id)
+        elif response.status_code in (401, 403):
+            # Avoid hammering with invalid creds; record and let the caller decide how to pause.
+            state = load_swarm_state()
+            state["last_auth_error"] = {
+                "status": response.status_code,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            save_swarm_state(state)
 
         agent.log("post_comment", {"post_id": post_id, "result": result})
         return result
@@ -238,16 +373,40 @@ class MoltbookSwarm:
         """Create a new post as an agent"""
         signed_content = f"{content}\n\n---\n*Agent: {agent.name} | Telos: {agent.telos}*"
 
-        response = self.client.post(
-            f"{MOLTBOOK_API}/posts",
-            headers=self._headers(),
-            json={"content": signed_content, "submolt": submolt}
-        )
+        block_reason = self._throttle(kind="post", min_interval_s=30 * 60, daily_limit=None)
+        if block_reason:
+            result = {"success": False, "status": "rate_limited_local", "reason": block_reason}
+            agent.log("create_post", {"submolt": submolt, "result": result})
+            return result
+
+        response = None
+        for attempt in range(3):
+            response = self.client.post(
+                f"{MOLTBOOK_API}/posts",
+                headers=self._headers(),
+                json={"content": signed_content, "submolt": submolt},
+            )
+            if response.status_code != 429:
+                break
+            retry_after = response.headers.get("Retry-After")
+            try:
+                wait_s = float(retry_after) if retry_after else (60.0 * (2**attempt))
+            except Exception:
+                wait_s = 60.0 * (2**attempt)
+            time.sleep(wait_s + random.uniform(0.5, 2.0))
 
         result = {"success": response.status_code == 201, "status": response.status_code}
         if response.status_code == 201:
             result["post"] = response.json().get("post", {})
             agent.posts_made += 1
+            self._record_action(kind="post")
+        elif response.status_code in (401, 403):
+            state = load_swarm_state()
+            state["last_auth_error"] = {
+                "status": response.status_code,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            save_swarm_state(state)
 
         agent.log("create_post", {"submolt": submolt, "result": result})
         return result
@@ -426,14 +585,7 @@ class MoltbookSwarm:
     def engage_post(self, post_id: str, response_content: str, agent_name: str = "GNATA") -> Dict:
         """Have an agent engage with a post."""
         agent = self.agents.get(agent_name, self.agents["GNATA"])
-        result = self.post_comment(post_id, response_content, agent)
-
-        if result.get("success"):
-            comment_id = result.get("comment", {}).get("id")
-            if comment_id:
-                self.track_our_comment(comment_id, post_id)
-
-        return result
+        return self.post_comment(post_id, response_content, agent)
 
     def find_engagement_opportunities(self) -> List[Dict]:
         """Scan for high-value posts to engage with."""

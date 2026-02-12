@@ -179,18 +179,10 @@ def process_post_queue(swarm) -> List[Dict]:
         # Try to post
         print(f"   Posting queued item to {item['submolt']}...")
         try:
-            import httpx
-            CREDS_PATH = Path(__file__).parent.parent.parent / "agora" / ".moltbook_credentials.json"
-            with open(CREDS_PATH) as f:
-                creds = json.load(f)
-
-            client = httpx.Client(timeout=30)
-            resp = client.post(
+            # Reuse the swarm client + headers to avoid credential drift across codepaths.
+            resp = swarm.client.post(
                 "https://www.moltbook.com/api/v1/posts",
-                headers={
-                    "Authorization": f"Bearer {creds['api_key']}",
-                    "Content-Type": "application/json"
-                },
+                headers=swarm._headers(),
                 json={
                     "title": item["title"],
                     "content": item["content"],
@@ -231,7 +223,22 @@ def run_heartbeat_cycle():
     print(f"{'='*60}\n")
 
     swarm = MoltbookSwarm()
+    # NOTE: `monitor_replies()` persists updates to `swarm_state.json` internally.
+    # We reload state after monitoring so later writes don't clobber those updates.
     state = load_swarm_state()
+
+    # If we recently hit an auth error (401/403), stop write attempts for a while
+    # to avoid hammering the API with invalid credentials.
+    allow_writes = True
+    auth_err = state.get("last_auth_error") or {}
+    if auth_err.get("status") in (401, 403) and auth_err.get("timestamp"):
+        try:
+            err_ts = datetime.fromisoformat(auth_err["timestamp"].replace("Z", "+00:00"))
+            if (datetime.now(timezone.utc) - err_ts).total_seconds() < 6 * 3600:
+                allow_writes = False
+        except Exception:
+            # If parsing fails, default to allowing writes (caller may still see 401/403).
+            pass
 
     results = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -276,6 +283,8 @@ def run_heartbeat_cycle():
     reply_results = swarm.monitor_replies()
     results["replies_found"] = reply_results.get("new_replies", 0)
     print(f"   Found {reply_results['found']} total replies, {reply_results.get('new_replies', 0)} new")
+    # Reload state to incorporate persisted `seen_reply_ids` / `last_reply_check`.
+    state = load_swarm_state()
 
     # 4. EXTRACT AGENT INSIGHTS from replies
     print("\n4. EXTRACTING AGENT INSIGHTS...")
@@ -295,59 +304,70 @@ def run_heartbeat_cycle():
 
     # 5. ENGAGE with high-value posts (limit to 2 per cycle)
     print("\n5. ENGAGING WITH HIGH-VALUE POSTS...")
+    if not allow_writes:
+        print("   Skipping engagements: recent auth failure (401/403) recorded in swarm state")
+    else:
 
-    engaged_posts = set(state.get("engaged_post_ids", []))
-    engagements_this_cycle = 0
-    max_engagements = 2
+        engaged_posts = set(state.get("engaged_post_ids", []))
+        engagements_this_cycle = 0
+        max_engagements = 2
 
-    # Prioritize consciousness posts with multiple matches
-    all_posts = (
-        [(p, "GNATA") for p in consciousness_results.get("posts", [])] +
-        [(p, "BRUTUS") for p in security_results.get("posts", [])]
-    )
+        # Prioritize consciousness posts with multiple matches
+        all_posts = (
+            [(p, "GNATA") for p in consciousness_results.get("posts", [])] +
+            [(p, "BRUTUS") for p in security_results.get("posts", [])]
+        )
 
-    # Sort by match count and comment count (engagement potential)
-    all_posts.sort(key=lambda x: (len(x[0].get("matches", [])), x[0].get("comments", 0)), reverse=True)
+        # Sort by match count and comment count (engagement potential)
+        all_posts.sort(key=lambda x: (len(x[0].get("matches", [])), x[0].get("comments", 0)), reverse=True)
 
-    for post, agent_name in all_posts:
-        if engagements_this_cycle >= max_engagements:
-            break
+        for post, agent_name in all_posts:
+            if engagements_this_cycle >= max_engagements:
+                break
 
-        post_id = post.get("id")
-        if post_id in engaged_posts:
-            continue
+            post_id = post.get("id")
+            if post_id in engaged_posts:
+                continue
 
-        # Generate response
-        response_content = generate_response_content(post, swarm)
-        if not response_content:
-            continue
+            # Generate response
+            response_content = generate_response_content(post, swarm)
+            if not response_content:
+                continue
 
-        # Post the engagement
-        print(f"   Engaging with post {post_id[:8]}... ({agent_name})")
-        result = swarm.engage_post(post_id, response_content, agent_name)
+            # Post the engagement
+            print(f"   Engaging with post {post_id[:8]}... ({agent_name})")
+            result = swarm.engage_post(post_id, response_content, agent_name)
 
-        if result.get("success"):
-            engaged_posts.add(post_id)
-            engagements_this_cycle += 1
-            results["engagements"].append({
-                "post_id": post_id,
-                "agent": agent_name,
-                "matches": post.get("matches", [])
-            })
-            print("      SUCCESS - Comment posted")
-        else:
-            print(f"      FAILED - {result.get('status')}")
+            if result.get("success"):
+                engaged_posts.add(post_id)
+                engagements_this_cycle += 1
+                results["engagements"].append({
+                    "post_id": post_id,
+                    "agent": agent_name,
+                    "matches": post.get("matches", [])
+                })
+                print("      SUCCESS - Comment posted")
+            else:
+                print(f"      FAILED - {result.get('status')}")
+                if result.get("status") in (401, 403):
+                    print("      AUTH ERROR - pausing engagement attempts for this cycle")
+                    break
 
-    # Update state
-    state["engaged_post_ids"] = list(engaged_posts)
-    state["last_heartbeat"] = datetime.now(timezone.utc).isoformat()
-    save_swarm_state(state)
+        # Update state
+        state["engaged_post_ids"] = list(engaged_posts)
+        state["last_heartbeat"] = datetime.now(timezone.utc).isoformat()
+        save_swarm_state(state)
 
     # 6. PROCESS POST QUEUE
     print("\n6. PROCESSING POST QUEUE...")
-    queued_posts = process_post_queue(swarm)
-    results["queued_posts_sent"] = len(queued_posts)
-    print(f"   Sent {len(queued_posts)} queued posts")
+    if not allow_writes:
+        queued_posts = []
+        results["queued_posts_sent"] = 0
+        print("   Skipping post queue: recent auth failure (401/403) recorded in swarm state")
+    else:
+        queued_posts = process_post_queue(swarm)
+        results["queued_posts_sent"] = len(queued_posts)
+        print(f"   Sent {len(queued_posts)} queued posts")
 
     # 7. LOG HEARTBEAT
     print("\n7. LOGGING HEARTBEAT...")

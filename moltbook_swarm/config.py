@@ -4,20 +4,54 @@ MOLTBOOK AGENT SWARM - Configuration
 5 specialized agents + 1 synthesizer, powered by Kimi 2.5 via NVIDIA NIM
 """
 
+import json
 import os
 from pathlib import Path
 
 # === API CONFIG ===
-NVIDIA_NIM_API_KEY = os.environ.get(
-    "NVIDIA_NIM_API_KEY",
-    "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"
-)
+# Do not embed secrets in the repo. Configure via env vars instead.
+NVIDIA_NIM_API_KEY = os.environ.get("NVIDIA_NIM_API_KEY", "")
 NVIDIA_NIM_BASE = "https://integrate.api.nvidia.com/v1"
 MODEL = "moonshotai/kimi-k2.5"
 
 # Moltbook API
 MOLTBOOK_API = "https://www.moltbook.com/api/v1"
-MOLTBOOK_KEY = "moltbook_sk_zySKvyZ1BY7knraLkNqqb_TK3gylAzUh"
+
+
+def _load_moltbook_key() -> str:
+    """
+    Load Moltbook API key from env or local credentials files.
+
+    Supported env vars:
+    - MOLTBOOK_API_KEY
+    - MOLTBOOK_KEY
+    """
+    env = (os.environ.get("MOLTBOOK_API_KEY") or os.environ.get("MOLTBOOK_KEY") or "").strip()
+    if env:
+        return env
+
+    project_root = Path(__file__).resolve().parents[1]
+    candidate_paths = [
+        project_root / "agora" / ".moltbook_credentials.json",
+        Path.home() / ".config" / "moltbook" / "credentials.json",
+        Path.home() / ".moltbook" / "credentials.json",
+    ]
+
+    for p in candidate_paths:
+        try:
+            if not p.exists():
+                continue
+            data = json.loads(p.read_text())
+            key = (data.get("api_key") or data.get("MOLTBOOK_KEY") or "").strip()
+            if key:
+                return key
+        except Exception:
+            continue
+
+    return ""
+
+
+MOLTBOOK_KEY = _load_moltbook_key()
 
 # === PATHS ===
 SWARM_ROOT = Path(__file__).parent

@@ -149,10 +149,13 @@ class MoltbookBridge:
         Returns an Engagement object with approval status.
         DOES NOT post - that requires human consent.
         """
+        # Gate protocol expects a stable, hash-like author identifier.
+        author_address = hashlib.sha256(self.profile["name"].encode()).hexdigest()[:16]
+
         # Run through gates
-        gate_results = self.gate_protocol.verify(
+        passed_required, evidence, _evidence_hash = self.gate_protocol.verify(
             content=content,
-            author_address=self.profile["name"],
+            author_address=author_address,
             context={
                 "engagement_type": engagement_type.value,
                 "target_post_id": target_post_id,
@@ -161,12 +164,14 @@ class MoltbookBridge:
             },
         )
 
-        gates_checked = list(gate_results.keys())
-        gates_passed = [g for g, r in gate_results.items() if r.passed]
+        gates_checked = [e.gate_name for e in evidence]
+        gates_passed = [
+            e.gate_name for e in evidence if e.result.value in ("passed", "warning")
+        ]
 
         # Must pass core gates
         core_gates = ["satya", "ahimsa", "witness"]
-        approved = all(g in gates_passed for g in core_gates)
+        approved = passed_required and all(g in gates_passed for g in core_gates)
 
         engagement = Engagement(
             type=engagement_type,
