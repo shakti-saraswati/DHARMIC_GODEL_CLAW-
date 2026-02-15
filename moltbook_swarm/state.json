@@ -1,9 +1,9 @@
 {
   "version": "1.0.0",
-  "status": "stopped",
-  "pid": 41370,
-  "started_at": "2026-02-08T09:51:28.495077",
-  "last_cycle": "2026-02-08T03:06:06.761939",
+  "status": "running",
+  "pid": 12053,
+  "started_at": "2026-02-14T22:47:02.706706",
+  "last_cycle": "2026-02-13T09:10:24.274813",
   "cycles_completed": 0,
   "observations_total": 0,
   "engagements_attempted": 0,
@@ -26,6 +26,6 @@
     "priority_agents": [],
     "engagement_style": "balanced"
   },
-  "last_updated": "2026-02-08T09:52:16.646003",
+  "last_updated": "2026-02-14T22:47:02.706986",
   "shutdown_at": "2026-02-08T09:52:16.645650"
 }

@@ -238,6 +238,54 @@
         "component": "src/dgm/archive.py",
         "error": null
       }
+    },
+    {
+      "id": "e01991ead86d",
+      "memory": "Email from noreply@medium.com: =?utf-8?q?Stop_Memorizing_Design_Patterns:_Use_This_Decision_Tree_Instead?= =?utf-8?q?_|_Alina_Kovtun=E2=9C=A8_in_Women_in_Technology?=. Response: Processed during heartbeat",
+      "user_id": "dhyana",
+      "created_at": "2026-02-13T04:09:46.005689",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "email",
+          "interaction",
+          "noreply_medium.com"
+        ],
+        "sender": "noreply@medium.com",
+        "subject": "=?utf-8?q?Stop_Memorizing_Design_Patterns:_Use_This_Decision_Tree_Instead?= =?utf-8?q?_|_Alina_Kovtun=E2=9C=A8_in_Women_in_Technology?="
+      }
+    },
+    {
+      "id": "6c6f04dcdda3",
+      "memory": "Email from noreply@medium.com: =?utf-8?q?Are_you_reading_Medium=E2=80=99s_best_stories=3F?=. Response: Processed during heartbeat",
+      "user_id": "dhyana",
+      "created_at": "2026-02-13T04:09:46.015693",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "email",
+          "interaction",
+          "noreply_medium.com"
+        ],
+        "sender": "noreply@medium.com",
+        "subject": "=?utf-8?q?Are_you_reading_Medium=E2=80=99s_best_stories=3F?="
+      }
+    },
+    {
+      "id": "1f96735274ca",
+      "memory": "Email from noreply@medium.com: Why Are We All So Afraid? The Neuroscience of Immigration and Immigration Fear | Kaitlin Moore. Response: Processed during heartbeat",
+      "user_id": "dhyana",
+      "created_at": "2026-02-13T04:09:46.024135",
+      "metadata": {
+        "layer": "episodic",
+        "tags": [
+          "email",
+          "interaction",
+          "noreply_medium.com"
+        ],
+        "sender": "noreply@medium.com",
+        "subject": "Why Are We All So Afraid? The Neuroscience of Immigration and Immigration Fear | Kaitlin Moore"
+      }
     }
   ]
 }

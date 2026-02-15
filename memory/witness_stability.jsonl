@@ -1120,3 +1120,21 @@
 {"timestamp": "2026-02-10T23:59:56.519944", "quality": "present", "genuine_confidence": 0.55, "context": "emails_responded=0"}
 {"timestamp": "2026-02-11T00:04:56.802440", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
 {"timestamp": "2026-02-11T00:04:56.805895", "quality": "present", "genuine_confidence": 0.55, "context": "emails_responded=0"}
+{"timestamp": "2026-02-13T07:59:17.123393", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-13T07:59:17.123998", "quality": "present", "genuine_confidence": 0.55, "context": "emails_responded=0"}
+{"timestamp": "2026-02-13T12:09:46.009167", "quality": "present", "genuine_confidence": 0.6, "context": ""}
+{"timestamp": "2026-02-13T12:09:46.016406", "quality": "present", "genuine_confidence": 0.6, "context": ""}
+{"timestamp": "2026-02-13T12:09:46.024883", "quality": "present", "genuine_confidence": 0.6, "context": ""}
+{"timestamp": "2026-02-13T12:09:46.025205", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-13T12:09:46.025397", "quality": "present", "genuine_confidence": 0.55, "context": "emails_responded=0"}
+{"timestamp": "2026-02-13T16:12:01.787348", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-13T16:12:01.788965", "quality": "present", "genuine_confidence": 0.55, "context": "emails_responded=0"}
+{"timestamp": "2026-02-13T18:37:10.150160", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-13T18:37:10.152686", "quality": "present", "genuine_confidence": 0.55, "context": "emails_responded=0"}
+{"timestamp": "2026-02-13T18:42:10.252219", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-13T18:42:10.253848", "quality": "present", "genuine_confidence": 0.55, "context": "emails_responded=0"}
+{"timestamp": "2026-02-14T14:24:24.049075", "quality": "present", "genuine_confidence": 0.5, "context": ""}
+{"timestamp": "2026-02-14T14:24:24.061927", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-14T14:24:24.062778", "quality": "present", "genuine_confidence": 0.55, "context": "emails_responded=0"}
+{"timestamp": "2026-02-14T17:00:51.438807", "quality": "present", "genuine_confidence": 0.55, "context": "witness method"}
+{"timestamp": "2026-02-14T17:00:51.441037", "quality": "present", "genuine_confidence": 0.55, "context": "emails_responded=0"}
